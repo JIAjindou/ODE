@@ -327,10 +327,10 @@ svg [data-s].dim{opacity:.12}
           <figcaption><b>Figure 1.</b> Success rate over training, four suites trained jointly, mean and std over three random seeds. ODE policy reaches 79.2% after one epoch and 85% after two, where A2A-DiT needs four and the other baselines thirty or more.</figcaption>
         </figure>
         <figure class="chart" id="ch-eff">
-          <p class="ct">Less data, smaller models</p>
+          <p class="ct">Gain over FM-DiT, less data and smaller models</p>
           <div class="ctls"><div class="seg seg-a" role="group" aria-label="Setting"></div></div>
           <div class="plot"></div>
-          <figcaption><b>Figure 2.</b> Success rate (%) by training epoch and by demonstrations per task or parameters, mean over three random seeds, one color scale for both. ODE policy with 20 demonstrations per task matches FM-DiT with 50, and with 1.5M parameters it beats FM-DiT with 48M at every epoch.</figcaption>
+          <figcaption><b>Figure 2.</b> Gain of ODE policy over FM-DiT in success rate (percentage points), by training epoch and by demonstrations per task or parameters, mean over three random seeds. The gain is positive in every cell and largest early in training, up to 65.7 points after one epoch.</figcaption>
         </figure>
       </div>
       <div class="charts c2">
@@ -1148,32 +1148,27 @@ if (D){
   lineChart(C('ch-libero'), { series: VM.map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet', pts: D.libero[m] })),
     x: { min: 1, max: 100, log: true, ticks: [1, 2, 5, 10, 20, 50, 100], label: 'Training epoch (log scale)', tipname: 'Epoch ' }, y: pct, unit: '%',
     refs: [{ y: 85, label: '85%' }] });
-  // 01 data and model size: success by setting and epoch, ODE next to FM-DiT on one color scale
+  // 01 data and model size: gain of ODE over FM-DiT in success rate, by setting and epoch
   { const host = C('ch-eff'); let mode = 0;
-    const heat = v => ramp(Math.min(1, Math.max(0, v / 100)));
+    const heat = v => ramp(Math.min(1, Math.max(0, v / 70)));
     const draw = () => { const src = mode ? D.size : D.demos;
       const rows = src['ODE-UNet'].map(r => r.x).reverse(), eps = Object.keys(src['ODE-UNet'][0]).filter(k => k !== 'x').sort((p, q) => p - q);
       const cell = (m, x, e) => src[m].find(r => r.x === x)[e];
       mount(host, (svg, W) => {
-        const L = 62, gap = 18, top = 30, ch = 38, side = W >= 520;
-        const pw = side ? (W - L - gap) / 2 : W - L, cw = pw / eps.length;
-        const panels = [['ODE-UNet', 'ODE (ours)'], ['FM-DiT', 'FM-DiT']];
-        const ph = top + rows.length * ch + 52, H = side ? ph : 2 * ph + 10;
+        const L = 62, top = 12, ch = Math.round(Math.min(56, Math.max(40, W * 0.09))), cw = (W - L) / eps.length, H = top + rows.length * ch + 56;
         const id = 'c' + (++clipId); const cp = sv('clipPath', { id }, svg); sv('rect', { x: 0, y: 0, width: 0, height: H }, cp);
         const plot = sv('g', { 'clip-path': `url(#${id})` }, svg);
-        panels.forEach(([m, title], pi) => { const ox = L + (side ? pi * (pw + gap) : 0), oy = side ? 0 : pi * (ph + 10);
-          sv('text', { x: ox + pw / 2, y: oy + 16, class: 'ptitle' + (pi ? '' : ' strong'), 'text-anchor': 'middle' }, svg).textContent = title;
-          rows.forEach((x, ri) => { if (pi === 0 || !side) sv('text', { x: L - 10, y: oy + top + ri * ch + ch / 2, class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg).textContent = x;
-            eps.forEach((e, ci) => { const [v, sd] = cell(m, x, e), cx = ox + ci * cw, cy = oy + top + ri * ch;
-              const g = sv('g', {}, plot);
-              sv('rect', { x: cx + 1.5, y: cy + 1.5, width: cw - 3, height: ch - 3, rx: 4, fill: heat(v) }, g);
-              sv('text', { x: cx + cw / 2, y: cy + ch / 2, class: 'cell' + (v > 55 ? ' on' : ''), 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, g).textContent = fmt1(v);
-              const hit = sv('rect', { x: cx, y: cy, width: cw, height: ch, fill: 'transparent' }, svg);
-              hit.addEventListener('mousemove', ev => showTip(`<b>${title}</b><div>${mode ? 'Parameters' : 'Demos per task'}<span>${x}</span></div><div>Epoch<span>${e}</span></div><div>Success<span>${fmt1(v)}% ± ${fmt1(sd)}</span></div>`, ev.clientX, ev.clientY));
-              hit.addEventListener('mouseleave', hideTip); }); });
-          eps.forEach((e, ci) => sv('text', { x: ox + ci * cw + cw / 2, y: oy + top + rows.length * ch + 18, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = e);
-          sv('text', { x: ox + pw / 2, y: oy + top + rows.length * ch + 42, class: 'alab', 'text-anchor': 'middle' }, svg).textContent = 'Training epoch'; });
-        sv('text', { x: 4, y: 16, class: 'alab' }, svg).textContent = mode ? 'Params' : 'Demos';
+        rows.forEach((x, ri) => { sv('text', { x: L - 10, y: top + ri * ch + ch / 2, class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg).textContent = x;
+          eps.forEach((e, ci) => { const o = cell('ODE-UNet', x, e), f = cell('FM-DiT', x, e), v = o[0] - f[0], cx = L + ci * cw, cy = top + ri * ch;
+            const g = sv('g', {}, plot);
+            sv('rect', { x: cx + 2, y: cy + 2, width: cw - 4, height: ch - 4, rx: 5, fill: heat(v) }, g);
+            sv('text', { x: cx + cw / 2, y: cy + ch / 2, class: 'cell' + (v > 30 ? ' on' : ''), 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, g).textContent = '+' + fmt1(v);
+            const hit = sv('rect', { x: cx, y: cy, width: cw, height: ch, fill: 'transparent' }, svg);
+            hit.addEventListener('mousemove', ev => showTip(`<b>${mode ? 'Parameters ' : 'Demos per task '}${x}, epoch ${e}</b><div><i style="background:${COL['ODE-UNet']}"></i>ODE (ours)<span>${fmt1(o[0])}%</span></div><div><i style="background:${COL['FM-DiT']}"></i>FM-DiT<span>${fmt1(f[0])}%</span></div><div>Gain<span>+${fmt1(v)} pp</span></div>`, ev.clientX, ev.clientY));
+            hit.addEventListener('mouseleave', hideTip); }); });
+        eps.forEach((e, ci) => sv('text', { x: L + ci * cw + cw / 2, y: top + rows.length * ch + 20, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = e);
+        sv('text', { x: L + (W - L) / 2, y: top + rows.length * ch + 46, class: 'alab', 'text-anchor': 'middle' }, svg).textContent = 'Training epoch';
+        sv('text', { x: 14, y: top + rows.length * ch / 2, class: 'alab', 'text-anchor': 'middle', transform: `rotate(-90 14 ${top + rows.length * ch / 2})` }, svg).textContent = mode ? 'Parameters' : 'Demos per task';
         return H; }); };
     const a = host.querySelector('.seg-a');
     ['Fewer demonstrations', 'Smaller models'].forEach((l, i) => { const x = document.createElement('button'); x.textContent = l; x.setAttribute('aria-pressed', i === 0);
