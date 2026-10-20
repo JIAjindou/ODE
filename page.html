@@ -117,6 +117,18 @@ section{padding-block:64px 8px}
 /* real robot */
 .tasks{display:grid;gap:30px}
 .task{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px;align-items:start}
+.clip{position:relative;margin:0;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line)}
+.clip video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.clip .lab{position:absolute;left:8px;top:8px;font:600 12px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:5px 8px;border-radius:999px}
+.clip .lab.ours{background:#397DB7;color:#fff}
+.clip .spd{position:absolute;right:8px;top:8px;font:500 11px/1 var(--mono);background:rgba(0,0,0,.55);color:#fff;padding:5px 7px;border-radius:5px}
+.clip .why{position:absolute;left:0;right:0;bottom:0;font-size:12.5px;line-height:1.3;color:#fff;padding:14px 8px 6px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.teaser{margin-top:30px}
+.teaser video{aspect-ratio:auto}
+.teaser figcaption{font-size:14.5px;color:var(--muted);margin-top:8px}
+.vcol{display:grid;gap:10px;min-width:0}
+.base{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.base .lab{font-size:11px;padding:4px 7px}
 .video{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--chip) 0 12px,var(--surface) 12px 24px);border:1px solid var(--line);display:grid;place-items:center}
 .video img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
 .video .badge{position:relative;font:500 12px/1 var(--mono);background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:999px;border:1px solid var(--line)}
@@ -134,6 +146,7 @@ section{padding-block:64px 8px}
 .pf:nth-child(even) .card{transform:rotate(1.6deg)}
 .pf:hover .card{transform:rotate(0) scale(1.03)}
 .pf .card img{max-width:78%;max-height:78%;object-fit:contain}
+.pf .card video{width:100%;height:100%;object-fit:cover}
 .pf .card img.photo{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover}
 .pf .name{font-weight:600;font-size:15px;text-align:center}
 .pf .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
@@ -200,6 +213,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     </div>
   </div>
   <div class="wrap">
+    <figure class="clip teaser"><video src="assets/video/teaser.mp4" muted loop playsinline autoplay preload="auto" aria-label="ODE policy inserts two flowers into two vases on a real robot"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span></figure>
+    <p class="quote" style="margin-top:8px">Autonomous rollout on a Galaxea R1 Lite. Two flowers, one after the other, from a glass into a narrow vase.</p>
     <div class="numbers" aria-label="Headline results">
       <div class="num"><div class="v">5.9×</div><div class="k">success after one epoch</div><div class="s">vs. flow matching · LIBERO</div></div>
       <div class="num"><div class="v">10.8×</div><div class="k">faster per action chunk</div><div class="s">5.7 ms · Euler · LIBERO</div></div>
@@ -319,20 +334,20 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     </div>
     <div class="tasks">
       <div class="task">
-        <div class="video" data-video="flower"><img src="assets/robots/flower_poppy_3.jpg" alt="" loading="lazy"><span class="badge">Video coming soon</span></div>
+        <div class="vcol"><figure class="clip"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy inserts a flower into a narrow vase"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span></figure><div class="base"><figure class="clip"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none"></video><span class="lab">FM-DiT</span><span class="why">fails to insert the stem</span></figure><figure class="clip"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none"></video><span class="lab">DDPM-UNet</span><span class="why">fails to insert the stem</span></figure><figure class="clip"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none"></video><span class="lab">DDIM-UNet</span><span class="why">fails to insert the stem</span></figure></div></div>
         <div class="txt">
           <h3>High-precision flower arrangement</h3>
           <p>Insert a thin stem into the narrow opening of a vase, with a long-stemmed poppy and a short-stemmed dahlia.</p>
-          <div class="kv"><span>ODE <b>30% / 60%</b></span><span>FM-DiT 20% / 40%</span><span>DDPM 0% / 0%</span><span>95 demos</span></div>
+          <div class="kv"><span>ODE <b>30% / 60%</b></span><span>FM-DiT 20% / 40%</span><span>DDPM 0% / 0%</span><span>DDIM 0% / 5%</span><span>95 demos</span></div>
           <figure class="plate"><img src="assets/figs/real.jpg" alt="Flower arrangement on a real robot" loading="lazy"></figure>
         </div>
       </div>
       <div class="task">
-        <div class="video" data-video="microwave"><img src="assets/robots/microwave_1.jpg" alt="" loading="lazy"><span class="badge">Video coming soon</span></div>
+        <div class="vcol"><figure class="clip"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy completes the bimanual microwave task"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span></figure><div class="base"><figure class="clip"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none"></video><span class="lab">FM-DiT</span><span class="why">leaves the door open</span></figure><figure class="clip"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none"></video><span class="lab">DDPM-UNet</span><span class="why">fails to grasp the bowl</span></figure><figure class="clip"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none"></video><span class="lab">DDIM-UNet</span><span class="why">fails to grasp the bowl</span></figure></div></div>
         <div class="txt">
           <h3>Long-horizon bimanual microwave</h3>
           <p>Grasp a bowl, place it in the microwave, push it in, and close the door with the other arm.</p>
-          <div class="kv"><span>ODE <b>75%</b></span><span>FM-DiT 20%</span><span>DDPM 0%</span><span>34 demos</span></div>
+          <div class="kv"><span>ODE <b>75%</b></span><span>FM-DiT 20%</span><span>DDPM 0%</span><span>DDIM 0%</span><span>34 demos</span></div>
           <figure class="plate"><img src="assets/figs/real_exec.jpg" alt="Inference cost and smoothness on the real robot" loading="lazy"><figcaption>8.4 ms per chunk on one RTX 5090, and commands smoother than the human demonstrations.</figcaption></figure>
         </div>
       </div>
@@ -348,11 +363,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     </div>
     <div class="platforms">
       <div class="pf"><div class="card"><img class="photo" src="assets/robots/microwave_1.jpg" alt="Galaxea R1 Lite" loading="lazy"></div><p class="name">Galaxea R1 Lite</p><div class="tags"><span>Real</span><span>IL</span></div></div>
-      <div class="pf"><div class="card"><img src="assets/robots/franka.png" alt="Franka arm" loading="lazy"></div><p class="name">Franka arm</p><div class="tags"><span>LIBERO</span><span>PPO</span></div></div>
-      <div class="pf"><div class="card"><img src="assets/robots/g1.png" alt="Unitree G1 humanoid" loading="lazy"></div><p class="name">G1 humanoid</p><div class="tags"><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><video data-src="assets/video/rl_franka.mp4" muted loop playsinline preload="none" aria-label="Franka arm, ODE policy trained with RL"></video></div><p class="name">Franka arm</p><div class="tags"><span>LIBERO</span><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><video data-src="assets/video/rl_g1.mp4" muted loop playsinline preload="none" aria-label="Unitree G1 humanoid, ODE policy trained with RL"></video></div><p class="name">G1 humanoid</p><div class="tags"><span>PPO</span></div></div>
       <div class="pf"><div class="card"><img src="assets/robots/h1_walk.png" alt="H1 humanoid" loading="lazy"></div><p class="name">H1 humanoid</p><div class="tags"><span>FlashSAC</span></div></div>
-      <div class="pf"><div class="card"><img src="assets/robots/anymal.png" alt="ANYmal-C quadruped" loading="lazy"></div><p class="name">ANYmal-C</p><div class="tags"><span>PPO</span></div></div>
-      <div class="pf"><div class="card"><img src="assets/robots/crazyflie.png" alt="Quadcopter" loading="lazy"></div><p class="name">Quadcopter</p><div class="tags"><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><video data-src="assets/video/rl_anymal.mp4" muted loop playsinline preload="none" aria-label="ANYmal-C quadruped, ODE policy trained with RL"></video></div><p class="name">ANYmal-C</p><div class="tags"><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><video data-src="assets/video/rl_quad.mp4" muted loop playsinline preload="none" aria-label="Quadcopter, ODE policy trained with RL"></video></div><p class="name">Quadcopter</p><div class="tags"><span>PPO</span></div></div>
     </div>
   </div>
 </section>
@@ -793,6 +808,10 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
 }
 
 /* ---------- lightbox and copy ---------- */
+// videos load when they come near the viewport and pause when they leave it
+const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target;
+  if (e.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else if (v.src) v.pause(); }), { rootMargin: '200px' });
+document.querySelectorAll('video').forEach(v => vio.observe(v));
 const lb = document.getElementById('lb'), lbi = document.getElementById('lb-img');
 document.querySelectorAll('.plate img').forEach(im => im.addEventListener('click', () => { lbi.src = im.src; lbi.alt = im.alt; lb.hidden = false; }));
 lb.addEventListener('click', () => { lb.hidden = true; });
