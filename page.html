@@ -403,6 +403,7 @@ function loop(fn){ let last = performance.now(); let vis = true;
   return { start(el){ io.observe(el); requestAnimationFrame(tick); } };
 }
 let rng = 7; const rand = () => { rng = (rng*16807) % 2147483647; return rng/2147483647; };
+const sq = v => v * v;   // a unary minus right before ** is a syntax error in JavaScript
 const gauss = () => { let u=0,v=0; while(!u) u=rand(); v=rand(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
 
 /* ---------- hero: a demonstrated motion, its vector field, and two ways to follow it ---------- */
@@ -669,7 +670,7 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
   let clock = 0, eps = 1, epsShown = 1, lastSample = -10;
   // a field panel (300 x 330): start at the bottom, goal at the top, obstacle in the middle
   const PW = 300, PH = 330;
-  const lam = y => 1.5 * Math.exp(-((y - 0.33) / 0.15) ** 2) - 1.5 * Math.exp(-((y - 0.78) / 0.12) ** 2);
+  const lam = y => 1.5 * Math.exp(-sq((y - 0.33) / 0.15)) - 1.5 * Math.exp(-sq((y - 0.78) / 0.12));
   const fx = (x, y, e) => -2.4 * x + lam(y) * e;     // x across, y from start (0) to goal (1)
   function route(e){ const p = [[0, 0]]; let x = 0; for (let i = 1; i <= 120; i++){ const y = i / 120; x += fx(x, y - 1 / 120, e) / 120; p.push([x, y]); } return p; }
   const demoL = route(1), demoR = route(-1);
@@ -717,7 +718,7 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
     const cx = ox + 300, cy = oy + 96, R = 34;
     arrow(g, ox + 200, oy + 160, cx - 52, cy + 8, c.muted);
     for (const [side, col] of [[-1, c.blue], [1, c.teal]]){ g.fillStyle = hexA(col, .28); g.beginPath();
-      for (let i = 0; i <= 40; i++){ const a = Math.PI / 2 + side * (-Math.PI / 2) + (i / 40 - .5) * Math.PI * 0.9; const rr = R + 18 * Math.exp(-((i / 40 - .5) / 0.22) ** 2); g.lineTo(cx + rr * Math.cos(a) * (side < 0 ? 1 : 1), cy + rr * Math.sin(a)); }
+      for (let i = 0; i <= 40; i++){ const a = Math.PI / 2 + side * (-Math.PI / 2) + (i / 40 - .5) * Math.PI * 0.9; const rr = R + 18 * Math.exp(-sq((i / 40 - .5) / 0.22)); g.lineTo(cx + rr * Math.cos(a) * (side < 0 ? 1 : 1), cy + rr * Math.sin(a)); }
       g.lineTo(cx, cy); g.closePath(); g.fill(); }
     g.strokeStyle = hexA(c.muted, .6); g.setLineDash([2, 3]); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.stroke(); g.setLineDash([]);
     const ang = epsShown > 0 ? Math.PI * (1 - 0.06) : 0.06 * Math.PI; const sw = ease(since / 0.5);
