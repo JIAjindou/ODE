@@ -182,6 +182,10 @@ svg .alab{fill:var(--muted);font:500 15px var(--body)}
 svg .val{fill:var(--ink);font:500 14px var(--mono)}
 svg .plab{fill:var(--ink);font:500 14.5px var(--body)}
 svg .note{fill:var(--muted);font:500 14px var(--mono)}
+svg .cell{fill:#1C2633;font:500 14px var(--mono)}
+svg .cell.on{fill:#fff}
+svg .ptitle{fill:var(--muted);font:700 15.5px var(--body)}
+svg .ptitle.strong{fill:var(--ink)}
 svg .gain{fill:var(--ink);font:700 15px var(--mono)}
 svg .bracket{fill:none;stroke:var(--ink);stroke-width:1.2;stroke-dasharray:3 2}
 svg .ref{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:4 3;opacity:.7}
@@ -210,10 +214,10 @@ svg [data-s].dim{opacity:.12}
 .thumb .lab{position:absolute;left:6px;top:6px;font:600 11px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:4px 7px;border-radius:999px}
 .thumb .lab.ours{background:#397DB7;color:#fff}
 .thumb .why{position:absolute;left:0;right:0;bottom:0;text-align:left;font:400 11.5px/1.25 var(--body);color:#fff;padding:12px 7px 5px;background:linear-gradient(transparent,rgba(0,0,0,.7))}
-.main,.thumb{transition:opacity .25s}
-.main.dim,.thumb.dim{opacity:.35}
-.fly{position:fixed;z-index:25;border-radius:10px;overflow:hidden;transform-origin:0 0;box-shadow:0 18px 40px rgba(10,20,30,.3);pointer-events:none;background:#000}
-.fly video{display:block;width:100%;height:100%;object-fit:cover}
+.clip video.layer,.thumb video.layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .42s ease}
+.main .lab,.main .why,.main .spd,.thumb .lab,.thumb .why{z-index:2}
+.fly{position:fixed;z-index:25;border-radius:10px;overflow:hidden;transform-origin:0 0;pointer-events:none;will-change:transform}
+.fly canvas{display:block;width:100%;height:100%}
 .hint{font-size:13.5px!important;color:var(--muted)}
 .clip .why{font-size:14px;padding:22px 12px 10px}
 
@@ -316,9 +320,9 @@ svg [data-s].dim{opacity:.12}
         </figure>
         <figure class="chart" id="ch-eff">
           <p class="ct">Less data, smaller models</p>
-          <div class="ctls"><div class="seg seg-a" role="group" aria-label="Setting"></div><div class="seg seg-b" role="group" aria-label="Epoch"></div></div>
-          <div class="legend"></div><div class="plot"></div>
-          <figcaption><b>Figure 2.</b> ODE policy against FM-DiT with fewer demonstrations per task or fewer parameters. ODE policy with 20 demonstrations per task matches FM-DiT with 50.</figcaption>
+          <div class="ctls"><div class="seg seg-a" role="group" aria-label="Setting"></div></div>
+          <div class="plot"></div>
+          <figcaption><b>Figure 2.</b> Success rate (%) by training epoch and by demonstrations per task or parameters, mean over three random seeds, one color scale for both. ODE policy with 20 demonstrations per task matches FM-DiT with 50, and with 1.5M parameters it beats FM-DiT with 48M at every epoch.</figcaption>
         </figure>
       </div>
       <div class="charts c2">
@@ -630,7 +634,7 @@ function heroPanel(id, mode){
       }
     }
     // chunk boundaries
-    g.fillStyle = hexA(c.muted,.8); g.font = '500 14px JetBrains Mono, monospace';
+    g.fillStyle = hexA(c.muted,.9); g.font = '500 17px JetBrains Mono, monospace';
     for (let ch=1; ch*H<N; ch++){ const [px] = toPx(X(ch*H),0); g.strokeStyle = hexA(c.line,1); g.lineWidth=1; g.beginPath(); g.moveTo(px,S.h*0.16); g.lineTo(px,S.h*0.84); g.stroke(); }
     g.fillText('physical time →', 14, S.h*0.9);
   }
@@ -678,14 +682,14 @@ function vstage(el, desk, phone){
   // desk / phone = [virtual width, virtual height]; the layout switches when the canvas is narrow
   const ctx = el.getContext('2d'); const s = {el, ctx, w:0, h:0, k:1, narrow:false};
   const fit = () => {
-    const W = el.parentElement.getBoundingClientRect().width - 20;
+    const W = el.clientWidth || el.parentElement.clientWidth;
     s.narrow = W < 640; const [vw, vh] = s.narrow ? phone : desk;
     el.style.aspectRatio = vw + ' / ' + vh;
-    const d = Math.min(window.devicePixelRatio || 1, 2); const h = W * vh / vw;
+    const d = Math.min(Math.max(window.devicePixelRatio || 1, 1), 3); const h = W * vh / vw;
     el.width = Math.round(W * d); el.height = Math.round(h * d); s.w = W; s.h = h; s.k = W / vw;
     ctx.setTransform(d * s.k, 0, 0, d * s.k, 0, 0);
   };
-  fit(); new ResizeObserver(fit).observe(el.parentElement); return s;
+  fit(); new ResizeObserver(fit).observe(el); return s;
 }
 function arrow(g, x1, y1, x2, y2, col, w = 1.4, dash = null){
   g.strokeStyle = col; g.fillStyle = col; g.lineWidth = w; if (dash) g.setLineDash(dash);
@@ -1136,18 +1140,36 @@ if (D){
   lineChart(C('ch-libero'), { series: VM.map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet', pts: D.libero[m] })),
     x: { min: 1, max: 100, log: true, ticks: [1, 2, 5, 10, 20, 50, 100], label: 'Training epoch (log scale)', tipname: 'Epoch ' }, y: pct, unit: '%',
     refs: [{ y: 85, label: '85%' }] });
-  // 01 data and model size, ODE vs FM-DiT
-  { const host = C('ch-eff'); let mode = 0, ep = 0; const EPS = ['1', '10', '100'];
+  // 01 data and model size: success by setting and epoch, ODE next to FM-DiT on one color scale
+  { const host = C('ch-eff'); let mode = 0;
+    const heat = v => ramp(Math.min(1, Math.max(0, v / 100)));
     const draw = () => { const src = mode ? D.size : D.demos;
-      const cats = src['ODE-UNet'].map(r => r.x);
-      lineChart(host, { xcat: cats, series: ['ODE-UNet', 'FM-DiT'].map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet',
-          pts: src[m].map((r, i) => [i, r[EPS[ep]][0], r[EPS[ep]][1]]) })),
-        x: { min: -0.3, max: cats.length - 0.7, ticks: cats.map((_, i) => i), fmt: i => cats[i], label: mode ? 'Parameters' : 'Demonstrations per task', tipname: mode ? 'Parameters ' : 'Demos ' },
-        y: pct, unit: '%' }); };
-    const a = host.querySelector('.seg-a'), b = host.querySelector('.seg-b');
-    const mk = (S, labels, cb) => { labels.forEach((l, i) => { const x = document.createElement('button'); x.textContent = l; x.setAttribute('aria-pressed', i === 0);
-      x.onclick = () => { S.querySelectorAll('button').forEach((y, j) => y.setAttribute('aria-pressed', j === i)); cb(i); draw(); }; S.appendChild(x); }); };
-    mk(a, ['Fewer demonstrations', 'Smaller models'], i => mode = i); mk(b, ['Epoch 1', 'Epoch 10', 'Epoch 100'], i => ep = i);
+      const rows = src['ODE-UNet'].map(r => r.x).reverse(), eps = Object.keys(src['ODE-UNet'][0]).filter(k => k !== 'x').sort((p, q) => p - q);
+      const cell = (m, x, e) => src[m].find(r => r.x === x)[e];
+      mount(host, (svg, W) => {
+        const L = 62, gap = 18, top = 30, ch = 38, side = W >= 520;
+        const pw = side ? (W - L - gap) / 2 : W - L, cw = pw / eps.length;
+        const panels = [['ODE-UNet', 'ODE (ours)'], ['FM-DiT', 'FM-DiT']];
+        const ph = top + rows.length * ch + 52, H = side ? ph : 2 * ph + 10;
+        const id = 'c' + (++clipId); const cp = sv('clipPath', { id }, svg); sv('rect', { x: 0, y: 0, width: 0, height: H }, cp);
+        const plot = sv('g', { 'clip-path': `url(#${id})` }, svg);
+        panels.forEach(([m, title], pi) => { const ox = L + (side ? pi * (pw + gap) : 0), oy = side ? 0 : pi * (ph + 10);
+          sv('text', { x: ox + pw / 2, y: oy + 16, class: 'ptitle' + (pi ? '' : ' strong'), 'text-anchor': 'middle' }, svg).textContent = title;
+          rows.forEach((x, ri) => { if (pi === 0 || !side) sv('text', { x: L - 10, y: oy + top + ri * ch + ch / 2, class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg).textContent = x;
+            eps.forEach((e, ci) => { const [v, sd] = cell(m, x, e), cx = ox + ci * cw, cy = oy + top + ri * ch;
+              const g = sv('g', {}, plot);
+              sv('rect', { x: cx + 1.5, y: cy + 1.5, width: cw - 3, height: ch - 3, rx: 4, fill: heat(v) }, g);
+              sv('text', { x: cx + cw / 2, y: cy + ch / 2, class: 'cell' + (v > 55 ? ' on' : ''), 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, g).textContent = fmt1(v);
+              const hit = sv('rect', { x: cx, y: cy, width: cw, height: ch, fill: 'transparent' }, svg);
+              hit.addEventListener('mousemove', ev => showTip(`<b>${title}</b><div>${mode ? 'Parameters' : 'Demos per task'}<span>${x}</span></div><div>Epoch<span>${e}</span></div><div>Success<span>${fmt1(v)}% ± ${fmt1(sd)}</span></div>`, ev.clientX, ev.clientY));
+              hit.addEventListener('mouseleave', hideTip); }); });
+          eps.forEach((e, ci) => sv('text', { x: ox + ci * cw + cw / 2, y: oy + top + rows.length * ch + 18, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = e);
+          sv('text', { x: ox + pw / 2, y: oy + top + rows.length * ch + 42, class: 'alab', 'text-anchor': 'middle' }, svg).textContent = 'Training epoch'; });
+        sv('text', { x: 4, y: 16, class: 'alab' }, svg).textContent = mode ? 'Params' : 'Demos';
+        return H; }); };
+    const a = host.querySelector('.seg-a');
+    ['Fewer demonstrations', 'Smaller models'].forEach((l, i) => { const x = document.createElement('button'); x.textContent = l; x.setAttribute('aria-pressed', i === 0);
+      x.onclick = () => { a.querySelectorAll('button').forEach((y, j) => y.setAttribute('aria-pressed', j === i)); mode = i; draw(); }; a.appendChild(x); });
     draw(); }
   // 01 VLA and WAM
   const SC = (src, b, ms) => ms.map(m => ({ key: m, name: nm(m), color: COL[m], dash: m.endsWith('-R'), ours: m === 'ODE', pts: src[b + ':' + m] }));
@@ -1220,32 +1242,54 @@ if (D){
       y: { min: 0, max: 1, ticks: [0, 0.25, 0.5, 0.75, 1], label: 'Mode balance γ' } }); }
 }
 
-/* ---------- real-robot players: a clicked clip flies into the large view and the two swap ---------- */
+/* ---------- real-robot players: the clicked clip flies into the large view, then the two cross-fade ---------- */
+function layer(box, src, t){
+  // a new video on top of the old one, shown once it has a frame
+  const old = box.querySelector('video'); const v = document.createElement('video');
+  v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; v.className = 'layer'; v.src = src; v.dataset.src = src;
+  const ready = new Promise(res => { let ok = false; const go = () => { if (ok) return; ok = true; res(); };
+    v.addEventListener('loadeddata', () => { try { v.currentTime = t; } catch (e) {} v.play().catch(() => {}); go(); }, { once: true }); setTimeout(go, 1200); });
+  old.after(v);
+  const show = () => new Promise(res => { requestAnimationFrame(() => { v.style.opacity = 1; setTimeout(() => { old.remove(); v.classList.remove('layer'); v.style.opacity = ''; try { vio.observe(v); } catch (e) {} res(); }, 420); }); });
+  return { ready, show };
+}
+function snapshot(video, r){
+  const c = document.createElement('canvas'); const d = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = Math.round(r.width * d); c.height = Math.round(r.height * d);
+  try { if (video.readyState >= 2) c.getContext('2d').drawImage(video, 0, 0, c.width, c.height); else return null; } catch (e) { return null; }
+  return c;
+}
 document.querySelectorAll('.player').forEach(P => {
   const main = P.querySelector('.main'); let busy = false;
   const read = el => ({ src: el.dataset.src, name: el.dataset.name, why: el.dataset.why || '', t: el.querySelector('video').currentTime || 0 });
-  const write = (el, d) => { el.dataset.src = d.src; el.dataset.name = d.name; el.dataset.why = d.why;
-    const v = el.querySelector('video'); v.dataset.src = d.src; v.src = d.src;
-    v.addEventListener('loadedmetadata', () => { try { v.currentTime = d.t; } catch (e) {} }, { once: true }); v.play().catch(() => {});
+  const label = (el, d) => { el.dataset.src = d.src; el.dataset.name = d.name; el.dataset.why = d.why;
     const lab = el.querySelector('.lab'); lab.textContent = d.name; lab.classList.toggle('ours', d.name.startsWith('ODE'));
     const why = el.querySelector('.why'); if (why){ why.textContent = d.why; why.hidden = !d.why; } };
   P.querySelectorAll('.thumb').forEach(t => t.addEventListener('click', async () => {
     if (busy) return; busy = true;
     const r0 = main.getBoundingClientRect();
-    if (r0.top < 70 || r0.bottom > innerHeight){ main.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); await new Promise(r => setTimeout(r, reduce ? 0 : 450)); }
+    if (r0.top < 70 || r0.bottom > innerHeight){ main.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); await new Promise(r => setTimeout(r, reduce ? 0 : 480)); }
     const a = t.getBoundingClientRect(), b = main.getBoundingClientRect(), dT = read(t), dM = read(main);
-    if (!reduce && Element.prototype.animate){
-      const fly = document.createElement('div'); fly.className = 'fly';
-      const fv = document.createElement('video'); fv.muted = true; fv.playsInline = true; fv.src = dT.src;
-      fv.addEventListener('loadedmetadata', () => { try { fv.currentTime = dT.t; } catch (e) {} }, { once: true }); fly.appendChild(fv); fv.play().catch(() => {});
+    const toMain = layer(main, dT.src, dT.t), toThumb = layer(t, dM.src, dM.t);
+    const snap = reduce ? null : snapshot(t.querySelector('video'), a);
+    main.classList.add('busy');
+    if (snap){
+      const fly = document.createElement('div'); fly.className = 'fly'; fly.appendChild(snap);
       Object.assign(fly.style, { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px' }); document.body.appendChild(fly);
-      main.classList.add('dim'); t.classList.add('dim');
-      await fly.animate([{ transform: 'none' }, { transform: `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width}, ${b.height / a.height})` }],
-        { duration: 650, easing: 'cubic-bezier(.2,.75,.2,1)', fill: 'forwards' }).finished;
-      write(main, dT); write(t, dM); main.classList.remove('dim'); t.classList.remove('dim');
-      fly.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: 'forwards' }).finished.then(() => fly.remove());
-    } else { write(main, dT); write(t, dM); }
-    busy = false;
+      const sx = b.width / a.width, sy = b.height / a.height;
+      const anim = fly.animate([
+        { transform: 'translate(0,0) scale(1,1)', borderRadius: '10px', boxShadow: '0 4px 10px rgba(10,20,30,.15)' },
+        { transform: `translate(${(b.left - a.left) * 0.55}px, ${(b.top - a.top) * 0.55 - 18}px) scale(${1 + (sx - 1) * 0.6}, ${1 + (sy - 1) * 0.6})`, boxShadow: '0 26px 60px rgba(10,20,30,.32)', offset: 0.55 },
+        { transform: `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${sx}, ${sy})`, borderRadius: `${12 / sx}px`, boxShadow: '0 0 0 rgba(10,20,30,0)' }],
+        { duration: 720, easing: 'cubic-bezier(.45,.05,.2,1)', fill: 'forwards' });
+      toThumb.ready.then(() => { label(t, dM); toThumb.show(); });
+      await Promise.all([anim.finished, toMain.ready]);
+      label(main, dT); toMain.show();
+      fly.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-out', fill: 'forwards' }).finished.then(() => fly.remove());
+    } else {
+      await Promise.all([toMain.ready, toThumb.ready]); label(main, dT); label(t, dM); toMain.show(); toThumb.show();
+    }
+    main.classList.remove('busy'); busy = false;
   }));
 });
 
