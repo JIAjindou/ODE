@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script>try { const t = localStorage.getItem('ode-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>
 /* Layout: one reading column (1120px) that opens on a live vector field; figures sit on white "paper" plates. */
 :root{
@@ -53,6 +54,12 @@ nav.top .brand span{color:var(--blue)}
 nav.top .links{display:flex;gap:18px;overflow-x:auto}
 nav.top .links a{color:var(--muted);text-decoration:none;font-size:15px;white-space:nowrap}
 nav.top .links a:hover{color:var(--ink)}
+.theme{margin-left:6px;width:34px;height:34px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);cursor:pointer;padding:0}
+.theme svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme .sun{display:none}
+:root[data-theme="dark"] .theme .sun{display:inline}
+:root[data-theme="dark"] .theme .moon{display:none}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .theme .sun{display:inline} :root:not([data-theme="light"]) .theme .moon{display:none} }
 
 /* cover: the real-robot demo fills the first screen */
 .cover{position:relative;height:min(92vh,62vw);min-height:460px;overflow:hidden;background:#0b1118;color:#fff}
@@ -263,6 +270,7 @@ svg [data-s].dim{opacity:.12}
       <a href="#method">Method</a>
       <a href="#cite">Cite</a>
     </div>
+    <button class="theme" id="theme" type="button" aria-label="Dark background" title="Dark background"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path class="moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></g></svg></button>
   </div>
 </nav>
 
@@ -1327,6 +1335,14 @@ document.querySelectorAll('.player').forEach(P => {
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
+
+/* ---------- light or dark background ---------- */
+{ const b = document.getElementById('theme'), root = document.documentElement;
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const sync = () => { const d = isDark(); b.setAttribute('aria-label', d ? 'Light background' : 'Dark background'); b.title = b.getAttribute('aria-label'); };
+  b.addEventListener('click', () => { root.dataset.theme = isDark() ? 'light' : 'dark'; try { localStorage.setItem('ode-theme', root.dataset.theme); } catch (e) {}
+    sync(); document.querySelectorAll('.chart').forEach(h => { if (h._draw){ h._W = 0; h._draw(); } }); });
+  sync(); }
 
 /* ---------- lightbox and copy ---------- */
 // videos load when they come near the viewport and pause when they leave it
