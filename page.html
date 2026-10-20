@@ -3,7 +3,7 @@
 <meta name="description" content="ODE Policy models how the action of a robot evolves over its physical time as an ordinary differential equation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: one reading column (1120px) that opens on a live vector field; figures sit on white "paper" plates. */
 :root{
@@ -48,326 +48,266 @@ nav.top .links{display:flex;gap:18px;overflow-x:auto}
 nav.top .links a{color:var(--muted);text-decoration:none;font-size:15px;white-space:nowrap}
 nav.top .links a:hover{color:var(--ink)}
 
-/* hero */
-.hero{padding-block:56px 28px}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:44px;align-items:center}
-.hero h1{font-size:clamp(44px,6.4vw,76px);line-height:.98;font-weight:700}
-.hero h1 em{font-style:normal;color:var(--blue)}
-.hero .sub{font-size:clamp(19px,2vw,23px);line-height:1.4;margin-top:18px;max-width:30ch}
-.authors{margin-top:22px;color:var(--muted);font-size:16px}
-.authors b{color:var(--ink);font-weight:600}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+/* cover: the real-robot demo fills the first screen */
+.cover{position:relative;height:min(92vh,62vw);min-height:460px;overflow:hidden;background:#0b1118;color:#fff}
+.cover-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,14,20,.05) 35%,rgba(8,14,20,.78) 100%),linear-gradient(90deg,rgba(8,14,20,.45),rgba(8,14,20,0) 60%)}
+.cover-in{position:absolute;left:0;right:0;bottom:0;padding-bottom:clamp(28px,5vw,56px)}
+.cover h1{font-size:clamp(40px,6.2vw,84px);line-height:.98;font-weight:700;max-width:13ch;color:#fff}
+.cover h1 em{font-style:normal;color:#9CCBF0}
+.cover .authors{margin-top:18px;font-size:17px;color:rgba(255,255,255,.92)}
+.cover .authors a{color:#fff;font-weight:600;text-decoration:none}
+.cover .authors span{color:rgba(255,255,255,.72);font-size:15px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font:600 15px/1 var(--body);text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--surface);cursor:pointer}
-.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn[aria-disabled="true"]{opacity:.55;cursor:default}
+.cover .btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;backdrop-filter:blur(6px)}
+.cover .btn.primary{background:#fff;color:#0b1118;border-color:#fff}
+.btn[aria-disabled="true"]{opacity:.6;cursor:default}
 .btn small{font:500 11px/1 var(--mono);opacity:.75}
-.quote{margin-top:26px;font-size:15px;color:var(--muted)}
-.quote i{color:var(--ink);font-size:17px}
+.cover-spd{position:absolute;right:16px;top:14px;font:500 11px/1 var(--mono);color:rgba(255,255,255,.75)}
 
-.stage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.stage canvas{display:block;width:100%;height:auto;aspect-ratio:16/11}
-.stage .bar{position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
-.seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:3px;pointer-events:auto}
-.seg button{border:0;background:transparent;color:var(--muted);font:600 13px/1 var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
-.stage .legend{font:500 11.5px/1.5 var(--mono);color:var(--muted);text-align:right;background:color-mix(in srgb,var(--surface) 80%,transparent);padding:4px 6px;border-radius:6px}
-.stage .caption{position:absolute;left:14px;bottom:10px;right:14px;font-size:14px;color:var(--muted);pointer-events:none}
+/* epigraph */
+.motto{padding-block:clamp(48px,7vw,84px) 0;text-align:center}
+.motto .latin{font:italic 400 clamp(34px,4.6vw,56px)/1.1 "Instrument Serif", Georgia, serif;color:var(--ink)}
+.motto .gloss{margin-top:12px;font-size:16px;color:var(--muted);letter-spacing:.01em}
+
+section{padding-block:clamp(56px,8vw,96px) 0}
+h2.sec{font-size:clamp(38px,5vw,60px);line-height:1.04;font-weight:700;margin-bottom:16px}
+h3{font-size:clamp(24px,2.6vw,32px);font-weight:700;line-height:1.15}
+h3 span{font:500 14px/1 var(--mono);color:var(--blue);margin-right:12px;vertical-align:middle}
+h3.sub{margin-top:56px;margin-bottom:10px}
+h4{font:700 19px/1.25 var(--display);margin:0}
+.lede{color:var(--muted);max-width:68ch;font-size:18px}
+
+/* idea: the two animations side by side */
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:30px}
+.stage{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stage canvas{display:block;width:100%;height:auto;aspect-ratio:16/10}
+.stage figcaption{padding:12px 16px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:15.5px}
+.stage figcaption b{color:var(--teal);margin-right:6px}
+.stage figcaption b.ours{color:var(--blue)}
 
 /* numbers */
-.numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-block:34px 8px}
-.num{background:var(--surface);padding:18px 18px 16px}
-.num .v{font:700 clamp(30px,3.6vw,42px)/1 var(--display);color:var(--blue);font-variant-numeric:tabular-nums}
-.num .k{margin-top:8px;font-size:15px;line-height:1.35}
-.num .s{margin-top:4px;font:400 12px/1.4 var(--mono);color:var(--muted)}
+.numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:24px}
+.num{background:var(--surface);padding:20px 18px 18px}
+.num .v{font:700 clamp(32px,3.8vw,46px)/1 var(--display);color:var(--blue);font-variant-numeric:tabular-nums}
+.num .k{margin-top:10px;font-size:15.5px;line-height:1.35}
+.note{margin-top:8px;font-size:13.5px;color:var(--muted)}
 
-section{padding-block:64px 8px}
-.head{display:grid;gap:12px;margin-bottom:28px}
+/* result blocks */
+.block{margin-top:clamp(56px,7vw,84px);display:grid;gap:18px}
+.block > .lede{margin-top:-6px}
+.plate{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 auto;width:100%}
+.plate img{display:block;width:100%;height:auto;cursor:zoom-in}
+.two{display:flex;justify-content:center}
+.clip{position:relative;margin:0;border-radius:12px;overflow:hidden;background:#000}
+.clip video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.clip.sq video{aspect-ratio:1}
+.clip .lab{position:absolute;left:8px;top:8px;font:600 12.5px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:5px 9px;border-radius:999px}
+.clip .lab.ours{background:#397DB7;color:#fff}
+.clip .spd{position:absolute;right:8px;top:8px;font:500 11px/1 var(--mono);background:rgba(0,0,0,.5);color:#fff;padding:5px 7px;border-radius:5px}
+.clip .why{position:absolute;left:0;right:0;bottom:0;font-size:12px;line-height:1.3;color:#fff;padding:14px 8px 6px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.rlvids{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.vcap{font-size:14px;color:var(--muted);margin-top:-8px}
+.task{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
+.task .txt{display:grid;gap:8px;min-width:0}
+.task .txt p{color:var(--muted);font-size:16px}
+.task .sr{color:var(--ink)!important;font-size:15px!important}
+.task .sr b{color:var(--blue)}
+.base{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:6px}
+.base .lab{font-size:11px;padding:4px 7px}
+.modes{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);gap:18px;align-items:center}
+.modes .stage canvas{aspect-ratio:4/3}
 
 /* method */
-.idea{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:center;margin-bottom:22px}
-.idea-txt{display:grid;gap:10px}.idea-txt p{color:var(--muted)}
+.idea{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;margin:8px 0 22px}
+.idea-txt p{color:var(--muted);font-size:17px}
 .anim{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 14px}
 .anim canvas{display:block;width:100%;height:auto}
-.anim figcaption{font-size:14.5px;color:var(--muted);margin-top:8px;padding-inline:8px;max-width:95ch}
-.anim figcaption b{color:var(--ink)}
-.eq{font:500 clamp(17px,2vw,21px)/1.5 var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;overflow-x:auto}
-.eq .c1{color:var(--blue)} .eq .c2{color:var(--teal)} .eq .cm{color:var(--muted);font-size:.72em;display:block;margin-top:6px;font-family:var(--body)}
-.plate{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0}
-.plate img{display:block;width:100%;height:auto;cursor:zoom-in}
-.plate figcaption{font-size:14px;color:#55657A;margin-top:8px;padding-inline:4px}
+.eq{font:500 clamp(18px,2.1vw,23px)/1.7 var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 22px;overflow-x:auto}
+.eq .c1{color:var(--blue)} .eq .c2{color:var(--teal)}
 .demos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:44px}
 .demo{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .demo canvas{display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--surface);touch-action:manipulation}
-.demo .body{padding:14px 16px 16px;display:grid;gap:8px;border-top:1px solid var(--line)}
-.demo .body p{font-size:15px;color:var(--muted);line-height:1.45}
-.demo .ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.demo .ctl button{border:1px solid var(--line);background:var(--chip);color:var(--ink);font:600 13px/1 var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
-.demo .ctl label{font:500 12px/1 var(--mono);color:var(--muted);display:flex;align-items:center;gap:8px}
-.demo input[type=range]{accent-color:var(--blue);width:120px}
-
-/* results */
-.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-.res{display:grid;gap:12px;align-content:start;min-width:0}
-.res .tag{font:500 12px/1 var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
-.res .big{font:700 26px/1.15 var(--display)}
-.res .big span{color:var(--blue)}
-.res p{color:var(--muted);font-size:15.5px;max-width:58ch}
-.res.wide{grid-column:1/-1}
-
-/* real robot */
-.tasks{display:grid;gap:30px}
-.task{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px;align-items:start}
-.clip{position:relative;margin:0;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line)}
-.clip video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
-.clip .lab{position:absolute;left:8px;top:8px;font:600 12px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:5px 8px;border-radius:999px}
-.clip .lab.ours{background:#397DB7;color:#fff}
-.clip .spd{position:absolute;right:8px;top:8px;font:500 11px/1 var(--mono);background:rgba(0,0,0,.55);color:#fff;padding:5px 7px;border-radius:5px}
-.clip .why{position:absolute;left:0;right:0;bottom:0;font-size:12.5px;line-height:1.3;color:#fff;padding:14px 8px 6px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
-.teaser{margin-top:30px}
-.teaser video{aspect-ratio:auto}
-.teaser figcaption{font-size:14.5px;color:var(--muted);margin-top:8px}
-.vcol{display:grid;gap:10px;min-width:0}
-.base{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.base .lab{font-size:11px;padding:4px 7px}
-.video{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--chip) 0 12px,var(--surface) 12px 24px);border:1px solid var(--line);display:grid;place-items:center}
-.video img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
-.video .badge{position:relative;font:500 12px/1 var(--mono);background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:999px;border:1px solid var(--line)}
-.task .txt{display:grid;gap:10px}
-.task .txt p{color:var(--muted)}
-.kv{display:flex;flex-wrap:wrap;gap:8px}
-.kv span{font:500 12px/1 var(--mono);padding:6px 9px;border-radius:6px;background:var(--chip);color:var(--ink)}
-.kv span b{color:var(--blue);font-weight:500}
-
-/* platforms */
-.platforms{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:22px 20px}
-.pf{display:grid;justify-items:center;gap:10px}
-.pf .card{width:100%;aspect-ratio:1;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 16px rgba(20,40,60,.08);display:grid;place-items:center;overflow:hidden;transition:transform .35s ease}
-.pf:nth-child(odd) .card{transform:rotate(-2deg)}
-.pf:nth-child(even) .card{transform:rotate(1.6deg)}
-.pf:hover .card{transform:rotate(0) scale(1.03)}
-.pf .card img{max-width:78%;max-height:78%;object-fit:contain}
-.pf .card video{width:100%;height:100%;object-fit:cover}
-.pf .card img.photo{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover}
-.pf .name{font-weight:600;font-size:15px;text-align:center}
-.pf .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
-.pf .tags span{font:500 11px/1 var(--mono);padding:5px 8px;border-radius:5px;background:var(--ink);color:var(--bg)}
+.demo .body{padding:14px 16px 16px;display:grid;gap:6px;border-top:1px solid var(--line)}
+.demo .body p{font-size:15.5px;color:var(--muted);line-height:1.45}
 
 /* cite */
 pre.bib{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;overflow-x:auto;font:400 13.5px/1.6 var(--mono);margin:0}
-.cite-row{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-footer{margin-top:70px;border-top:1px solid var(--line);padding-block:26px 40px;color:var(--muted);font-size:14px}
+.cite-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+footer{margin-top:80px;border-top:1px solid var(--line);padding-block:26px 40px;color:var(--muted);font-size:14px}
 footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
 /* lightbox */
 .lb{position:fixed;inset:0;z-index:20;background:rgba(10,16,22,.82);display:grid;place-items:center;padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));cursor:zoom-out}
-.lb img{max-width:min(1400px,100%);max-height:100%;background:#fff;border-radius:8px}
+.lb img{max-width:min(1600px,100%);max-height:100%;background:#fff;border-radius:8px}
 
 @media (max-width:900px){
-  .hero-grid,.idea,.task{grid-template-columns:minmax(0,1fr)}
-  .demos{grid-template-columns:minmax(0,1fr)}
-  .results{grid-template-columns:minmax(0,1fr)}
-  .numbers{grid-template-columns:repeat(2,minmax(0,1fr))}
-  nav.top .links{gap:14px}
+  .pair,.idea,.task,.modes,.demos{grid-template-columns:minmax(0,1fr)}
+  .numbers,.rlvids{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (max-width:520px){ nav.top .links a.opt{display:none} }
-@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .pf .card{transition:none} }
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
 </style>
 
 <nav class="top" aria-label="Sections">
   <div class="wrap">
     <a class="brand" href="#top">ODE <span>Policy</span></a>
     <div class="links">
-      <a href="#method">Method</a>
+      <a href="#idea">Idea</a>
       <a href="#results">Results</a>
-      <a href="#real">Real robot</a>
-      <a href="#platforms" class="opt">Platforms</a>
+      <a href="#method">Method</a>
       <a href="#cite">Cite</a>
     </div>
   </div>
 </nav>
 
-<header class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div>
-      <p class="eyebrow">Robot learning · IL &amp; RL</p>
-      <h1 style="margin-top:14px">Ordinary Differential Equation <em>Policy</em></h1>
-      <p class="sub">A robot policy that integrates its actions over physical time, so motion is continuous by construction.</p>
-      <p class="authors"><b><a href="https://jiajindou.github.io/">Jindou Jia</a></b>, … , <b><a href="https://marsyang.site/">Jianfei Yang</a></b><br>MARS Lab, Nanyang Technological University</p>
-      <div class="btns">
-        <a class="btn primary" aria-disabled="true" title="Coming soon">Paper <small>soon</small></a>
-        <a class="btn" aria-disabled="true" title="Coming soon">Code <small>soon</small></a>
-        <a class="btn" href="#cite">BibTeX</a>
-      </div>
-      <p class="quote"><i>Natura non facit saltus.</i> &nbsp;Nature does not make jumps. &nbsp;— Leibniz</p>
-    </div>
-    <div class="stage" id="hero-stage">
-      <canvas id="hero" aria-label="Animated comparison of a discrete chunked policy and ODE policy on a vector field"></canvas>
-      <div class="bar">
-        <div class="seg" role="group" aria-label="Policy type">
-          <button id="mode-ode" aria-pressed="true">ODE policy</button>
-          <button id="mode-disc" aria-pressed="false">Discrete policy</button>
-        </div>
-        <div class="legend" id="hero-legend">H = 8 steps per chunk</div>
-      </div>
-      <p class="caption" id="hero-cap">Each action is integrated from the previous one. Chunks join without jumps.</p>
+<header class="cover" id="top">
+  <video class="cover-v" src="assets/video/teaser.mp4" muted loop playsinline autoplay preload="auto" aria-label="ODE policy moves two flowers into a narrow vase on a real robot, autonomous, 2x speed"></video>
+  <div class="cover-shade"></div>
+  <div class="wrap cover-in">
+    <h1>Ordinary Differential Equation <em>Policy</em></h1>
+    <p class="authors"><a href="https://jiajindou.github.io/">Jindou Jia</a>, … , <a href="https://marsyang.site/">Jianfei Yang</a><br><span>MARS Lab, Nanyang Technological University</span></p>
+    <div class="btns">
+      <a class="btn primary" aria-disabled="true" title="Coming soon">Paper <small>soon</small></a>
+      <a class="btn" aria-disabled="true" title="Coming soon">Code <small>soon</small></a>
+      <a class="btn" href="#cite">BibTeX</a>
     </div>
   </div>
-  <div class="wrap">
-    <figure class="clip teaser"><video src="assets/video/teaser.mp4" muted loop playsinline autoplay preload="auto" aria-label="ODE policy inserts two flowers into two vases on a real robot"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span></figure>
-    <p class="quote" style="margin-top:8px">Autonomous rollout on a Galaxea R1 Lite. Two flowers, one after the other, from a glass into a narrow vase.</p>
-    <div class="numbers" aria-label="Headline results">
-      <div class="num"><div class="v">5.9×</div><div class="k">success after one epoch</div><div class="s">vs. flow matching · LIBERO</div></div>
-      <div class="num"><div class="v">10.8×</div><div class="k">faster per action chunk</div><div class="s">5.7 ms · Euler · LIBERO</div></div>
-      <div class="num"><div class="v">3.9×</div><div class="k">mode balance after one epoch</div><div class="s">vs. flow matching · 2D navigation</div></div>
-      <div class="num"><div class="v">0.6×</div><div class="k">the jerk of human demonstrations</div><div class="s">commands · real bimanual task</div></div>
-    </div>
-  </div>
+  <span class="cover-spd">Autonomous · 2×</span>
 </header>
 
-<section id="method">
+<section class="motto" aria-label="Epigraph">
   <div class="wrap">
-    <div class="head">
-      <p class="eyebrow">Method</p>
-      <h2>Learn the vector field, integrate the actions</h2>
-      <p class="lede">Discrete policies output action values at fixed steps and leave continuity to the data. ODE policy learns how the action changes and integrates it over the robot's own time.</p>
-    </div>
-    <div class="idea">
-      <div class="eq" role="math" aria-label="a dot equals f theta of a, s, z">
-        <span class="c1">ȧ(t)</span> = <span class="c2">f<sub>θ</sub></span>( a(t), s<sub>t</sub>, z<sub>t</sub> )
-        <span class="cm">Velocity of the action, conditioned on proprioception s and the image and language embedding z. Trained by matching the integrated path to the demonstration, without velocity labels.</span>
-        <br>
-        a<sub>t+k+1</sub> = a<sub>t+k</sub> + ∫ f<sub>θ</sub> dt
-        <span class="cm">Integrated over short chunks (H = 8, RK4). The next chunk starts where the last one ended.</span>
-      </div>
-      <div class="idea-txt">
-        <h3>Two ways to produce a chunk</h3>
-        <p>A discrete policy emits the whole chunk at once and starts the next one from scratch, so actions jump at the boundary. ODE policy reads the observation once per chunk, then integrates action by action and continues from where it stopped.</p>
-      </div>
-    </div>
-    <figure class="anim">
-      <canvas id="fig1" aria-label="Animated figure, discrete policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
-      <figcaption><b>Fig. 1</b> Discrete policies map the embedding to action values at fixed steps. ODE policy learns a vector field f<sub>θ</sub> and integrates it, so each action follows from the previous one and is sent as soon as it is computed.</figcaption>
-    </figure>
-    <div class="head" style="margin-top:44px">
-      <h3>Diversity head for multi-modality</h3>
-      <p class="lede">The mode is decided by the direction in which integration sets off, so it is enough to randomize that direction.</p>
-    </div>
-    <figure class="anim">
-      <canvas id="fig2" aria-label="Animated figure of the diversity head, a sampled offset tilts the field toward one route"></canvas>
-      <figcaption><b>Fig. 2</b> (a) The plain field averages two demonstrated routes and hits the obstacle. (b) The head samples a direction ε with one mode per route and a rate λ<sub>k</sub> per step. (c) The offset λ<sub>k</sub>⊙ε tilts the whole field, so each sample takes one route.</figcaption>
-    </figure>
-    <div class="demos">
-      <article class="demo">
-        <canvas id="d-contract" aria-label="Contractive perturbation demo, click to drop a start point"></canvas>
-        <div class="body">
-          <h3>Contractive perturbation</h3>
-          <p>Training starts some chunks off the demonstration and asks the path to come back. The field learns to pull drift back.</p>
-          <div class="ctl"><button id="b-contract">Perturb</button><label>or click the plot</label></div>
-        </div>
-      </article>
-      <article class="demo">
-        <canvas id="d-rate" aria-label="Arbitrary control rate demo"></canvas>
-        <div class="body">
-          <h3>Any control rate</h3>
-          <p>The field lives in continuous time. One trained model runs at a finer step simply by integrating with a smaller step.</p>
-          <div class="ctl"><label for="r-rate">Control rate <input id="r-rate" type="range" min="0" max="2" step="1" value="0"></label><span class="mono" id="r-val">20 Hz</span></div>
-        </div>
-      </article>
+    <p class="latin">Natura non facit saltus.</p>
+    <p class="gloss">Nature does not make jumps. &nbsp;— G.&#8201;W. Leibniz, 1704</p>
+  </div>
+</section>
+
+<section id="idea">
+  <div class="wrap">
+    <h2 class="sec">Actions should not jump either</h2>
+    <p class="lede">A discrete policy predicts each chunk of actions on its own, so the motion jumps where chunks meet. ODE policy learns how the action changes and integrates it over the robot's physical time, so each action follows from the previous one.</p>
+    <div class="pair">
+      <figure class="stage"><canvas id="hero-disc" aria-label="Animation of a discrete chunked policy, actions jump at chunk boundaries"></canvas><figcaption><b>Discrete policy</b> jumps at chunk boundaries</figcaption></figure>
+      <figure class="stage"><canvas id="hero-ode" aria-label="Animation of ODE policy, chunks join without jumps"></canvas><figcaption><b class="ours">ODE policy</b> continuous by construction</figcaption></figure>
     </div>
   </div>
 </section>
 
 <section id="results">
   <div class="wrap">
-    <div class="head">
-      <p class="eyebrow">Results</p>
-      <h2>Fast to learn, fast to run</h2>
-      <p class="lede">Visuomotor policies on LIBERO, the action head of a VLA (π<sub>0.5</sub>) and a world action model (ImageWAM), and the actor of PPO and FlashSAC.</p>
+    <h2 class="sec">Results</h2>
+    <div class="numbers" aria-label="Headline results">
+      <div class="num"><div class="v">5.9×</div><div class="k">success after one epoch</div></div>
+      <div class="num"><div class="v">10.8×</div><div class="k">faster inference</div></div>
+      <div class="num"><div class="v">0.6×</div><div class="k">the jerk of human demonstrations</div></div>
+      <div class="num"><div class="v">3.9×</div><div class="k">mode balance after one epoch</div></div>
     </div>
-    <div class="results">
-      <div class="res wide">
-        <p class="tag">Learning efficiency · LIBERO</p>
-        <p class="big"><span>79.2%</span> after one epoch, against at most 43.2% for six baselines</p>
-        <p>It matches a flow matching policy with less than half of the demonstrations, at every model size.</p>
-        <figure class="plate"><img src="assets/figs/efficiency.jpg" alt="Learning efficiency in visuomotor imitation learning" loading="lazy"></figure>
-      </div>
-      <div class="res">
-        <p class="tag">At scale · VLA and WAM</p>
-        <p class="big"><span>85.5%</span> after half an epoch in π<sub>0.5</sub></p>
-        <p>A randomly initialized ODE head with 3% of the parameters of the action expert. In ImageWAM, 82.6% against 24.6% after one epoch.</p>
-        <figure class="plate"><img src="assets/figs/scale.jpg" alt="Learning efficiency at scale" loading="lazy"></figure>
-      </div>
-      <div class="res">
-        <p class="tag">Generalization · LIBERO-plus</p>
-        <p class="big"><span>89.9%</span> zero-shot under unseen perturbations in ImageWAM</p>
-        <p>Robustness arrives early in training, and within π<sub>0.5</sub> it matches a pretrained expert many times its size.</p>
-        <figure class="plate"><img src="assets/figs/plus.jpg" alt="Generalization to unseen perturbations" loading="lazy"></figure>
-      </div>
-      <div class="res wide">
-        <p class="tag">Inference and smoothness</p>
-        <p class="big"><span>5.7 ms</span> per chunk of 8 actions, each action sent as soon as it is integrated</p>
-        <p>10.8× faster than flow matching and about 100× faster than DDPM, with the lowest jerk at every checkpoint.</p>
-        <figure class="plate"><img src="assets/figs/inference.jpg" alt="Inference cost and action smoothness" loading="lazy"></figure>
-      </div>
-      <div class="res">
-        <p class="tag">Reinforcement learning</p>
-        <p class="big"><span>97.7%</span> vs. 72.3% on the G1 humanoid</p>
-        <p>A drop-in actor for PPO and FlashSAC, faster early learning on most tasks.</p>
-        <figure class="plate"><img src="assets/figs/rl.jpg" alt="Learning efficiency in reinforcement learning" loading="lazy"></figure>
-      </div>
-      <div class="res">
-        <p class="tag">Multi-modality</p>
-        <p class="big">All <span>four routes</span> from the first epoch</p>
-        <p>Randomizing the direction of the field is enough to pick a mode, without multi-step sampling.</p>
-        <figure class="plate"><img src="assets/figs/nav2d_curves.jpg" alt="Multi-modal tests on a 2D navigation task" loading="lazy"></figure>
-      </div>
-    </div>
-  </div>
-</section>
+    <p class="note">All ratios against flow matching, except the jerk.</p>
 
-<section id="real">
-  <div class="wrap">
-    <div class="head">
-      <p class="eyebrow">Real robot · Galaxea R1 Lite</p>
-      <h2>Precise and smooth on hardware</h2>
-      <p class="lede">Joint-space actions at 15 Hz, the same method without changes.</p>
-    </div>
-    <div class="tasks">
+    <article class="block">
+      <h3><span>01</span>Learns fast</h3>
+      <p class="lede">79.2% on LIBERO after one epoch, against at most 43.2% for six baselines. The gain holds in a VLA, in a world action model, and in RL.</p>
+      <div class="rlvids">
+        <figure class="clip sq"><video data-src="assets/video/rl_anymal.mp4" muted loop playsinline preload="none" aria-label="ANYmal-C quadruped walking over stairs with an ODE policy actor"></video><span class="lab">ANYmal-C</span></figure>
+        <figure class="clip sq"><video data-src="assets/video/rl_g1.mp4" muted loop playsinline preload="none" aria-label="G1 humanoid with an ODE policy actor"></video><span class="lab">G1 humanoid</span></figure>
+        <figure class="clip sq"><video data-src="assets/video/rl_franka.mp4" muted loop playsinline preload="none" aria-label="Franka arm opening a drawer with an ODE policy actor"></video><span class="lab">Franka drawer</span></figure>
+        <figure class="clip sq"><video data-src="assets/video/rl_quad.mp4" muted loop playsinline preload="none" aria-label="Quadcopter reaching a target with an ODE policy actor"></video><span class="lab">Quadcopter</span></figure>
+      </div>
+      <p class="vcap">ODE policy as the actor of PPO</p>
+      <figure class="plate" style="max-width:872px"><img src="assets/figs/efficiency.jpg" alt="Learning efficiency in visuomotor imitation learning" loading="lazy"></figure>
+      <div class="two">
+        <figure class="plate" style="max-width:676px"><img src="assets/figs/scale.jpg" alt="Learning efficiency in a VLA and a world action model" loading="lazy"></figure>
+      </div>
+      <figure class="plate" style="max-width:872px"><img src="assets/figs/rl.jpg" alt="Learning efficiency in reinforcement learning" loading="lazy"></figure>
+    </article>
+
+    <article class="block">
+      <h3><span>02</span>Executes precisely and smoothly</h3>
+      <p class="lede">On a real Galaxea R1 Lite, ODE policy succeeds where flow matching and diffusion baselines fail, with commands smoother than the human demonstrations.</p>
       <div class="task">
-        <div class="vcol"><figure class="clip"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy inserts a flower into a narrow vase"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span></figure><div class="base"><figure class="clip"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none"></video><span class="lab">FM-DiT</span><span class="why">fails to insert the stem</span></figure><figure class="clip"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none"></video><span class="lab">DDPM-UNet</span><span class="why">fails to insert the stem</span></figure><figure class="clip"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none"></video><span class="lab">DDIM-UNet</span><span class="why">fails to insert the stem</span></figure></div></div>
+        <figure class="clip"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy completes the bimanual microwave task"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span></figure>
         <div class="txt">
-          <h3>High-precision flower arrangement</h3>
-          <p>Insert a thin stem into the narrow opening of a vase, with a long-stemmed poppy and a short-stemmed dahlia.</p>
-          <div class="kv"><span>ODE <b>30% / 60%</b></span><span>FM-DiT 20% / 40%</span><span>DDPM 0% / 0%</span><span>DDIM 0% / 5%</span><span>95 demos</span></div>
-          <figure class="plate"><img src="assets/figs/real.jpg" alt="Flower arrangement on a real robot" loading="lazy"></figure>
+          <h4>Bimanual microwave</h4>
+          <p>Grasp a bowl, place it in, push it in, close the door.</p>
+          <p class="sr"><b>75%</b> ODE &nbsp;·&nbsp; 20% FM-DiT &nbsp;·&nbsp; 0% DDPM / DDIM</p>
+          <div class="base">
+            <figure class="clip"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none" aria-label="FM-DiT leaves the microwave door open"></video><span class="lab">FM-DiT</span><span class="why">door left open</span></figure>
+            <figure class="clip"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none" aria-label="DDPM-UNet fails to grasp the bowl"></video><span class="lab">DDPM</span><span class="why">misses the bowl</span></figure>
+            <figure class="clip"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none" aria-label="DDIM-UNet fails to grasp the bowl"></video><span class="lab">DDIM</span><span class="why">misses the bowl</span></figure>
+          </div>
         </div>
       </div>
       <div class="task">
-        <div class="vcol"><figure class="clip"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy completes the bimanual microwave task"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span></figure><div class="base"><figure class="clip"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none"></video><span class="lab">FM-DiT</span><span class="why">leaves the door open</span></figure><figure class="clip"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none"></video><span class="lab">DDPM-UNet</span><span class="why">fails to grasp the bowl</span></figure><figure class="clip"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none"></video><span class="lab">DDIM-UNet</span><span class="why">fails to grasp the bowl</span></figure></div></div>
+        <figure class="clip"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy inserts a flower into a narrow vase"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span></figure>
         <div class="txt">
-          <h3>Long-horizon bimanual microwave</h3>
-          <p>Grasp a bowl, place it in the microwave, push it in, and close the door with the other arm.</p>
-          <div class="kv"><span>ODE <b>75%</b></span><span>FM-DiT 20%</span><span>DDPM 0%</span><span>DDIM 0%</span><span>34 demos</span></div>
-          <figure class="plate"><img src="assets/figs/real_exec.jpg" alt="Inference cost and smoothness on the real robot" loading="lazy"><figcaption>8.4 ms per chunk on one RTX 5090, and commands smoother than the human demonstrations.</figcaption></figure>
+          <h4>Flower into a narrow vase</h4>
+          <p>Insert a thin stem into a small opening. Poppy / dahlia.</p>
+          <p class="sr"><b>30% / 60%</b> ODE &nbsp;·&nbsp; 20% / 40% FM-DiT &nbsp;·&nbsp; 0% / 0% DDPM &nbsp;·&nbsp; 0% / 5% DDIM</p>
+          <div class="base">
+            <figure class="clip"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none" aria-label="FM-DiT fails to insert the stem"></video><span class="lab">FM-DiT</span><span class="why">stem not inserted</span></figure>
+            <figure class="clip"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none" aria-label="DDPM-UNet fails to insert the stem"></video><span class="lab">DDPM</span><span class="why">stem not inserted</span></figure>
+            <figure class="clip"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none" aria-label="DDIM-UNet fails to insert the stem"></video><span class="lab">DDIM</span><span class="why">stem not inserted</span></figure>
+          </div>
         </div>
       </div>
-    </div>
+      <figure class="plate" style="max-width:888px"><img src="assets/figs/real_exec.jpg" alt="Inference cost and smoothness on the real robot" loading="lazy"></figure>
+      <figure class="plate" style="max-width:871px"><img src="assets/figs/inference.jpg" alt="Inference cost and action smoothness on LIBERO" loading="lazy"></figure>
+    </article>
+
+    <article class="block">
+      <h3><span>03</span>Generalizes</h3>
+      <p class="lede">Robust to unseen perturbations on LIBERO-plus, early in training. A world action model with ODE policy reaches 89.9% zero-shot.</p>
+      <figure class="plate" style="max-width:871px"><img src="assets/figs/plus.jpg" alt="Generalization to unseen perturbations" loading="lazy"></figure>
+    </article>
+
+    <article class="block">
+      <h3><span>04</span>Keeps multi-modality</h3>
+      <p class="lede">A sampled direction tilts the field toward one route, so ODE policy takes all four routes from the first epoch.</p>
+      <div class="modes">
+        <figure class="stage"><canvas id="d-modes" aria-label="Animated rollouts on the four-route navigation task, each rollout takes one route"></canvas></figure>
+        <figure class="plate"><img src="assets/figs/nav2d_bc.jpg" alt="Task success and mode balance on the navigation task" loading="lazy"></figure>
+      </div>
+    </article>
   </div>
 </section>
 
-<section id="platforms">
+<section id="method">
   <div class="wrap">
-    <div class="head">
-      <p class="eyebrow">Platforms</p>
-      <h2>One formulation, many bodies</h2>
+    <h2 class="sec">Method</h2>
+    <div class="idea">
+      <div class="eq" role="math" aria-label="a dot equals f theta of a, s, z">
+        <span class="c1">ȧ(t)</span> = <span class="c2">f<sub>θ</sub></span>( a(t), s<sub>t</sub>, z<sub>t</sub> )
+        <br>
+        a<sub>t+k+1</sub> = a<sub>t+k</sub> + ∫ f<sub>θ</sub> dt
+      </div>
+      <div class="idea-txt">
+        <p>Learn the velocity of the action, then integrate it in short chunks (H = 8, RK4). The next chunk starts where the last one ended. Training matches the integrated path to the demonstration, without velocity labels.</p>
+      </div>
     </div>
-    <div class="platforms">
-      <div class="pf"><div class="card"><img class="photo" src="assets/robots/microwave_1.jpg" alt="Galaxea R1 Lite" loading="lazy"></div><p class="name">Galaxea R1 Lite</p><div class="tags"><span>Real</span><span>IL</span></div></div>
-      <div class="pf"><div class="card"><video data-src="assets/video/rl_franka.mp4" muted loop playsinline preload="none" aria-label="Franka arm, ODE policy trained with RL"></video></div><p class="name">Franka arm</p><div class="tags"><span>LIBERO</span><span>PPO</span></div></div>
-      <div class="pf"><div class="card"><video data-src="assets/video/rl_g1.mp4" muted loop playsinline preload="none" aria-label="Unitree G1 humanoid, ODE policy trained with RL"></video></div><p class="name">G1 humanoid</p><div class="tags"><span>PPO</span></div></div>
-      <div class="pf"><div class="card"><img src="assets/robots/h1_walk.png" alt="H1 humanoid" loading="lazy"></div><p class="name">H1 humanoid</p><div class="tags"><span>FlashSAC</span></div></div>
-      <div class="pf"><div class="card"><video data-src="assets/video/rl_anymal.mp4" muted loop playsinline preload="none" aria-label="ANYmal-C quadruped, ODE policy trained with RL"></video></div><p class="name">ANYmal-C</p><div class="tags"><span>PPO</span></div></div>
-      <div class="pf"><div class="card"><video data-src="assets/video/rl_quad.mp4" muted loop playsinline preload="none" aria-label="Quadcopter, ODE policy trained with RL"></video></div><p class="name">Quadcopter</p><div class="tags"><span>PPO</span></div></div>
+    <figure class="anim">
+      <canvas id="fig1" aria-label="Animated figure, discrete policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
+    </figure>
+    <h3 class="sub">Diversity head</h3>
+    <p class="lede">The mode is decided by the direction in which integration sets off, so it is enough to randomize that direction.</p>
+    <figure class="anim">
+      <canvas id="fig2" aria-label="Animated figure of the diversity head, a sampled offset tilts the field toward one route"></canvas>
+    </figure>
+    <div class="demos">
+      <article class="demo">
+        <canvas id="d-contract" aria-label="Contractive perturbation, perturbed starts are pulled back to the demonstration"></canvas>
+        <div class="body">
+          <h4>Contractive perturbation</h4>
+          <p>Some training chunks start off the demonstration, so the field learns to pull drift back.</p>
+        </div>
+      </article>
+      <article class="demo">
+        <canvas id="d-rate" aria-label="One trained model integrated at 20, 40 and 80 Hz"></canvas>
+        <div class="body">
+          <h4>Any control rate</h4>
+          <p>The field lives in continuous time. One model runs at a finer rate by integrating with a smaller step.</p>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -375,7 +315,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 <section id="cite">
   <div class="wrap">
     <div class="cite-row">
-      <div class="head" style="margin:0"><p class="eyebrow">Cite</p><h2>BibTeX</h2></div>
+      <h2 class="sec" style="margin:0">BibTeX</h2>
       <button class="btn" id="copy-bib">Copy</button>
     </div>
 <pre class="bib" id="bib">@article{jia2026ode,
@@ -422,13 +362,12 @@ const sq = v => v * v;   // a unary minus right before ** is a syntax error in J
 const gauss = () => { let u=0,v=0; while(!u) u=rand(); v=rand(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
 
 /* ---------- hero: a demonstrated motion, its vector field, and two ways to follow it ---------- */
-{
-  const S = stage(document.getElementById('hero'));
+function heroPanel(id, mode){
+  const S = stage(document.getElementById(id));
   const ref = x => 0.20*Math.sin(2*Math.PI*0.85*x + 0.5) + 0.06*Math.sin(2*Math.PI*2.2*x);
   const dref = x => 0.20*2*Math.PI*0.85*Math.cos(2*Math.PI*0.85*x + 0.5) + 0.06*2*Math.PI*2.2*Math.cos(2*Math.PI*2.2*x);
   const K = 5.0;                                    // contraction toward the demonstration
   const field = (x,y) => [1, dref(x) - K*(y - ref(x))];
-  let mode = 'ode';
   const N = 56, H = 8;                              // control steps and chunk length
   const P = [];                                      // ambient particles
   for (let i=0;i<260;i++) P.push({x:rand(), y:(rand()-.5)*0.9, age:rand()*2});
@@ -450,15 +389,6 @@ const gauss = () => { let u=0,v=0; while(!u) u=rand(); v=rand(); return Math.sqr
   }
   plan = makePlan();
   const toPx = (x,y) => [x*S.w, S.h*0.56 - y*S.h*1.05];
-  function setMode(m){ mode = m; prog = 0; hold = 0; plan = makePlan();
-    document.getElementById('mode-ode').setAttribute('aria-pressed', m==='ode');
-    document.getElementById('mode-disc').setAttribute('aria-pressed', m!=='ode');
-    document.getElementById('hero-cap').textContent = m==='ode'
-      ? 'Each action is integrated from the previous one. Chunks join without jumps.'
-      : 'Each chunk is predicted on its own. Actions jump at chunk boundaries.'; }
-  document.getElementById('mode-ode').onclick = () => setMode('ode');
-  document.getElementById('mode-disc').onclick = () => setMode('disc');
-
   function draw(dt){
     const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
     // streamlines as drifting particles
@@ -502,6 +432,7 @@ const gauss = () => { let u=0,v=0; while(!u) u=rand(); v=rand(); return Math.sqr
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
+heroPanel('hero-disc', 'disc'); heroPanel('hero-ode', 'ode');
 
 /* ---------- contractive perturbation ---------- */
 {
@@ -514,7 +445,6 @@ const gauss = () => { let u=0,v=0; while(!u) u=rand(); v=rand(); return Math.sqr
   let tracks = [];
   function drop(x,y){ tracks.push({x, y, pts:[[x,y]], life:0}); if (tracks.length>6) tracks.shift(); }
   function auto(){ const x = 0.05+rand()*0.35; drop(x, ref(x) + (rand()<.5?-1:1)*(0.12+rand()*0.12)); }
-  document.getElementById('b-contract').onclick = auto;
   S.el.addEventListener('click', e => { const r = S.el.getBoundingClientRect(); const [x,y] = fromPx(e.clientX-r.left, e.clientY-r.top); if (x>0 && x<0.9) drop(x,y); });
   auto(); let t0 = 0;
   function draw(dt, t){
@@ -789,9 +719,7 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
   const ref = x => 0.2*Math.sin(2*Math.PI*1.1*x) + 0.05*Math.cos(2*Math.PI*3*x);
   const dref = x => 0.2*2*Math.PI*1.1*Math.cos(2*Math.PI*1.1*x) - 0.05*2*Math.PI*3*Math.sin(2*Math.PI*3*x);
   const toPx = (x,y) => [S.w*(0.06+0.88*x), S.h*0.5 - y*S.h*1.1];
-  const rates = [20,40,80]; let k = 0, shown = 0;
-  const input = document.getElementById('r-rate'), out = document.getElementById('r-val');
-  input.addEventListener('input', () => { k = +input.value; out.textContent = rates[k] + ' Hz'; shown = 0; });
+  const rates = [20,40,80]; let k = 0, shown = 0, hold = 0;
   function draw(dt){
     const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
     g.strokeStyle=hexA(c.teal,.55); g.lineWidth=1.6; g.beginPath();
@@ -800,9 +728,51 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
     if (!reduce) shown = Math.min(n, shown + dt*n/1.6); else shown = n;
     for (let i=0;i<=shown;i++){ const x=i/n; if (i>0){ const dx=1/n, x0=(i-1)/n; y += dx*(dref(x0+dx/2) - 4*(y-ref(x0))); }
       const [px,py]=toPx(x,y); g.fillStyle=c.blue; g.beginPath(); g.arc(px,py, k===0?4:(k===1?3.2:2.5),0,7); g.fill(); }
-    g.fillStyle=hexA(c.muted,.9); g.font='500 11px JetBrains Mono, monospace';
-    g.fillText(`${Math.round(n)} actions · same model, step 1/${rates[k]/20}`, 12, 18);
-    if (!reduce && shown>=n){ shown = n; }
+    // the rate cycles 20, 40, 80 Hz, one model throughout
+    g.fillStyle=c.blue; g.font='700 22px Bricolage Grotesque, Segoe UI, sans-serif'; g.textAlign='left'; g.textBaseline='alphabetic';
+    g.fillText(`${rates[k]} Hz`, 16, 34);
+    g.fillStyle=hexA(c.muted,.9); g.font='500 12px JetBrains Mono, monospace'; g.fillText(`${Math.round(n)} actions, same model`, 16, 54);
+    if (!reduce && shown>=n){ hold += dt; if (hold > 1.4){ hold = 0; shown = 0; k = (k+1) % 3; } }
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+/* ---------- multi-modality: rollouts on the four-route task ---------- */
+{
+  const S = stage(document.getElementById('d-modes'));
+  const lanes = [0.34, 0.12, -0.12, -0.34], cols = ['#F2B84B', '#E0704F', '#1F86B5', '#2BB5A3'];
+  const toPx = (x,y) => [S.w*(0.05+0.9*x), S.h*0.47 - y*S.h*0.95];
+  const sm = t => t<0?0:t>1?1:t*t*(3-2*t);
+  const path = (L, w) => { const p = []; for (let i=0;i<=120;i++){ const x=i/120;
+    const y = L*sm((x-0.03)/0.12)*(1-sm((x-0.40)/0.12)) + w*Math.sin(9*x)*sm((x-0.03)/0.12)*(1-sm((x-0.4)/0.12)); p.push([x,y]); } return p; };
+  let done = [], cur = null, count = [0,0,0,0];
+  const next = () => { const r = Math.floor(rand()*4); cur = {r, p: path(lanes[r] + gauss()*0.018, gauss()*0.012), f: 0}; };
+  next();
+  function draw(dt){
+    const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
+    // walls: three short blocks split the four lanes, a long wall leaves one gap in the middle
+    const block = (x, y0, y1) => { const [ax,ay]=toPx(x-0.012,y1), [bx,by]=toPx(x+0.012,y0);
+      g.fillStyle=hexA(c.muted,.16); g.strokeStyle=hexA(c.muted,.75); g.lineWidth=1.2; g.fillRect(ax,ay,bx-ax,by-ay); g.strokeRect(ax,ay,bx-ax,by-ay); };
+    block(0.24, 0.20, 0.27); block(0.24, -0.05, 0.05); block(0.24, -0.27, -0.20);
+    block(0.52, 0.07, 0.46); block(0.52, -0.46, -0.07);
+    const draw1 = (tr, a, w, frac) => { const n = Math.floor(frac*(tr.p.length-1)); g.strokeStyle = hexA(cols[tr.r], a); g.lineWidth = w; g.lineJoin='round';
+      g.beginPath(); for (let i=0;i<=n;i++){ const [px,py]=toPx(...tr.p[i]); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke(); return n; };
+    for (const tr of done) draw1(tr, .35, 1.4, 1);
+    if (!reduce){ cur.f = Math.min(1, Math.max(0, cur.f + dt/1.1)); }
+    else cur.f = 1;
+    const n = draw1(cur, 1, 3, cur.f); const [hx,hy] = toPx(...cur.p[n]); g.fillStyle = cols[cur.r]; g.beginPath(); g.arc(hx,hy,5,0,7); g.fill();
+    if (cur.f >= 1 && !reduce){ done.push(cur); count[cur.r]++; if (done.length > 40){ done = []; count = [0,0,0,0]; } next(); }
+    // start and goal
+    const [sx,sy]=toPx(0,0), [gx,gy]=toPx(0.98,0);
+    g.fillStyle=c.ink; g.beginPath(); g.arc(sx,sy,6,0,7); g.fill();
+    g.strokeStyle=c.ink; g.lineWidth=2; g.beginPath(); g.arc(gx,gy,8,0,7); g.stroke();
+    g.font='500 12px JetBrains Mono, monospace'; g.fillStyle=c.muted; g.textAlign='left'; g.textBaseline='alphabetic';
+    g.fillText('start', sx-4, sy+24); g.textAlign='right'; g.fillText('goal', gx+8, gy+26);
+    // how often each route was taken
+    const bw = 16, bx0 = S.w - 4*(bw+8) - 10, by0 = S.h - 14;
+    const top = Math.max(1, ...count); count.forEach((v,i) => { const h = 44*v/top; g.fillStyle = cols[i]; g.fillRect(bx0 + i*(bw+8), by0 - h, bw, h); });
+    g.textAlign='left'; g.fillStyle=c.muted; g.fillText('routes taken', bx0 - 2, by0 - 54);
+    g.textAlign='left'; g.font='500 12px JetBrains Mono, monospace'; g.fillText(`${done.length} rollout${done.length === 1 ? "" : "s"}`, 14, 22);
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
