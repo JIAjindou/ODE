@@ -80,7 +80,7 @@ nav.top .links a:hover{color:var(--ink)}
 section{padding-block:clamp(56px,8vw,96px) 0}
 h2.sec{font-size:clamp(38px,5vw,60px);line-height:1.04;font-weight:700;margin-bottom:16px}
 h3{font-size:clamp(24px,2.6vw,32px);font-weight:700;line-height:1.15}
-h3 span{font:500 14px/1 var(--mono);color:var(--blue);margin-right:12px;vertical-align:middle}
+h3 span{font:inherit;color:var(--blue);margin-right:14px;font-variant-numeric:tabular-nums}
 h3.sub{margin-top:56px;margin-bottom:10px}
 h4{font:700 19px/1.25 var(--display);margin:0}
 .lede{color:var(--muted);max-width:68ch;font-size:18px}
@@ -208,13 +208,18 @@ svg [data-s].dim{opacity:.12}
 .player .sr{color:var(--ink)!important;font-size:15px!important}
 .player .sr b{color:var(--blue)}
 .player .sr .muted{color:var(--muted)}
-.thumbs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
-.thumb{position:relative;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:#000;cursor:pointer}
-.thumb video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;opacity:.75;transition:opacity .2s}
-.thumb:hover video,.thumb[aria-pressed="true"] video{opacity:1}
-.thumb[aria-pressed="true"]{border-color:var(--blue)}
-.thumb span{position:absolute;left:6px;top:6px;font:600 11.5px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:4px 7px;border-radius:999px}
-.thumb[aria-pressed="true"] span{background:#397DB7;color:#fff}
+.player .base{margin-top:8px}
+.thumb{position:relative;display:block;padding:0;border:0;border-radius:10px;overflow:hidden;background:#000;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.thumb:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(10,20,30,.18)}
+.thumb video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.thumb .lab{position:absolute;left:6px;top:6px;font:600 11px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:4px 7px;border-radius:999px}
+.thumb .lab.ours{background:#397DB7;color:#fff}
+.thumb .why{position:absolute;left:0;right:0;bottom:0;text-align:left;font:400 11.5px/1.25 var(--body);color:#fff;padding:12px 7px 5px;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.main,.thumb{transition:opacity .25s}
+.main.dim,.thumb.dim{opacity:.35}
+.fly{position:fixed;z-index:25;border-radius:10px;overflow:hidden;transform-origin:0 0;box-shadow:0 18px 40px rgba(10,20,30,.3);pointer-events:none;background:#000}
+.fly video{display:block;width:100%;height:100%;object-fit:cover}
+.hint{font-size:13.5px!important;color:var(--muted)}
 .clip .why{font-size:14px;padding:22px 12px 10px}
 
 /* method steps */
@@ -346,33 +351,25 @@ svg [data-s].dim{opacity:.12}
 
     <article class="block">
       <h3><span>02</span>Executes precisely and smoothly</h3>
-      <p class="lede">On a real Galaxea R1 Lite, ODE policy succeeds where flow matching and diffusion fail. Click a baseline to watch it.</p>
+      <p class="lede">On a real Galaxea R1 Lite, ODE policy succeeds where flow matching and diffusion fail.</p>
       <div class="player">
-        <figure class="clip main"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="Real-robot rollout of the microwave task"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span><span class="why" hidden></span></figure>
+        <figure class="clip main" data-src="assets/video/microwave_ode.mp4" data-name="ODE policy" data-why=""><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="Real-robot rollout, Bimanual microwave"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span><span class="why" hidden></span></figure>
         <div class="txt">
           <h4>Bimanual microwave</h4>
           <p>Grasp a bowl, place it in the microwave, push it in, close the door with the other arm.</p>
           <p class="sr"><b>75%</b> ODE &nbsp;·&nbsp; 20% FM-DiT &nbsp;·&nbsp; 0% DDPM &nbsp;·&nbsp; 0% DDIM</p>
-          <div class="thumbs">
-            <button class="thumb" aria-pressed="true" data-full="assets/video/microwave_ode.mp4" data-name="ODE policy"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none"></video><span>ODE</span></button>
-            <button class="thumb" aria-pressed="false" data-full="assets/video/microwave_fm.mp4" data-name="FM-DiT" data-why="leaves the door open"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none"></video><span>FM-DiT</span></button>
-            <button class="thumb" aria-pressed="false" data-full="assets/video/microwave_ddpm.mp4" data-name="DDPM-UNet" data-why="fails to grasp the bowl"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none"></video><span>DDPM</span></button>
-            <button class="thumb" aria-pressed="false" data-full="assets/video/microwave_ddim.mp4" data-name="DDIM-UNet" data-why="fails to grasp the bowl"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none"></video><span>DDIM</span></button>
-          </div>
+          <div class="base"><button class="thumb" data-src="assets/video/microwave_fm.mp4" data-name="FM-DiT" data-why="leaves the door open"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none"></video><span class="lab">FM-DiT</span><span class="why">leaves the door open</span></button><button class="thumb" data-src="assets/video/microwave_ddpm.mp4" data-name="DDPM-UNet" data-why="fails to grasp the bowl"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none"></video><span class="lab">DDPM-UNet</span><span class="why">fails to grasp the bowl</span></button><button class="thumb" data-src="assets/video/microwave_ddim.mp4" data-name="DDIM-UNet" data-why="fails to grasp the bowl"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none"></video><span class="lab">DDIM-UNet</span><span class="why">fails to grasp the bowl</span></button></div>
+          <p class="hint">Click a baseline to play it in the large view.</p>
         </div>
       </div>
       <div class="player">
-        <figure class="clip main"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="Real-robot rollout of the flower task"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span><span class="why" hidden></span></figure>
+        <figure class="clip main" data-src="assets/video/flower_ode.mp4" data-name="ODE policy" data-why=""><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="Real-robot rollout, Flower into a narrow vase"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span><span class="why" hidden></span></figure>
         <div class="txt">
           <h4>Flower into a narrow vase</h4>
           <p>Insert a thin stem into a small opening, which leaves almost no room for error.</p>
           <p class="sr"><b>30% / 60%</b> ODE &nbsp;·&nbsp; 20% / 40% FM-DiT &nbsp;·&nbsp; 0% / 0% DDPM &nbsp;·&nbsp; 0% / 5% DDIM <span class="muted">(poppy / dahlia)</span></p>
-          <div class="thumbs">
-            <button class="thumb" aria-pressed="true" data-full="assets/video/flower_ode.mp4" data-name="ODE policy"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none"></video><span>ODE</span></button>
-            <button class="thumb" aria-pressed="false" data-full="assets/video/flower_fm.mp4" data-name="FM-DiT" data-why="the stem misses the opening"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none"></video><span>FM-DiT</span></button>
-            <button class="thumb" aria-pressed="false" data-full="assets/video/flower_ddpm.mp4" data-name="DDPM-UNet" data-why="the stem misses the opening"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none"></video><span>DDPM</span></button>
-            <button class="thumb" aria-pressed="false" data-full="assets/video/flower_ddim.mp4" data-name="DDIM-UNet" data-why="the stem misses the opening"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none"></video><span>DDIM</span></button>
-          </div>
+          <div class="base"><button class="thumb" data-src="assets/video/flower_fm.mp4" data-name="FM-DiT" data-why="the stem misses the opening"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none"></video><span class="lab">FM-DiT</span><span class="why">the stem misses the opening</span></button><button class="thumb" data-src="assets/video/flower_ddpm.mp4" data-name="DDPM-UNet" data-why="the stem misses the opening"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none"></video><span class="lab">DDPM-UNet</span><span class="why">the stem misses the opening</span></button><button class="thumb" data-src="assets/video/flower_ddim.mp4" data-name="DDIM-UNet" data-why="the stem misses the opening"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none"></video><span class="lab">DDIM-UNet</span><span class="why">the stem misses the opening</span></button></div>
+          <p class="hint">Click a baseline to play it in the large view.</p>
         </div>
       </div>
 
@@ -712,216 +709,214 @@ const MONO = 'JetBrains Mono, ui-monospace, monospace';
 const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
 
 /* ---------- Fig. 1: discrete policies vs. ODE policy ---------- */
+// text with a subscript, centered on x (e.g. f with theta)
+function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, italic = true){
+  g.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`; const wb = g.measureText(base).width;
+  g.font = `${italic ? 'italic ' : ''}${weight} ${size * 0.68}px ${family}`; const ws = g.measureText(sub).width;
+  const x0 = x - (wb + ws) / 2;
+  txt(g, base, x0, y, col, size, weight, 'left', family, italic); txt(g, sub, x0 + wb + 1, y + size * 0.3, col, size * 0.68, weight, 'left', family, italic);
+}
 {
-  const S = vstage(document.getElementById('fig1'), [1100, 430], [560, 860]);
-  const N = 24, H = 8, T = 1.7;                       // steps, chunk length, seconds per chunk
-  const ref = u => 0.55 * Math.sin(2 * Math.PI * (0.9 * u + 0.08)) + 0.18 * Math.sin(2 * Math.PI * 2.1 * u);
-  let offs = [0.5, -0.35, 0.42];
-  const reroll = () => { offs = [0, 1, 2].map(i => (i % 2 ? -1 : 1) * (0.28 + rand() * 0.25)); };
-  const odePath = (() => { const p = [ref(0) + 0.6]; for (let i = 1; i <= N; i++){ const u = i / N; p.push(ref(u) + (p[i-1] - ref((i-1)/N)) * 0.62); } return p; })();
-  let clock = 0;
+  const S = vstage(document.getElementById('fig1'), [1100, 470], [560, 940]);
+  const N = 24, H = 8, T = 1.6;                          // control steps, chunk length, seconds per chunk
+  const ref = u => 0.5 * Math.sin(2 * Math.PI * (0.85 * u + 0.1)) + 0.16 * Math.sin(2 * Math.PI * 2.1 * u);
+  const dref = u => 0.5 * 2 * Math.PI * 0.85 * Math.cos(2 * Math.PI * (0.85 * u + 0.1)) + 0.16 * 2 * Math.PI * 2.1 * Math.cos(2 * Math.PI * 2.1 * u);
+  let offs = [0.34, -0.3, 0.28];
+  const reroll = () => { offs = [0, 1, 2].map(i => (i % 2 ? -1 : 1) * (0.2 + rand() * 0.18)); };
+  // the ODE path starts off the demonstration and is pulled onto it
+  const odePath = Array.from({ length: N + 1 }, (_, i) => ref(i / N) + 0.3 * Math.pow(0.72, i));
   const heads = ['Regression', 'Generative', 'RL actor'];
-
-  function encoder(g, c, x, y){                      // input icon, encoder, embedding tokens
-    for (let i = 0; i < 3; i++){ g.fillStyle = hexA(c.muted, 0.18 + i * 0.12); g.strokeStyle = hexA(c.muted, .7); g.lineWidth = 1;
-      g.beginPath(); g.roundRect(x + i * 5, y - 22 + i * 5, 34, 26, 4); g.fill(); g.stroke(); }
-    txt(g, 'o, l  or  s', x + 22, y + 30, c.muted, 12, 500, 'center', MONO);
-    arrow(g, x + 50, y, x + 78, y, c.muted);
-    g.fillStyle = hexA(c.muted, .12); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3;
-    g.beginPath(); g.moveTo(x + 82, y - 26); g.lineTo(x + 160, y - 16); g.lineTo(x + 160, y + 16); g.lineTo(x + 82, y + 26); g.closePath(); g.fill(); g.stroke();
-    txt(g, 'Encoder', x + 121, y, c.ink, 14, 600);
-    arrow(g, x + 162, y, x + 184, y, c.muted);
+  let clock = 0;
+  function inputs(g, c, x, y, label){
+    for (let i = 0; i < 3; i++){ g.fillStyle = hexA(c.muted, 0.16 + i * 0.12); g.strokeStyle = hexA(c.muted, .75); g.lineWidth = 1;
+      g.beginPath(); g.roundRect(x - 20 + i * 5, y - 18 + i * 5, 30, 24, 4); g.fill(); g.stroke(); }
+    txt(g, label, x, y + 34, c.muted, 12.5, 500, 'center', MONO);
+  }
+  function encoder(g, c, x, y){
+    g.fillStyle = hexA(c.muted, .1); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3;
+    g.beginPath(); g.moveTo(x, y - 26); g.lineTo(x + 80, y - 16); g.lineTo(x + 80, y + 16); g.lineTo(x, y + 26); g.closePath(); g.fill(); g.stroke();
+    txt(g, 'Encoder', x + 40, y, c.ink, 13.5, 600);
   }
   function tokens(g, x, y, col, lit){
-    for (let i = 0; i < 4; i++){ g.fillStyle = hexA(col, 0.35 + 0.65 * lit * (0.6 + 0.4 * Math.sin(clock * 6 + i)));
-      g.beginPath(); g.roundRect(x, y - 24 + i * 12.5, 14, 10, 2); g.fill(); }
+    for (let i = 0; i < 4; i++){ g.fillStyle = hexA(col, 0.3 + 0.7 * lit); g.beginPath(); g.roundRect(x, y - 23 + i * 12, 14, 9, 2); g.fill(); }
   }
   function timeline(g, c, x0, y0, w, h, kind, prog){
-    // prog: chunk-time in [0, 3]; discrete chunks appear whole, ODE actions appear one at a time
-    const X = i => x0 + 20 + (w - 40) * i / N, Y = v => y0 + h * 0.48 - v * h * 0.38;
-    g.strokeStyle = hexA(c.ink, .7); g.lineWidth = 1.3; arrow(g, x0, y0 + h - 4, x0 + w, y0 + h - 4, hexA(c.ink, .7));
-    txt(g, 't', x0 + w + 2, y0 + h - 16, c.muted, 13, 500, 'left', MONO, true);
-    for (let k = 0; k < 3; k++){
-      const xa = X(k * H), xb = X((k + 1) * H);
-      g.fillStyle = hexA(c.muted, k % 2 ? .07 : .03); g.fillRect(xa, y0 + 6, xb - xa, h - 14);
-      txt(g, ['chunk i−1', 'chunk i', 'chunk i+1'][k], (xa + xb) / 2, y0 + h + 12, c.muted, 12.5, 500, 'center', MONO);
-    }
-    g.setLineDash([3, 4]); g.strokeStyle = hexA(c.muted, .55); g.lineWidth = 1.3; g.beginPath();
-    for (let i = 0; i <= 60; i++){ const u = i / 60; const px = x0 + 20 + (w - 40) * u, py = Y(ref(u)); i ? g.lineTo(px, py) : g.moveTo(px, py); }
-    g.stroke(); g.setLineDash([]);
+    const X = i => x0 + 16 + (w - 32) * i / N, Y = v => y0 + h * 0.5 - v * h * 0.5;
+    for (let k = 0; k < 3; k++){ const xa = X(k * H), xb = X((k + 1) * H);
+      g.fillStyle = hexA(c.muted, k % 2 ? .08 : .03); g.fillRect(xa, y0, xb - xa, h);
+      txt(g, ['chunk i−1', 'chunk i', 'chunk i+1'][k], (xa + xb) / 2, y0 + h + 30, c.muted, 12.5, 500, 'center', MONO); }
+    arrow(g, x0, y0 + h + 10, x0 + w + 8, y0 + h + 10, hexA(c.ink, .7));
+    txt(g, 't', x0 + w + 16, y0 + h + 10, c.muted, 13, 500, 'left', MONO, true);
+    if (kind === 'ode'){                                   // faint field arrows toward the demonstration
+      for (let i = 1; i < 24; i += 2) for (let j = 0; j < 5; j++){ const u = i / N, v = -0.75 + j * 0.375;
+        let vx = 1 / N, vy = (dref(u) - 4 * (v - ref(u))) / N; const L = Math.hypot(vx * (w - 32), vy * h * 0.5); const s = 11 / L;
+        const px = X(i), py = Y(v); g.strokeStyle = hexA(c.blue, .16); g.lineWidth = 1.2; g.beginPath(); g.moveTo(px, py); g.lineTo(px + vx * (w - 32) * s, py - vy * h * 0.5 * s); g.stroke(); } }
+    g.setLineDash([4, 4]); g.strokeStyle = hexA(c.muted, .7); g.lineWidth = 1.4; g.beginPath();
+    for (let i = 0; i <= 80; i++){ const u = i / 80; i ? g.lineTo(X(u * N), Y(ref(u))) : g.moveTo(X(0), Y(ref(0))); } g.stroke(); g.setLineDash([]);
+    g.setLineDash([4, 4]); g.strokeStyle = hexA(c.muted, .7); g.beginPath(); g.moveTo(x0 + w - 150, y0 + 12); g.lineTo(x0 + w - 128, y0 + 12); g.stroke(); g.setLineDash([]);
+    txt(g, 'demonstration', x0 + w - 122, y0 + 12, c.muted, 11.5, 500, 'left', MONO);
     if (kind === 'disc'){
       const shown = Math.min(3, Math.floor(prog) + 1);
       for (let k = 0; k < shown; k++){
-        const pts = []; for (let i = k * H; i <= (k + 1) * H - (k < 2 ? 1 : 0); i++) pts.push([X(i), Y(ref(i / N) + offs[k] * 0.55)]);
-        const a = k === Math.floor(prog) ? ease((prog - k) * 4) : 1;
-        pts.forEach(([px, py]) => { g.strokeStyle = hexA(c.teal, .35 * a); g.lineWidth = 1; g.beginPath(); g.moveTo(px, Y(-1.05)); g.lineTo(px, py); g.stroke();
+        const a = k === Math.floor(prog) && prog < 3 ? ease((prog - k) * 4) : 1;
+        const pts = []; for (let i = k * H; i < (k + 1) * H + (k === 2 ? 1 : 0); i++) pts.push([X(i), Y(ref(i / N) + offs[k])]);
+        pts.forEach(([px, py]) => { g.strokeStyle = hexA(c.teal, .3 * a); g.lineWidth = 1; g.beginPath(); g.moveTo(px, y0 + h); g.lineTo(px, py); g.stroke();
           g.fillStyle = hexA(c.teal, a); g.beginPath(); g.arc(px, py, 4, 0, 7); g.fill(); });
-        if (k > 0){ const pv = [X(k * H - 1), Y(ref((k * H - 1) / N) + offs[k - 1] * 0.55)];
-          g.strokeStyle = hexA(c.orange, a); g.lineWidth = 2; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(...pv); g.lineTo(pts[0][0], pts[0][1]); g.stroke(); g.setLineDash([]); }
+        if (k > 0){ const px = X(k * H - 1), py = Y(ref((k * H - 1) / N) + offs[k - 1]);
+          g.strokeStyle = hexA(c.orange, a); g.lineWidth = 2.2; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(px, py); g.lineTo(pts[0][0], pts[0][1]); g.stroke(); g.setLineDash([]);
+          if (k === 1) txt(g, 'jump', (px + pts[0][0]) / 2 + 22, (py + pts[0][1]) / 2, hexA(c.orange, a), 12, 600, 'left', MONO); }
       }
     } else {
-      const n = Math.min(N, prog / 3 * N);
-      // faint field lines toward the path
-      for (let j = 0; j < 7; j++){ const u0 = j / 7; let v = odePath[Math.round(u0 * N)] + (j % 2 ? .5 : -.45);
-        g.strokeStyle = hexA(c.blue, .16); g.lineWidth = 1.2; g.beginPath(); g.moveTo(X(u0 * N), Y(v));
-        for (let s = 1; s <= 8; s++){ const i = Math.min(N, u0 * N + s * 0.7); const tgt = odePath[Math.floor(i)]; v += (tgt - v) * 0.33; g.lineTo(X(i), Y(v)); } g.stroke(); }
+      const n = Math.min(N, prog / 3 * N), fi = Math.floor(n), fr = n - fi;
       g.strokeStyle = c.blue; g.lineWidth = 3; g.lineJoin = 'round'; g.beginPath();
-      for (let i = 0; i <= n; i++){ const px = X(i), py = Y(odePath[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); }
-      const fi = Math.floor(n), fr = n - fi;
-      if (fi < N){ const px = X(fi + fr), py = Y(odePath[fi] + (odePath[fi + 1] - odePath[fi]) * fr); g.lineTo(px, py); g.stroke();
-        g.fillStyle = c.blue; g.beginPath(); g.arc(px, py, 5.5, 0, 7); g.fill(); g.strokeStyle = hexA(c.blue, .35); g.lineWidth = 6; g.beginPath(); g.arc(px, py, 9, 0, 7); g.stroke(); }
-      else g.stroke();
+      for (let i = 0; i <= fi; i++) i ? g.lineTo(X(i), Y(odePath[i])) : g.moveTo(X(0), Y(odePath[0]));
+      let hx = X(fi), hy = Y(odePath[fi]);
+      if (fi < N){ hx = X(fi + fr); hy = Y(odePath[fi] + (odePath[fi + 1] - odePath[fi]) * fr); g.lineTo(hx, hy); }
+      g.stroke();
       for (let i = 0; i <= fi; i++){ g.fillStyle = c.blue; g.beginPath(); g.arc(X(i), Y(odePath[i]), 3, 0, 7); g.fill(); }
+      for (let k = 1; k < 3; k++) if (fi >= k * H){ const px = X(k * H), py = Y(odePath[k * H]);   // chunk boundaries join without a jump
+        g.strokeStyle = hexA(c.blue, .5); g.lineWidth = 1.5; g.beginPath(); g.arc(px, py, 8, 0, 7); g.stroke(); }
+      if (fi < N){ g.fillStyle = hexA(c.blue, .2); g.beginPath(); g.arc(hx, hy, 10, 0, 7); g.fill(); g.fillStyle = c.blue; g.beginPath(); g.arc(hx, hy, 5.5, 0, 7); g.fill(); }
     }
   }
   function panel(g, c, ox, oy, kind, prog){
-    const col = kind === 'disc' ? c.teal : c.blue;
-    txt(g, kind === 'disc' ? 'Discrete policies' : 'ODE policy (ours)', ox + 270, oy + 22, col, 19, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
-    const y = oy + 100; encoder(g, c, ox + 14, y);
-    const chunkStart = prog % 1 < 0.22 && prog < 3;     // the encoder runs once at the start of each chunk
-    tokens(g, ox + 190, y, col, chunkStart ? 1 : 0.15);
-    txt(g, 'z', ox + 197, y + 36, c.ink, 13, 500, 'center', MONO, true);
-    arrow(g, ox + 210, y, ox + 236, y, c.muted);
+    const col = kind === 'disc' ? c.teal : c.blue, y = oy + 112;
+    txt(g, kind === 'disc' ? 'Discrete policies' : 'ODE policy (ours)', ox + 270, oy + 20, col, 19, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
+    const lit = prog < 3 && prog % 1 < 0.25 ? 1 : 0;      // the encoder runs once at the start of each chunk
+    inputs(g, c, ox + 34, y, kind === 'disc' ? 'o, l, s' : 'o, l');
+    arrow(g, ox + 62, y, ox + 86, y, c.muted); encoder(g, c, ox + 90, y); arrow(g, ox + 172, y, ox + 192, y, c.muted);
+    tokens(g, ox + 196, y, col, lit); txt(g, 'z', ox + 203, y + 34, c.ink, 13, 500, 'center', MONO, true);
+    arrow(g, ox + 216, y, ox + 240, y, c.muted);
     if (kind === 'disc'){
-      txt(g, 'Action head π', ox + 300, y - 46, c.ink, 13.5, 500);
-      const hi = Math.floor(clock / 1.6) % 3, fade = ease((clock % 1.6) * 3);
-      g.fillStyle = hexA(c.teal, .14); g.strokeStyle = hexA(c.teal, .9); g.lineWidth = 1.4; g.beginPath(); g.roundRect(ox + 240, y - 20, 120, 40, 18); g.fill(); g.stroke();
-      txt(g, heads[hi], ox + 300, y, hexA(c.ink, fade), 14, 600);
-      arrow(g, ox + 362, y, ox + 384, y, c.muted);
-      const k = Math.min(2, Math.floor(prog)), pop = ease((prog - Math.floor(prog)) * 4);
-      for (let i = 0; i < H; i++){ const v = ref((k * H + i) / N) + offs[k] * 0.55; const hh = (18 + v * 16) * (prog < 3 ? pop : 1);
-        const px = ox + 392 + i * 9; g.strokeStyle = hexA(c.teal, .8); g.lineWidth = 1.4; g.beginPath(); g.moveTo(px, y + 22); g.lineTo(px, y + 22 - hh); g.stroke();
-        g.fillStyle = c.teal; g.beginPath(); g.arc(px, y + 22 - hh, 3, 0, 7); g.fill(); }
-      arrow(g, ox + 470, y, ox + 494, y, c.muted); txt(g, 'A', ox + 508, y, c.ink, 15, 600, 'center', MONO);
-      txt(g, 'whole chunk at once', ox + 430, y + 42, c.muted, 11.5, 500, 'center', MONO);
+      txt(g, 'Action head', ox + 302, y - 38, c.ink, 13, 600, 'center', MONO);
+      g.fillStyle = hexA(c.teal, .14); g.strokeStyle = hexA(c.teal, .9); g.lineWidth = 1.4; g.beginPath(); g.roundRect(ox + 244, y - 20, 116, 40, 18); g.fill(); g.stroke();
+      const cyc = 3 * T + 1.4, hi = Math.floor(clock / cyc) % 3;
+      txt(g, heads[hi], ox + 302, y, c.ink, 13.5, 600, 'center', MONO, true);
+      arrow(g, ox + 364, y, ox + 386, y, c.muted);
+      const k = Math.min(2, Math.floor(prog)), pop = prog < 3 ? ease((prog - Math.floor(prog)) * 4) : 1;
+      for (let i = 0; i < H; i++){ const v = ref((k * H + i) / N) + offs[k]; const hh = Math.max(6, 24 + v * 16) * pop;
+        const px = ox + 396 + i * 10; g.strokeStyle = hexA(c.teal, .8); g.lineWidth = 1.4; g.beginPath(); g.moveTo(px, y + 20); g.lineTo(px, y + 20 - hh); g.stroke();
+        g.fillStyle = c.teal; g.beginPath(); g.arc(px, y + 20 - hh, 3, 0, 7); g.fill(); }
+      arrow(g, ox + 476, y, ox + 498, y, c.muted); txt(g, 'A', ox + 512, y, c.ink, 15, 700, 'center', MONO, true);
+      txt(g, 'whole chunk at once', ox + 442, y + 40, c.muted, 11.5, 500, 'center', MONO);
     } else {
-      txt(g, 'Vector field f', ox + 335, y - 46, c.ink, 13.5, 500); txt(g, 'θ', ox + 377, y - 42, c.ink, 10, 500);
-      // field plate with moving streamlines and the integrated point
-      const P = [[ox + 252, y + 30], [ox + 286, y - 30], [ox + 430, y - 30], [ox + 396, y + 30]];
-      g.fillStyle = hexA(c.blue, .09); g.strokeStyle = hexA(c.blue, .85); g.lineWidth = 1.3; g.beginPath(); P.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.fill(); g.stroke();
-      const map = (u, v) => [ox + 262 + u * 150 + (v + 1) * 13, y + 18 - (v + 1) * 18];
-      for (let j = 0; j < 5; j++){ g.strokeStyle = hexA(c.blue, .3); g.lineWidth = 1; g.beginPath();
-        for (let i = 0; i <= 20; i++){ const u = i / 20, v = 0.65 * Math.sin(3 * u + j) * (1 - u) + 0.25 * Math.sin(5 * u); const [px, py] = map(u, v); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
-      const u = ((clock * 0.35) % 1); const v = 0.25 * Math.sin(5 * u);
-      g.strokeStyle = c.blue; g.lineWidth = 2.4; g.beginPath(); for (let i = 0; i <= 30 * u; i++){ const uu = i / 30; const [px, py] = map(uu, 0.25 * Math.sin(5 * uu)); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
-      const [qx, qy] = map(u, v); g.fillStyle = c.blue; g.beginPath(); g.arc(qx, qy, 4, 0, 7); g.fill();
-      arrow(g, ox + 196, y + 46, ox + 262, y + 22, c.muted); txt(g, 's', ox + 190, y + 50, c.ink, 13, 500, 'center', MONO, true);
-      arrow(g, ox + 436, y, ox + 462, y, c.muted); txt(g, '∫ dt', ox + 492, y, c.blue, 18, 500, 'center', MONO);
-      txt(g, 'ȧ = f(a, s, z)', ox + 345, y + 48, c.ink, 13, 500, 'center', MONO);
-      txt(g, 'one action at a time', ox + 492, y + 30, c.muted, 11.5, 500, 'center', MONO);
+      txt(g, 'Vector field', ox + 316, y - 44, c.ink, 13, 600, 'center', MONO);
+      const P = [[ox + 244, y + 28], [ox + 264, y - 28], [ox + 392, y - 28], [ox + 372, y + 28]];
+      g.fillStyle = hexA(c.blue, .08); g.strokeStyle = hexA(c.blue, .85); g.lineWidth = 1.3; g.beginPath(); P.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.fill(); g.stroke();
+      const map = (u, v) => [ox + 262 + u * 112 + v * 8, y + v * 18];
+      for (let j = 0; j < 4; j++){ g.strokeStyle = hexA(c.blue, .28); g.lineWidth = 1; g.beginPath();
+        for (let i = 0; i <= 20; i++){ const u = i / 20, v = (j - 1.5) * 0.55 * (1 - u) + 0.25 * Math.sin(5 * u); const [px, py] = map(u, v); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+      const u = (clock * 0.3) % 1; g.strokeStyle = c.blue; g.lineWidth = 2.2; g.beginPath();
+      for (let i = 0; i <= 30 * u; i++){ const uu = i / 30; const [px, py] = map(uu, 0.25 * Math.sin(5 * uu)); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
+      const [qx, qy] = map(u, 0.25 * Math.sin(5 * u)); g.fillStyle = c.blue; g.beginPath(); g.arc(qx, qy, 4, 0, 7); g.fill();
+      txtSub(g, 'ȧ = f', 'θ', ox + 300, y + 46, c.ink, 13); txt(g, '(a, s, z)', ox + 326, y + 46, c.ink, 13, 600, 'left', MONO, true);
+      arrow(g, ox + 396, y, ox + 416, y, c.muted); txt(g, '∫ dt', ox + 440, y, c.blue, 17, 600, 'center', MONO);
+      arrow(g, ox + 464, y, ox + 486, y, c.muted);
+      const pulse = 0.5 + 0.5 * Math.sin(clock * 10); g.fillStyle = hexA(c.blue, .2 + .2 * pulse); g.beginPath(); g.arc(ox + 502, y, 10, 0, 7); g.fill();
+      g.fillStyle = c.blue; g.beginPath(); g.arc(ox + 502, y, 5, 0, 7); g.fill();
+      txt(g, 'one action', ox + 494, y + 34, c.muted, 11.5, 500, 'center', MONO); txt(g, 'at a time', ox + 494, y + 50, c.muted, 11.5, 500, 'center', MONO);
+      // proprioception enters the field directly
+      arrow(g, ox + 236, y + 52, ox + 254, y + 26, c.muted); txt(g, 's', ox + 230, y + 60, c.ink, 13, 500, 'center', MONO, true);
     }
-    timeline(g, c, ox + 20, oy + 190, 500, 190, kind, prog);
+    timeline(g, c, ox + 20, oy + 220, 490, 190, kind, prog);
   }
   function draw(dt){
-    const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [560, 860] : [1100, 430];
+    const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [560, 940] : [1100, 470];
     g.clearRect(0, 0, vw, vh);
     if (!reduce) clock += dt; else clock = 3 * T;
     const cyc = 3 * T + 1.4, t = clock % cyc; const prog = Math.min(3, t / T);
     if (!reduce && t < dt * 1.5) reroll();
-    if (S.narrow){ panel(g, c, 10, 4, 'disc', prog); panel(g, c, 10, 434, 'ode', prog); }
-    else { panel(g, c, 0, 4, 'disc', prog); g.strokeStyle = hexA(c.line, 1); g.lineWidth = 1; g.beginPath(); g.moveTo(550, 20); g.lineTo(550, 410); g.stroke(); panel(g, c, 560, 4, 'ode', prog); }
+    if (S.narrow){ panel(g, c, 10, 4, 'disc', prog); panel(g, c, 10, 474, 'ode', prog); }
+    else { panel(g, c, 0, 4, 'disc', prog); g.strokeStyle = hexA(c.line, 1); g.lineWidth = 1; g.beginPath(); g.moveTo(550, 24); g.lineTo(550, 450); g.stroke(); panel(g, c, 560, 4, 'ode', prog); }
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
 
 /* ---------- Fig. 2: the diversity head ---------- */
 {
-  const S = vstage(document.getElementById('fig2'), [1080, 380], [480, 1160]);
-  let clock = 0, eps = 1, epsShown = 1, lastSample = -10;
-  // a field panel (300 x 330): start at the bottom, goal at the top, obstacle in the middle
-  const PW = 300, PH = 330;
-  const lam = y => 1.5 * Math.exp(-sq((y - 0.33) / 0.15)) - 1.5 * Math.exp(-sq((y - 0.78) / 0.12));
-  const fx = (x, y, e) => -2.4 * x + lam(y) * e;     // x across, y from start (0) to goal (1)
-  function route(e){ const p = [[0, 0]]; let x = 0; for (let i = 1; i <= 120; i++){ const y = i / 120; x += fx(x, y - 1 / 120, e) / 120; p.push([x, y]); } return p; }
-  const demoL = route(1), demoR = route(-1);
+  const S = vstage(document.getElementById('fig2'), [1080, 410], [520, 1250]);
+  const PW = 280, PH = 360;
+  let clock = 0, eps = 1, lastSample = 0;
+  // routes from the start (y = 0) to the goal (y = 1): both ends fixed, the middle bends around the obstacle
+  const bend = y => Math.pow(Math.sin(Math.PI * y), 0.9);
+  const route = (e, x0 = 0) => Array.from({ length: 81 }, (_, i) => { const y = i / 80; return [e * 0.62 * bend(y) + x0 * (1 - y), y]; });
+  function star(g, x, y, r, col){ g.fillStyle = col; g.beginPath(); for (let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; g.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); } g.closePath(); g.fill(); }
+  function path(g, M, p, col, w, frac = 1, dash = null){
+    const n = Math.max(1, Math.floor(frac * (p.length - 1))); g.strokeStyle = col; g.lineWidth = w; g.lineJoin = 'round'; g.lineCap = 'round'; if (dash) g.setLineDash(dash);
+    g.beginPath(); for (let i = 0; i <= n; i++){ const [px, py] = M(...p[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.setLineDash([]); return p[n];
+  }
   function fieldPanel(g, c, ox, oy, e, title, note, parts){
-    const M = (x, y) => [ox + PW / 2 + x * PW * 0.9, oy + PH - 30 - y * (PH - 70)];
-    txt(g, title, ox + PW / 2, oy + 10, c.ink, 17, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
-    // streamlines as moving dashes
-    for (let j = 0; j < 9; j++){ const x0 = (j / 8 - 0.5) * 0.62; let x = x0; g.strokeStyle = hexA(e === 0 ? c.muted : c.blue, .28); g.lineWidth = 1.3;
-      g.setLineDash([10, 8]); g.lineDashOffset = -clock * 22; g.beginPath(); g.moveTo(...M(x, 0));
-      for (let i = 1; i <= 40; i++){ const y = i / 40; x += fx(x, y, e) / 40; g.lineTo(...M(x, y)); } g.stroke(); }
+    const M = (x, y) => [ox + PW / 2 + x * (PW / 2 - 24), oy + PH - 48 - y * (PH - 118)];
+    txt(g, title, ox + PW / 2, oy + 12, c.ink, 17, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
+    // streamlines of the field, all ending at the goal
+    g.setLineDash([9, 7]); g.lineDashOffset = -clock * 20;
+    for (let j = 0; j < 9; j++){ const x0 = (j / 8 - 0.5) * 1.7; path(g, M, route(e, x0), hexA(e === 0 ? c.muted : c.blue, .22), 1.3); }
     g.setLineDash([]); g.lineDashOffset = 0;
-    // demonstrations
-    for (const d of [demoL, demoR]){ g.strokeStyle = hexA(c.muted, .45); g.lineWidth = 1.4; g.beginPath(); d.forEach((p, i) => i ? g.lineTo(...M(...p)) : g.moveTo(...M(...p))); g.stroke(); }
-    // obstacle
-    const [bx, by] = M(0, 0.55); g.fillStyle = hexA(c.muted, .14); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3;
-    g.beginPath(); g.roundRect(bx - 34, by - 18, 68, 36, 6); g.fill(); g.stroke();
-    g.save(); g.beginPath(); g.roundRect(bx - 34, by - 18, 68, 36, 6); g.clip(); g.strokeStyle = hexA(c.muted, .45); g.lineWidth = 1;
+    for (const d of [route(1), route(-1)]) path(g, M, d, hexA(c.muted, .5), 1.5);   // demonstrations
+    const [bx, by] = M(0, 0.5);                            // obstacle between the two routes
+    g.fillStyle = c.bg; g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3; g.beginPath(); g.roundRect(bx - 32, by - 17, 64, 34, 6); g.fill(); g.stroke();
+    g.save(); g.beginPath(); g.roundRect(bx - 32, by - 17, 64, 34, 6); g.clip(); g.strokeStyle = hexA(c.muted, .45); g.lineWidth = 1;
     for (let k = -80; k < 80; k += 8){ g.beginPath(); g.moveTo(bx + k, by + 20); g.lineTo(bx + k + 40, by - 20); g.stroke(); } g.restore();
     parts(M);
     const [sx, sy] = M(0, 0), [gx, gy] = M(0, 1);
-    g.fillStyle = c.ink; g.beginPath(); g.arc(sx, sy, 6, 0, 7); g.fill(); txt(g, 'start', sx + 30, sy + 2, c.ink, 12.5, 500, 'center', MONO);
-    star(g, gx, gy, 9, c.ink); txt(g, 'goal', gx + 28, gy, c.ink, 12.5, 500, 'center', MONO);
+    g.fillStyle = c.ink; g.beginPath(); g.arc(sx, sy, 6, 0, 7); g.fill(); txt(g, 'start', sx, sy + 20, c.ink, 12.5, 500, 'center', MONO);
+    star(g, gx, gy, 9, c.ink); txt(g, 'goal', gx, gy - 20, c.ink, 12.5, 500, 'center', MONO);
     txt(g, note, ox + PW / 2, oy + PH + 18, c.muted, 13.5, 500);
   }
-  function star(g, x, y, r, col){ g.fillStyle = col; g.beginPath(); for (let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; g.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); } g.closePath(); g.fill(); }
-  function drawPath(g, M, p, col, w, frac, dash){
-    const n = Math.floor(frac * (p.length - 1)); g.strokeStyle = col; g.lineWidth = w; g.lineJoin = 'round'; if (dash) g.setLineDash(dash);
-    g.beginPath(); for (let i = 0; i <= n; i++){ const [px, py] = M(...p[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.setLineDash([]); return n;
-  }
-  function head(g, c, ox, oy){
-    txt(g, '(b) Diversity head', ox + 230, oy + 10, c.ink, 17, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
-    const since = clock - lastSample;                  // seconds since the last sample
+  function head(g, c, bx, oy){
+    txt(g, '(b) Diversity head', bx + 250, oy + 12, c.ink, 17, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
+    const since = clock - lastSample, cy = oy + 190;
     // features of the field, gradient stopped
-    for (let i = 0; i < 7; i++){ g.fillStyle = hexA(c.muted, 0.25 + 0.5 * (0.5 + 0.5 * Math.sin(clock * 3 + i * 1.3))); g.beginPath(); g.roundRect(ox + 20, oy + 120 + i * 18, 20, 13, 3); g.fill(); }
-    txt(g, 'features', ox + 30, oy + 268, c.muted, 12.5, 500, 'center', MONO); txt(g, 'of f', ox + 26, oy + 284, c.muted, 12.5, 500, 'center', MONO);
-    arrow(g, ox + 48, oy + 183, ox + 92, oy + 183, c.muted, 1.4, [4, 3]); txt(g, 'sg', ox + 70, oy + 170, c.muted, 12, 500, 'center', MONO, true);
-    // the network h_psi with a pulse
-    const L = [[4, ox + 108], [3, ox + 148], [4, ox + 188]]; const nodes = L.map(([n, x]) => Array.from({length: n}, (_, i) => [x, oy + 183 + (i - (n - 1) / 2) * 26]));
-    for (let a = 0; a < 2; a++) for (const p of nodes[a]) for (const q of nodes[a + 1]){ g.strokeStyle = hexA(c.blue, .25); g.lineWidth = 1; g.beginPath(); g.moveTo(...p); g.lineTo(...q); g.stroke(); }
-    const pulse = ease(since / 0.6);
+    for (let i = 0; i < 7; i++){ g.fillStyle = hexA(c.muted, 0.25 + 0.45 * (0.5 + 0.5 * Math.sin(clock * 3 + i * 1.3))); g.beginPath(); g.roundRect(bx + 20, cy - 62 + i * 18, 22, 12, 3); g.fill(); }
+    txt(g, 'features', bx + 31, cy + 82, c.muted, 12, 500, 'center', MONO); txtSub(g, 'of f', 'θ', bx + 31, cy + 98, c.muted, 12, 500);
+    arrow(g, bx + 50, cy, bx + 94, cy, c.muted, 1.4, [4, 3]); txt(g, 'sg', bx + 72, cy - 13, c.muted, 12, 500, 'center', MONO, true);
+    // the network with a pulse
+    const L = [[4, bx + 108], [3, bx + 148], [4, bx + 188]]; const nodes = L.map(([n, x]) => Array.from({ length: n }, (_, i) => [x, cy + (i - (n - 1) / 2) * 26]));
+    for (let a = 0; a < 2; a++) for (const p of nodes[a]) for (const q of nodes[a + 1]){ g.strokeStyle = hexA(c.blue, .22); g.lineWidth = 1; g.beginPath(); g.moveTo(...p); g.lineTo(...q); g.stroke(); }
     nodes.flat().forEach(([x, y]) => { g.fillStyle = c.bg; g.strokeStyle = c.blue; g.lineWidth = 1.8; g.beginPath(); g.arc(x, y, 6.5, 0, 7); g.fill(); g.stroke(); });
-    if (pulse < 1){ const px = ox + 108 + pulse * 80; g.fillStyle = hexA(c.orange, 1 - pulse * 0.3); g.beginPath(); g.arc(px, oy + 183, 5, 0, 7); g.fill(); }
-    txt(g, 'h', ox + 144, oy + 248, c.blue, 17, 600, 'center', MONO); txt(g, 'ψ', ox + 155, oy + 254, c.blue, 11, 500, 'center', MONO);
-    // mixture over the direction eps, two lobes
-    const cx = ox + 300, cy = oy + 96, R = 34;
-    arrow(g, ox + 200, oy + 160, cx - 52, cy + 8, c.muted);
-    for (const [side, col] of [[-1, c.blue], [1, c.teal]]){ g.fillStyle = hexA(col, .28); g.beginPath();
-      for (let i = 0; i <= 40; i++){ const a = Math.PI / 2 + side * (-Math.PI / 2) + (i / 40 - .5) * Math.PI * 0.9; const rr = R + 18 * Math.exp(-sq((i / 40 - .5) / 0.22)); g.lineTo(cx + rr * Math.cos(a) * (side < 0 ? 1 : 1), cy + rr * Math.sin(a)); }
-      g.lineTo(cx, cy); g.closePath(); g.fill(); }
-    g.strokeStyle = hexA(c.muted, .6); g.setLineDash([2, 3]); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.stroke(); g.setLineDash([]);
-    const ang = epsShown > 0 ? Math.PI * (1 - 0.06) : 0.06 * Math.PI; const sw = ease(since / 0.5);
-    const a0 = epsShown > 0 ? 0.06 * Math.PI : Math.PI * (1 - 0.06), aa = a0 + (ang - a0) * sw;
-    arrow(g, cx, cy, cx + (R + 4) * Math.cos(aa), cy - (R + 4) * Math.sin(aa) * 0.15, c.blue, 2.4);
-    g.fillStyle = c.ink; g.beginPath(); g.arc(cx, cy, 3.5, 0, 7); g.fill();
-    txt(g, 'ε', cx + (epsShown > 0 ? -22 : 22), cy - 16, c.blue, 17, 600, 'center', MONO, true);
-    txt(g, 'ε ~ Σ w N(μ, σ²)', cx, cy + 64, c.ink, 13, 500, 'center', MONO);
-    // rate per step lambda_k and its sum Lambda_k
-    const bx = ox + 252, by = oy + 300; arrow(g, ox + 200, oy + 206, bx - 6, by - 50, c.muted);
-    g.strokeStyle = hexA(c.ink, .6); g.lineWidth = 1; g.beginPath(); g.moveTo(bx, by - 70); g.lineTo(bx, by); g.lineTo(bx + 104, by); g.stroke();
-    const lamk = [1, .82, .66, .52, .42, .34, .28, .24]; let cum = 0; const grow = ease(since / 1.2);
-    g.strokeStyle = c.ink; g.lineWidth = 1.6; g.beginPath();
-    lamk.forEach((v, i) => { const show = Math.min(1, Math.max(0, grow * 8 - i)); g.fillStyle = hexA(c.blue, .45); g.fillRect(bx + 6 + i * 12, by - v * 20 * show, 8, v * 20 * show);
-      cum += v; const px = bx + 10 + i * 12, py = by - cum / 4.28 * 60; if (show > 0){ i ? g.lineTo(px, py) : g.moveTo(px, py); } });
-    g.stroke(); cum = 0; lamk.forEach((v, i) => { cum += v; if (grow * 8 - i > 0){ g.fillStyle = c.ink; g.beginPath(); g.arc(bx + 10 + i * 12, by - cum / 4.28 * 60, 2.6, 0, 7); g.fill(); } });
-    txt(g, 'Λ', bx + 118, by - 58, c.ink, 13, 600, 'left', MONO); txt(g, 'λ', bx + 118, by - 14, c.blue, 13, 600, 'left', MONO);
-    txt(g, 'step k in a chunk', bx + 52, by + 16, c.muted, 12, 500, 'center', MONO);
-    // the velocity offset
-    arrow(g, cx + 56, cy + 10, ox + 404, oy + 168, c.muted); arrow(g, bx + 110, by - 40, ox + 404, oy + 196, c.muted);
-    txt(g, 'ȧ = f + λ⊙ε', ox + 420, oy + 182, c.ink, 15, 600, 'center', MONO);
-    g.strokeStyle = c.blue; g.lineWidth = 1; g.beginPath(); g.moveTo(ox + 372, oy + 200); g.lineTo(ox + 468, oy + 200); g.stroke();
-    txt(g, 'fixed ε per chunk', ox + 420, oy + 214, c.muted, 12, 500, 'center', MONO);
+    const pulse = ease(since / 0.6); if (pulse < 1){ g.fillStyle = c.orange; g.beginPath(); g.arc(bx + 108 + pulse * 80, cy, 5, 0, 7); g.fill(); }
+    txtSub(g, 'h', 'ψ', bx + 148, cy + 70, c.blue, 17, 600, MONO, true);
+    // direction: a mixture with one lobe per route
+    const mx = bx + 318, my = oy + 92, R = 30;
+    arrow(g, bx + 198, cy - 16, mx - 52, my + 14, c.muted);
+    for (const [side, col] of [[-1, c.blue], [1, c.teal]]){ g.fillStyle = hexA(col, .3); g.beginPath();
+      for (let i = 0; i <= 40; i++){ const a = (side < 0 ? Math.PI : 0) + (i / 40 - .5) * Math.PI * 0.9; const rr = R + 16 * Math.exp(-sq((i / 40 - .5) / 0.22)); g.lineTo(mx + rr * Math.cos(a), my + rr * Math.sin(a) * 0.7); }
+      g.lineTo(mx, my); g.closePath(); g.fill(); }
+    const a1 = eps > 0 ? 0 : Math.PI, a0 = eps > 0 ? Math.PI : 0, aa = a0 + (a1 - a0) * ease(since / 0.5);
+    arrow(g, mx, my, mx + (R + 6) * Math.cos(aa), my + (R + 6) * Math.sin(aa) * 0.7, c.ink, 2.2);
+    g.fillStyle = c.ink; g.beginPath(); g.arc(mx, my, 3.5, 0, 7); g.fill();
+    txt(g, 'direction ε', mx, my + 50, c.ink, 13, 600, 'center', MONO, true);
+    txt(g, 'one mode per route', mx, my + 67, c.muted, 11.5, 500, 'center', MONO);
+    // rate per step
+    const rx = bx + 268, ry = oy + 312; arrow(g, bx + 198, cy + 16, rx - 8, ry - 34, c.muted);
+    g.strokeStyle = hexA(c.ink, .6); g.lineWidth = 1; g.beginPath(); g.moveTo(rx, ry - 50); g.lineTo(rx, ry); g.lineTo(rx + 108, ry); g.stroke();
+    const lamk = [1, .82, .66, .52, .42, .34, .28, .24], grow = ease(since / 1.2);
+    lamk.forEach((v, i) => { const show = Math.min(1, Math.max(0, grow * 8 - i)); g.fillStyle = hexA(c.blue, .55); g.fillRect(rx + 6 + i * 12.5, ry - v * 44 * show, 8, v * 44 * show); });
+    txtSub(g, 'rate λ', 'k', rx + 54, ry + 18, c.ink, 13, 600);
+    txt(g, 'k = 1 … 8', rx + 54, ry + 35, c.muted, 11.5, 500, 'center', MONO);
+    // the offset added to the velocity
+    const fx = bx + 448, fy = cy;
+    arrow(g, mx + 52, my + 8, fx - 34, fy - 18, c.muted); arrow(g, rx + 116, ry - 30, fx - 34, fy + 18, c.muted);
+    txtSub(g, 'ȧ = f', 'θ', fx, fy - 13, c.ink, 15); txtSub(g, '+ λ', 'k', fx - 12, fy + 13, c.ink, 15);
+    txt(g, '⊙ ε', fx + 14, fy + 13, c.ink, 15, 600, 'left', MONO, true);
   }
   function draw(dt){
-    const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [480, 1160] : [1080, 380]; g.clearRect(0, 0, vw, vh);
+    const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [520, 1250] : [1080, 410]; g.clearRect(0, 0, vw, vh);
     if (!reduce) clock += dt; else clock = 10;
-    if (!reduce && clock - lastSample > 3.4){ lastSample = clock; eps = -eps; epsShown = eps; }
-    if (reduce){ lastSample = 0; }
-    const since = clock - lastSample, frac = reduce ? 1 : ease((since - 0.6) / 1.8);
-    const pos = S.narrow ? [[90, 6], [10, 380], [90, 790]] : [[0, 6], [310, 6], [780, 6]];
-    // (a) plain field, path into the obstacle
+    if (!reduce && clock - lastSample > 3.6){ lastSample = clock; eps = -eps; }
+    const since = reduce ? 10 : clock - lastSample, frac = reduce ? 1 : ease((since - 0.5) / 1.8);
+    const pos = S.narrow ? [[120, 6], [10, 420], [120, 840]] : [[0, 6], [290, 6], [800, 6]];
     fieldPanel(g, c, pos[0][0], pos[0][1], 0, '(a) Plain ODE', 'the mean field hits the obstacle', M => {
-      const p = route(0); const fr = reduce ? 1 : ease((clock % 3.4) / 1.6); const stop = 0.47;
-      const n = drawPath(g, M, p.filter(q => q[1] <= stop), c.ink, 3, fr);
-      if (fr > 0.95){ const [hx, hy] = M(0, stop); g.strokeStyle = c.orange; g.lineWidth = 3.2; g.beginPath(); g.moveTo(hx - 8, hy - 8); g.lineTo(hx + 8, hy + 8); g.moveTo(hx + 8, hy - 8); g.lineTo(hx - 8, hy + 8); g.stroke(); }
+      const fr = reduce ? 1 : ease((clock % 3.6) / 1.5), stop = 0.42;
+      const p = route(0).filter(q => q[1] <= stop); path(g, M, p, c.ink, 3, fr);
+      if (fr > 0.97){ const [hx, hy] = M(0, stop); g.strokeStyle = c.orange; g.lineWidth = 3; g.beginPath(); g.moveTo(hx - 7, hy - 7); g.lineTo(hx + 7, hy + 7); g.moveTo(hx + 7, hy - 7); g.lineTo(hx - 7, hy + 7); g.stroke(); }
     });
     head(g, c, pos[1][0], pos[1][1]);
-    // (c) tilted field
-    fieldPanel(g, c, pos[2][0], pos[2][1], eps * (reduce ? 1 : ease(since / 0.6)), '(c) With the head', 'the offset tilts the whole field', M => {
-      drawPath(g, M, route(-eps), hexA(c.teal, .8), 2, 1, [6, 4]);
-      drawPath(g, M, route(eps), c.blue, 4, frac);
-      const [lx, ly] = M(eps > 0 ? 0.36 : -0.36, 0.86); txt(g, 'sampled ε', lx, ly, c.blue, 12.5, 600, 'center', MONO);
+    const tilt = reduce ? eps : (since < 0.6 ? -eps + 2 * eps * ease(since / 0.6) : eps);
+    fieldPanel(g, c, pos[2][0], pos[2][1], tilt, '(c) With the head', 'the offset tilts the field', M => {
+      path(g, M, route(-eps), hexA(c.teal, .75), 2, 1, [6, 5]);
+      const tip = path(g, M, route(eps), c.blue, 4, frac);
+      if (frac < 1){ const [tx, ty] = M(...tip); g.fillStyle = c.blue; g.beginPath(); g.arc(tx, ty, 5.5, 0, 7); g.fill(); }
     });
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
@@ -1230,15 +1225,32 @@ if (D){
       y: { min: 0, max: 1, ticks: [0, 0.25, 0.5, 0.75, 1], label: 'Mode balance γ' } }); }
 }
 
-/* ---------- real-robot players: a click on a thumbnail plays it in the large player ---------- */
+/* ---------- real-robot players: a clicked clip flies into the large view and the two swap ---------- */
 document.querySelectorAll('.player').forEach(P => {
-  const main = P.querySelector('.main video'), lab = P.querySelector('.main .lab'), why = P.querySelector('.main .why'), spd = P.querySelector('.main .spd');
-  P.querySelectorAll('.thumb').forEach(t => t.addEventListener('click', () => {
-    P.querySelectorAll('.thumb').forEach(x => x.setAttribute('aria-pressed', x === t));
-    main.src = t.dataset.full; main.play().catch(() => {});
-    lab.textContent = t.dataset.name; lab.classList.toggle('ours', t.dataset.name.startsWith('ODE'));
-    why.textContent = t.dataset.why || ''; why.hidden = !t.dataset.why;
-    const r = main.getBoundingClientRect(); if (r.top < 60 || r.bottom > innerHeight) main.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+  const main = P.querySelector('.main'); let busy = false;
+  const read = el => ({ src: el.dataset.src, name: el.dataset.name, why: el.dataset.why || '', t: el.querySelector('video').currentTime || 0 });
+  const write = (el, d) => { el.dataset.src = d.src; el.dataset.name = d.name; el.dataset.why = d.why;
+    const v = el.querySelector('video'); v.dataset.src = d.src; v.src = d.src;
+    v.addEventListener('loadedmetadata', () => { try { v.currentTime = d.t; } catch (e) {} }, { once: true }); v.play().catch(() => {});
+    const lab = el.querySelector('.lab'); lab.textContent = d.name; lab.classList.toggle('ours', d.name.startsWith('ODE'));
+    const why = el.querySelector('.why'); if (why){ why.textContent = d.why; why.hidden = !d.why; } };
+  P.querySelectorAll('.thumb').forEach(t => t.addEventListener('click', async () => {
+    if (busy) return; busy = true;
+    const r0 = main.getBoundingClientRect();
+    if (r0.top < 70 || r0.bottom > innerHeight){ main.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); await new Promise(r => setTimeout(r, reduce ? 0 : 450)); }
+    const a = t.getBoundingClientRect(), b = main.getBoundingClientRect(), dT = read(t), dM = read(main);
+    if (!reduce && Element.prototype.animate){
+      const fly = document.createElement('div'); fly.className = 'fly';
+      const fv = document.createElement('video'); fv.muted = true; fv.playsInline = true; fv.src = dT.src;
+      fv.addEventListener('loadedmetadata', () => { try { fv.currentTime = dT.t; } catch (e) {} }, { once: true }); fly.appendChild(fv); fv.play().catch(() => {});
+      Object.assign(fly.style, { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px' }); document.body.appendChild(fly);
+      main.classList.add('dim'); t.classList.add('dim');
+      await fly.animate([{ transform: 'none' }, { transform: `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width}, ${b.height / a.height})` }],
+        { duration: 650, easing: 'cubic-bezier(.2,.75,.2,1)', fill: 'forwards' }).finished;
+      write(main, dT); write(t, dM); main.classList.remove('dim'); t.classList.remove('dim');
+      fly.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: 'forwards' }).finished.then(() => fly.remove());
+    } else { write(main, dT); write(t, dM); }
+    busy = false;
   }));
 });
 
