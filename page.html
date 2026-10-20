@@ -1,0 +1,802 @@
+<title>ODE Policy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="ODE Policy models how the action of a robot evolves over its physical time as an ordinary differential equation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (1120px) that opens on a live vector field; figures sit on white "paper" plates. */
+:root{
+  --bg:#F4F7F9; --surface:#FFFFFF; --paper:#FFFFFF; --ink:#1C2633; --muted:#55657A; --line:#DCE4EB;
+  --blue:#397DB7; --teal:#57B1AB; --mint:#8ECFB0; --pale:#D5ECBB; --orange:#E27A33; --chip:#E8F0F7;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E141B; --surface:#151E28; --paper:#FFFFFF; --ink:#E5ECF3; --muted:#93A4B7; --line:#26333F;
+  --blue:#62A3DD; --teal:#6CC6BE; --mint:#8ED6B5; --pale:#BFE3A6; --orange:#F0A061; --chip:#1D2A37; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E141B; --surface:#151E28; --paper:#FFFFFF; --ink:#E5ECF3; --muted:#93A4B7; --line:#26333F;
+  --blue:#62A3DD; --teal:#6CC6BE; --mint:#8ED6B5; --pale:#BFE3A6; --orange:#F0A061; --chip:#1D2A37; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--blue);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h2{font-size:clamp(28px,3.4vw,40px);font-weight:700;line-height:1.1}
+h3{font-size:20px;font-weight:700;line-height:1.25}
+p{margin:0}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+.lede{color:var(--muted);max-width:62ch}
+.mono{font-family:var(--mono)}
+
+/* nav */
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;align-items:center;gap:20px;height:54px}
+nav.top .brand{font:700 18px/1 var(--display);color:var(--ink);text-decoration:none;margin-right:auto}
+nav.top .brand span{color:var(--blue)}
+nav.top .links{display:flex;gap:18px;overflow-x:auto}
+nav.top .links a{color:var(--muted);text-decoration:none;font-size:15px;white-space:nowrap}
+nav.top .links a:hover{color:var(--ink)}
+
+/* hero */
+.hero{padding-block:56px 28px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:44px;align-items:center}
+.hero h1{font-size:clamp(44px,6.4vw,76px);line-height:.98;font-weight:700}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.hero .sub{font-size:clamp(19px,2vw,23px);line-height:1.4;margin-top:18px;max-width:30ch}
+.authors{margin-top:22px;color:var(--muted);font-size:16px}
+.authors b{color:var(--ink);font-weight:600}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font:600 15px/1 var(--body);text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--surface);cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn[aria-disabled="true"]{opacity:.55;cursor:default}
+.btn small{font:500 11px/1 var(--mono);opacity:.75}
+.quote{margin-top:26px;font-size:15px;color:var(--muted)}
+.quote i{color:var(--ink);font-size:17px}
+
+.stage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stage canvas{display:block;width:100%;height:auto;aspect-ratio:16/11}
+.stage .bar{position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+.seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:3px;pointer-events:auto}
+.seg button{border:0;background:transparent;color:var(--muted);font:600 13px/1 var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.stage .legend{font:500 11.5px/1.5 var(--mono);color:var(--muted);text-align:right;background:color-mix(in srgb,var(--surface) 80%,transparent);padding:4px 6px;border-radius:6px}
+.stage .caption{position:absolute;left:14px;bottom:10px;right:14px;font-size:14px;color:var(--muted);pointer-events:none}
+
+/* numbers */
+.numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-block:34px 8px}
+.num{background:var(--surface);padding:18px 18px 16px}
+.num .v{font:700 clamp(30px,3.6vw,42px)/1 var(--display);color:var(--blue);font-variant-numeric:tabular-nums}
+.num .k{margin-top:8px;font-size:15px;line-height:1.35}
+.num .s{margin-top:4px;font:400 12px/1.4 var(--mono);color:var(--muted)}
+
+section{padding-block:64px 8px}
+.head{display:grid;gap:12px;margin-bottom:28px}
+
+/* method */
+.idea{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:center;margin-bottom:22px}
+.idea-txt{display:grid;gap:10px}.idea-txt p{color:var(--muted)}
+.anim{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 14px}
+.anim canvas{display:block;width:100%;height:auto}
+.anim figcaption{font-size:14.5px;color:var(--muted);margin-top:8px;padding-inline:8px;max-width:95ch}
+.anim figcaption b{color:var(--ink)}
+.eq{font:500 clamp(17px,2vw,21px)/1.5 var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;overflow-x:auto}
+.eq .c1{color:var(--blue)} .eq .c2{color:var(--teal)} .eq .cm{color:var(--muted);font-size:.72em;display:block;margin-top:6px;font-family:var(--body)}
+.plate{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0}
+.plate img{display:block;width:100%;height:auto;cursor:zoom-in}
+.plate figcaption{font-size:14px;color:#55657A;margin-top:8px;padding-inline:4px}
+.demos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:44px}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.demo canvas{display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--surface);touch-action:manipulation}
+.demo .body{padding:14px 16px 16px;display:grid;gap:8px;border-top:1px solid var(--line)}
+.demo .body p{font-size:15px;color:var(--muted);line-height:1.45}
+.demo .ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demo .ctl button{border:1px solid var(--line);background:var(--chip);color:var(--ink);font:600 13px/1 var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
+.demo .ctl label{font:500 12px/1 var(--mono);color:var(--muted);display:flex;align-items:center;gap:8px}
+.demo input[type=range]{accent-color:var(--blue);width:120px}
+
+/* results */
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.res{display:grid;gap:12px;align-content:start;min-width:0}
+.res .tag{font:500 12px/1 var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.res .big{font:700 26px/1.15 var(--display)}
+.res .big span{color:var(--blue)}
+.res p{color:var(--muted);font-size:15.5px;max-width:58ch}
+.res.wide{grid-column:1/-1}
+
+/* real robot */
+.tasks{display:grid;gap:30px}
+.task{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px;align-items:start}
+.video{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--chip) 0 12px,var(--surface) 12px 24px);border:1px solid var(--line);display:grid;place-items:center}
+.video img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+.video .badge{position:relative;font:500 12px/1 var(--mono);background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:999px;border:1px solid var(--line)}
+.task .txt{display:grid;gap:10px}
+.task .txt p{color:var(--muted)}
+.kv{display:flex;flex-wrap:wrap;gap:8px}
+.kv span{font:500 12px/1 var(--mono);padding:6px 9px;border-radius:6px;background:var(--chip);color:var(--ink)}
+.kv span b{color:var(--blue);font-weight:500}
+
+/* platforms */
+.platforms{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:22px 20px}
+.pf{display:grid;justify-items:center;gap:10px}
+.pf .card{width:100%;aspect-ratio:1;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 16px rgba(20,40,60,.08);display:grid;place-items:center;overflow:hidden;transition:transform .35s ease}
+.pf:nth-child(odd) .card{transform:rotate(-2deg)}
+.pf:nth-child(even) .card{transform:rotate(1.6deg)}
+.pf:hover .card{transform:rotate(0) scale(1.03)}
+.pf .card img{max-width:78%;max-height:78%;object-fit:contain}
+.pf .card img.photo{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover}
+.pf .name{font-weight:600;font-size:15px;text-align:center}
+.pf .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.pf .tags span{font:500 11px/1 var(--mono);padding:5px 8px;border-radius:5px;background:var(--ink);color:var(--bg)}
+
+/* cite */
+pre.bib{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;overflow-x:auto;font:400 13.5px/1.6 var(--mono);margin:0}
+.cite-row{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+footer{margin-top:70px;border-top:1px solid var(--line);padding-block:26px 40px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:20;background:rgba(10,16,22,.82);display:grid;place-items:center;padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));cursor:zoom-out}
+.lb img{max-width:min(1400px,100%);max-height:100%;background:#fff;border-radius:8px}
+
+@media (max-width:900px){
+  .hero-grid,.idea,.task{grid-template-columns:minmax(0,1fr)}
+  .demos{grid-template-columns:minmax(0,1fr)}
+  .results{grid-template-columns:minmax(0,1fr)}
+  .numbers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  nav.top .links{gap:14px}
+}
+@media (max-width:520px){ nav.top .links a.opt{display:none} }
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .pf .card{transition:none} }
+</style>
+
+<nav class="top" aria-label="Sections">
+  <div class="wrap">
+    <a class="brand" href="#top">ODE <span>Policy</span></a>
+    <div class="links">
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#real">Real robot</a>
+      <a href="#platforms" class="opt">Platforms</a>
+      <a href="#cite">Cite</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Robot learning · IL &amp; RL</p>
+      <h1 style="margin-top:14px">Ordinary Differential Equation <em>Policy</em></h1>
+      <p class="sub">A robot policy that integrates its actions over physical time, so motion is continuous by construction.</p>
+      <p class="authors"><b><a href="https://jiajindou.github.io/">Jindou Jia</a></b>, … , <b><a href="https://marsyang.site/">Jianfei Yang</a></b><br>MARS Lab, Nanyang Technological University</p>
+      <div class="btns">
+        <a class="btn primary" aria-disabled="true" title="Coming soon">Paper <small>soon</small></a>
+        <a class="btn" aria-disabled="true" title="Coming soon">Code <small>soon</small></a>
+        <a class="btn" href="#cite">BibTeX</a>
+      </div>
+      <p class="quote"><i>Natura non facit saltus.</i> &nbsp;Nature does not make jumps. &nbsp;— Leibniz</p>
+    </div>
+    <div class="stage" id="hero-stage">
+      <canvas id="hero" aria-label="Animated comparison of a discrete chunked policy and ODE policy on a vector field"></canvas>
+      <div class="bar">
+        <div class="seg" role="group" aria-label="Policy type">
+          <button id="mode-ode" aria-pressed="true">ODE policy</button>
+          <button id="mode-disc" aria-pressed="false">Discrete policy</button>
+        </div>
+        <div class="legend" id="hero-legend">H = 8 steps per chunk</div>
+      </div>
+      <p class="caption" id="hero-cap">Each action is integrated from the previous one. Chunks join without jumps.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="numbers" aria-label="Headline results">
+      <div class="num"><div class="v">5.9×</div><div class="k">success after one epoch</div><div class="s">vs. flow matching · LIBERO</div></div>
+      <div class="num"><div class="v">10.8×</div><div class="k">faster per action chunk</div><div class="s">5.7 ms · Euler · LIBERO</div></div>
+      <div class="num"><div class="v">3.9×</div><div class="k">mode balance after one epoch</div><div class="s">vs. flow matching · 2D navigation</div></div>
+      <div class="num"><div class="v">0.6×</div><div class="k">the jerk of human demonstrations</div><div class="s">commands · real bimanual task</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="method">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Method</p>
+      <h2>Learn the vector field, integrate the actions</h2>
+      <p class="lede">Discrete policies output action values at fixed steps and leave continuity to the data. ODE policy learns how the action changes and integrates it over the robot's own time.</p>
+    </div>
+    <div class="idea">
+      <div class="eq" role="math" aria-label="a dot equals f theta of a, s, z">
+        <span class="c1">ȧ(t)</span> = <span class="c2">f<sub>θ</sub></span>( a(t), s<sub>t</sub>, z<sub>t</sub> )
+        <span class="cm">Velocity of the action, conditioned on proprioception s and the image and language embedding z. Trained by matching the integrated path to the demonstration, without velocity labels.</span>
+        <br>
+        a<sub>t+k+1</sub> = a<sub>t+k</sub> + ∫ f<sub>θ</sub> dt
+        <span class="cm">Integrated over short chunks (H = 8, RK4). The next chunk starts where the last one ended.</span>
+      </div>
+      <div class="idea-txt">
+        <h3>Two ways to produce a chunk</h3>
+        <p>A discrete policy emits the whole chunk at once and starts the next one from scratch, so actions jump at the boundary. ODE policy reads the observation once per chunk, then integrates action by action and continues from where it stopped.</p>
+      </div>
+    </div>
+    <figure class="anim">
+      <canvas id="fig1" aria-label="Animated figure, discrete policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
+      <figcaption><b>Fig. 1</b> Discrete policies map the embedding to action values at fixed steps. ODE policy learns a vector field f<sub>θ</sub> and integrates it, so each action follows from the previous one and is sent as soon as it is computed.</figcaption>
+    </figure>
+    <div class="head" style="margin-top:44px">
+      <h3>Diversity head for multi-modality</h3>
+      <p class="lede">The mode is decided by the direction in which integration sets off, so it is enough to randomize that direction.</p>
+    </div>
+    <figure class="anim">
+      <canvas id="fig2" aria-label="Animated figure of the diversity head, a sampled offset tilts the field toward one route"></canvas>
+      <figcaption><b>Fig. 2</b> (a) The plain field averages two demonstrated routes and hits the obstacle. (b) The head samples a direction ε with one mode per route and a rate λ<sub>k</sub> per step. (c) The offset λ<sub>k</sub>⊙ε tilts the whole field, so each sample takes one route.</figcaption>
+    </figure>
+    <div class="demos">
+      <article class="demo">
+        <canvas id="d-contract" aria-label="Contractive perturbation demo, click to drop a start point"></canvas>
+        <div class="body">
+          <h3>Contractive perturbation</h3>
+          <p>Training starts some chunks off the demonstration and asks the path to come back. The field learns to pull drift back.</p>
+          <div class="ctl"><button id="b-contract">Perturb</button><label>or click the plot</label></div>
+        </div>
+      </article>
+      <article class="demo">
+        <canvas id="d-rate" aria-label="Arbitrary control rate demo"></canvas>
+        <div class="body">
+          <h3>Any control rate</h3>
+          <p>The field lives in continuous time. One trained model runs at a finer step simply by integrating with a smaller step.</p>
+          <div class="ctl"><label for="r-rate">Control rate <input id="r-rate" type="range" min="0" max="2" step="1" value="0"></label><span class="mono" id="r-val">20 Hz</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Results</p>
+      <h2>Fast to learn, fast to run</h2>
+      <p class="lede">Visuomotor policies on LIBERO, the action head of a VLA (π<sub>0.5</sub>) and a world action model (ImageWAM), and the actor of PPO and FlashSAC.</p>
+    </div>
+    <div class="results">
+      <div class="res wide">
+        <p class="tag">Learning efficiency · LIBERO</p>
+        <p class="big"><span>79.2%</span> after one epoch, against at most 43.2% for six baselines</p>
+        <p>It matches a flow matching policy with less than half of the demonstrations, at every model size.</p>
+        <figure class="plate"><img src="assets/figs/efficiency.jpg" alt="Learning efficiency in visuomotor imitation learning" loading="lazy"></figure>
+      </div>
+      <div class="res">
+        <p class="tag">At scale · VLA and WAM</p>
+        <p class="big"><span>85.5%</span> after half an epoch in π<sub>0.5</sub></p>
+        <p>A randomly initialized ODE head with 3% of the parameters of the action expert. In ImageWAM, 82.6% against 24.6% after one epoch.</p>
+        <figure class="plate"><img src="assets/figs/scale.jpg" alt="Learning efficiency at scale" loading="lazy"></figure>
+      </div>
+      <div class="res">
+        <p class="tag">Generalization · LIBERO-plus</p>
+        <p class="big"><span>89.9%</span> zero-shot under unseen perturbations in ImageWAM</p>
+        <p>Robustness arrives early in training, and within π<sub>0.5</sub> it matches a pretrained expert many times its size.</p>
+        <figure class="plate"><img src="assets/figs/plus.jpg" alt="Generalization to unseen perturbations" loading="lazy"></figure>
+      </div>
+      <div class="res wide">
+        <p class="tag">Inference and smoothness</p>
+        <p class="big"><span>5.7 ms</span> per chunk of 8 actions, each action sent as soon as it is integrated</p>
+        <p>10.8× faster than flow matching and about 100× faster than DDPM, with the lowest jerk at every checkpoint.</p>
+        <figure class="plate"><img src="assets/figs/inference.jpg" alt="Inference cost and action smoothness" loading="lazy"></figure>
+      </div>
+      <div class="res">
+        <p class="tag">Reinforcement learning</p>
+        <p class="big"><span>97.7%</span> vs. 72.3% on the G1 humanoid</p>
+        <p>A drop-in actor for PPO and FlashSAC, faster early learning on most tasks.</p>
+        <figure class="plate"><img src="assets/figs/rl.jpg" alt="Learning efficiency in reinforcement learning" loading="lazy"></figure>
+      </div>
+      <div class="res">
+        <p class="tag">Multi-modality</p>
+        <p class="big">All <span>four routes</span> from the first epoch</p>
+        <p>Randomizing the direction of the field is enough to pick a mode, without multi-step sampling.</p>
+        <figure class="plate"><img src="assets/figs/nav2d_curves.jpg" alt="Multi-modal tests on a 2D navigation task" loading="lazy"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="real">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Real robot · Galaxea R1 Lite</p>
+      <h2>Precise and smooth on hardware</h2>
+      <p class="lede">Joint-space actions at 15 Hz, the same method without changes.</p>
+    </div>
+    <div class="tasks">
+      <div class="task">
+        <div class="video" data-video="flower"><img src="assets/robots/flower_poppy_3.jpg" alt="" loading="lazy"><span class="badge">Video coming soon</span></div>
+        <div class="txt">
+          <h3>High-precision flower arrangement</h3>
+          <p>Insert a thin stem into the narrow opening of a vase, with a long-stemmed poppy and a short-stemmed dahlia.</p>
+          <div class="kv"><span>ODE <b>30% / 60%</b></span><span>FM-DiT 20% / 40%</span><span>DDPM 0% / 0%</span><span>95 demos</span></div>
+          <figure class="plate"><img src="assets/figs/real.jpg" alt="Flower arrangement on a real robot" loading="lazy"></figure>
+        </div>
+      </div>
+      <div class="task">
+        <div class="video" data-video="microwave"><img src="assets/robots/microwave_1.jpg" alt="" loading="lazy"><span class="badge">Video coming soon</span></div>
+        <div class="txt">
+          <h3>Long-horizon bimanual microwave</h3>
+          <p>Grasp a bowl, place it in the microwave, push it in, and close the door with the other arm.</p>
+          <div class="kv"><span>ODE <b>75%</b></span><span>FM-DiT 20%</span><span>DDPM 0%</span><span>34 demos</span></div>
+          <figure class="plate"><img src="assets/figs/real_exec.jpg" alt="Inference cost and smoothness on the real robot" loading="lazy"><figcaption>8.4 ms per chunk on one RTX 5090, and commands smoother than the human demonstrations.</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="platforms">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Platforms</p>
+      <h2>One formulation, many bodies</h2>
+    </div>
+    <div class="platforms">
+      <div class="pf"><div class="card"><img class="photo" src="assets/robots/microwave_1.jpg" alt="Galaxea R1 Lite" loading="lazy"></div><p class="name">Galaxea R1 Lite</p><div class="tags"><span>Real</span><span>IL</span></div></div>
+      <div class="pf"><div class="card"><img src="assets/robots/franka.png" alt="Franka arm" loading="lazy"></div><p class="name">Franka arm</p><div class="tags"><span>LIBERO</span><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><img src="assets/robots/g1.png" alt="Unitree G1 humanoid" loading="lazy"></div><p class="name">G1 humanoid</p><div class="tags"><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><img src="assets/robots/h1_walk.png" alt="H1 humanoid" loading="lazy"></div><p class="name">H1 humanoid</p><div class="tags"><span>FlashSAC</span></div></div>
+      <div class="pf"><div class="card"><img src="assets/robots/anymal.png" alt="ANYmal-C quadruped" loading="lazy"></div><p class="name">ANYmal-C</p><div class="tags"><span>PPO</span></div></div>
+      <div class="pf"><div class="card"><img src="assets/robots/crazyflie.png" alt="Quadcopter" loading="lazy"></div><p class="name">Quadcopter</p><div class="tags"><span>PPO</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <div class="cite-row">
+      <div class="head" style="margin:0"><p class="eyebrow">Cite</p><h2>BibTeX</h2></div>
+      <button class="btn" id="copy-bib">Copy</button>
+    </div>
+<pre class="bib" id="bib">@article{jia2026ode,
+  title   = {Ordinary Differential Equation Policy},
+  author  = {Jia, Jindou and others and Yang, Jianfei},
+  year    = {2026},
+  note    = {Under review}
+}</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 MARS Lab, Nanyang Technological University</span>
+    <a href="#top">Top ↑</a>
+  </div>
+</footer>
+
+<div class="lb" id="lb" hidden><img id="lb-img" alt=""></div>
+
+<script>
+(() => {
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const hexA = (hex, a) => { const h = hex.replace('#',''); const v = h.length === 3 ? h.split('').map(c=>c+c).join('') : h;
+  const n = parseInt(v,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; };
+const colors = () => ({ bg: css('--surface'), ink: css('--ink'), muted: css('--muted'), line: css('--line'),
+  blue: css('--blue'), teal: css('--teal'), mint: css('--mint'), orange: css('--orange') });
+
+// a canvas that keeps its backing store at device resolution
+function stage(el){
+  const ctx = el.getContext('2d'); const s = {el, ctx, w:0, h:0};
+  const fit = () => { const r = el.getBoundingClientRect(); const d = Math.min(window.devicePixelRatio||1, 2);
+    s.w = r.width; s.h = r.height; el.width = Math.round(r.width*d); el.height = Math.round(r.height*d); ctx.setTransform(d,0,0,d,0,0); };
+  fit(); new ResizeObserver(fit).observe(el); return s;
+}
+function loop(fn){ let last = performance.now(); let vis = true;
+  const io = new IntersectionObserver(e => { vis = e[0].isIntersecting; });
+  const tick = t => { const dt = Math.min(0.05,(t-last)/1000); last = t; if (vis) fn(dt, t/1000); requestAnimationFrame(tick); };
+  return { start(el){ io.observe(el); requestAnimationFrame(tick); } };
+}
+let rng = 7; const rand = () => { rng = (rng*16807) % 2147483647; return rng/2147483647; };
+const gauss = () => { let u=0,v=0; while(!u) u=rand(); v=rand(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+
+/* ---------- hero: a demonstrated motion, its vector field, and two ways to follow it ---------- */
+{
+  const S = stage(document.getElementById('hero'));
+  const ref = x => 0.20*Math.sin(2*Math.PI*0.85*x + 0.5) + 0.06*Math.sin(2*Math.PI*2.2*x);
+  const dref = x => 0.20*2*Math.PI*0.85*Math.cos(2*Math.PI*0.85*x + 0.5) + 0.06*2*Math.PI*2.2*Math.cos(2*Math.PI*2.2*x);
+  const K = 5.0;                                    // contraction toward the demonstration
+  const field = (x,y) => [1, dref(x) - K*(y - ref(x))];
+  let mode = 'ode';
+  const N = 56, H = 8;                              // control steps and chunk length
+  const P = [];                                      // ambient particles
+  for (let i=0;i<260;i++) P.push({x:rand(), y:(rand()-.5)*0.9, age:rand()*2});
+  let prog = 0, hold = 0, plan = null;
+  const X = i => 0.06 + 0.88*i/N;
+  function makePlan(){
+    if (mode === 'ode'){
+      const pts = [[X(0), ref(X(0)) + 0.16]]; let y = pts[0][1];
+      for (let i=0;i<N;i++){ const x0 = X(i), dx = X(i+1)-x0;          // one RK4 step per control step
+        const f = (x,yy) => field(x,yy)[1];
+        const k1=f(x0,y), k2=f(x0+dx/2,y+dx*k1/2), k3=f(x0+dx/2,y+dx*k2/2), k4=f(x0+dx,y+dx*k3);
+        y += dx*(k1+2*k2+2*k3+k4)/6; pts.push([X(i+1), y]); }
+      return pts;
+    }
+    const pts = []; let off = 0.16;                   // each chunk regenerated from scratch around the demonstration
+    for (let i=0;i<=N;i++){ if (i % H === 0) off = (i===0?0.16:0) + gauss()*0.045;
+      pts.push([X(i), ref(X(i)) + off + gauss()*0.012]); }
+    return pts;
+  }
+  plan = makePlan();
+  const toPx = (x,y) => [x*S.w, S.h*0.56 - y*S.h*1.05];
+  function setMode(m){ mode = m; prog = 0; hold = 0; plan = makePlan();
+    document.getElementById('mode-ode').setAttribute('aria-pressed', m==='ode');
+    document.getElementById('mode-disc').setAttribute('aria-pressed', m!=='ode');
+    document.getElementById('hero-cap').textContent = m==='ode'
+      ? 'Each action is integrated from the previous one. Chunks join without jumps.'
+      : 'Each chunk is predicted on its own. Actions jump at chunk boundaries.'; }
+  document.getElementById('mode-ode').onclick = () => setMode('ode');
+  document.getElementById('mode-disc').onclick = () => setMode('disc');
+
+  function draw(dt){
+    const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
+    // streamlines as drifting particles
+    for (const p of P){
+      if (!reduce){ const [vx,vy] = field(p.x,p.y); const sp = 0.10;
+        const nx = p.x + vx*sp*dt, ny = p.y + vy*sp*dt;
+        const a = Math.min(1, p.age/0.6) * (1 - Math.max(0,(p.age-2.6)/0.6));
+        const [x1,y1] = toPx(p.x,p.y), [x2,y2] = toPx(nx,ny);
+        g.strokeStyle = hexA(c.teal, 0.35*Math.max(0,a)); g.lineWidth = 1.4;
+        g.beginPath(); g.moveTo(x1,y1); g.lineTo(x1+(x2-x1)*9, y1+(y2-y1)*9); g.stroke();
+        p.x = nx; p.y = ny; p.age += dt;
+        if (p.x > 1.02 || p.age > 3.2){ p.x = rand()*0.9; p.y = (rand()-.5)*0.9; p.age = 0; }
+      } else { const [x1,y1]=toPx(p.x,p.y); const [vx,vy]=field(p.x,p.y); const L=Math.hypot(vx,vy);
+        g.strokeStyle = hexA(c.teal,.3); g.beginPath(); g.moveTo(x1,y1); g.lineTo(x1+vx/L*12,y1-vy/L*12); g.stroke(); }
+    }
+    // the demonstration
+    g.setLineDash([5,5]); g.strokeStyle = hexA(c.muted,.75); g.lineWidth = 1.4; g.beginPath();
+    for (let i=0;i<=200;i++){ const x=0.04+0.92*i/200; const [px,py]=toPx(x,ref(x)); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke(); g.setLineDash([]);
+    // the policy's actions, revealed step by step
+    if (!reduce){ if (prog < N) prog = Math.min(N, prog + dt*16); else { hold += dt; if (hold > 1.6){ prog = 0; hold = 0; plan = makePlan(); } } }
+    else prog = N;
+    const n = Math.floor(prog);
+    for (let ch=0; ch*H<=n; ch++){
+      const a = ch*H, b = Math.min(n, a+H);
+      const col = ch%2 ? c.teal : c.blue;
+      g.strokeStyle = col; g.lineWidth = 2.6; g.lineJoin='round'; g.beginPath();
+      // ODE chunks share their boundary point, discrete chunks start fresh
+      const start = (mode==='ode' && ch>0) ? a : a;
+      for (let i=start;i<=b;i++){ const [px,py]=toPx(...plan[i]); i===start?g.moveTo(px,py):g.lineTo(px,py); }
+      g.stroke();
+      for (let i=a;i<=b;i++){ const [px,py]=toPx(...plan[i]); g.fillStyle = col; g.beginPath(); g.arc(px,py,2.6,0,7); g.fill(); }
+      if (mode!=='ode' && ch>0 && a<=n){        // the jump between the last action of a chunk and the first of the next
+        const prev = plan[a-1], [px0,py0]=toPx(...prev), [px1,py1]=toPx(...plan[a]);
+        g.strokeStyle = c.orange; g.lineWidth = 2; g.setLineDash([3,3]); g.beginPath(); g.moveTo(px0,py0); g.lineTo(px1,py1); g.stroke(); g.setLineDash([]);
+      }
+    }
+    // chunk boundaries
+    g.fillStyle = hexA(c.muted,.8); g.font = '500 11px JetBrains Mono, monospace';
+    for (let ch=1; ch*H<N; ch++){ const [px] = toPx(X(ch*H),0); g.strokeStyle = hexA(c.line,1); g.lineWidth=1; g.beginPath(); g.moveTo(px,S.h*0.16); g.lineTo(px,S.h*0.84); g.stroke(); }
+    g.fillText('physical time →', 14, S.h*0.86);
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+/* ---------- contractive perturbation ---------- */
+{
+  const S = stage(document.getElementById('d-contract'));
+  const ref = x => 0.22*Math.sin(2*Math.PI*0.9*x + 0.3);
+  const dref = x => 0.22*2*Math.PI*0.9*Math.cos(2*Math.PI*0.9*x + 0.3);
+  const K = 6;
+  const toPx = (x,y) => [S.w*(0.06+0.88*x), S.h*0.5 - y*S.h*1.1];
+  const fromPx = (px,py) => [(px/S.w-0.06)/0.88, (S.h*0.5-py)/(S.h*1.1)];
+  let tracks = [];
+  function drop(x,y){ tracks.push({x, y, pts:[[x,y]], life:0}); if (tracks.length>6) tracks.shift(); }
+  function auto(){ const x = 0.05+rand()*0.35; drop(x, ref(x) + (rand()<.5?-1:1)*(0.12+rand()*0.12)); }
+  document.getElementById('b-contract').onclick = auto;
+  S.el.addEventListener('click', e => { const r = S.el.getBoundingClientRect(); const [x,y] = fromPx(e.clientX-r.left, e.clientY-r.top); if (x>0 && x<0.9) drop(x,y); });
+  auto(); let t0 = 0;
+  function draw(dt, t){
+    const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
+    // field arrows
+    for (let i=0;i<=14;i++) for (let j=0;j<=8;j++){ const x=i/14, y=(j/8-.5)*0.7;
+      let vx=1, vy=dref(x)-K*(y-ref(x)); const L=Math.hypot(vx,vy); vx/=L; vy/=L;
+      const [px,py]=toPx(x,y); g.strokeStyle=hexA(c.teal,.32); g.lineWidth=1.2; g.beginPath(); g.moveTo(px,py); g.lineTo(px+vx*11,py-vy*11*1.1); g.stroke(); }
+    g.setLineDash([5,5]); g.strokeStyle=hexA(c.muted,.8); g.lineWidth=1.4; g.beginPath();
+    for (let i=0;i<=120;i++){ const x=i/120; const [px,py]=toPx(x,ref(x)); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke(); g.setLineDash([]);
+    for (const tr of tracks){
+      if (!reduce){ for (let s=0;s<3;s++){ const last=tr.pts[tr.pts.length-1]; if (last[0]>=1) break; const dx=0.004;
+        const y=last[1]+dx*(dref(last[0])-K*(last[1]-ref(last[0]))); tr.pts.push([last[0]+dx,y]); } }
+      else { while(tr.pts[tr.pts.length-1][0]<1){ const last=tr.pts[tr.pts.length-1]; const dx=0.004; tr.pts.push([last[0]+dx,last[1]+dx*(dref(last[0])-K*(last[1]-ref(last[0])))]); } }
+      g.strokeStyle=c.blue; g.lineWidth=2.4; g.beginPath(); tr.pts.forEach((p,i)=>{const [px,py]=toPx(...p); i?g.lineTo(px,py):g.moveTo(px,py);}); g.stroke();
+      const [sx,sy]=toPx(tr.x,tr.y); g.fillStyle=c.orange; g.beginPath(); g.arc(sx,sy,5,0,7); g.fill();
+      const [rx,ry]=toPx(tr.x,ref(tr.x)); g.strokeStyle=hexA(c.orange,.8); g.setLineDash([2,3]); g.beginPath(); g.moveTo(rx,ry); g.lineTo(sx,sy); g.stroke(); g.setLineDash([]);
+    }
+    if (!reduce && t - t0 > 2.4){ t0 = t; auto(); }
+    g.fillStyle=hexA(c.muted,.9); g.font='500 11px JetBrains Mono, monospace'; g.fillText('δ ~ start offset', 12, 18);
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0,0);
+}
+
+/* ---------- shared drawing for the two animated figures (virtual coordinates, scaled to the canvas) ---------- */
+function vstage(el, desk, phone){
+  // desk / phone = [virtual width, virtual height]; the layout switches when the canvas is narrow
+  const ctx = el.getContext('2d'); const s = {el, ctx, w:0, h:0, k:1, narrow:false};
+  const fit = () => {
+    const W = el.parentElement.getBoundingClientRect().width - 20;
+    s.narrow = W < 640; const [vw, vh] = s.narrow ? phone : desk;
+    el.style.aspectRatio = vw + ' / ' + vh;
+    const d = Math.min(window.devicePixelRatio || 1, 2); const h = W * vh / vw;
+    el.width = Math.round(W * d); el.height = Math.round(h * d); s.w = W; s.h = h; s.k = W / vw;
+    ctx.setTransform(d * s.k, 0, 0, d * s.k, 0, 0);
+  };
+  fit(); new ResizeObserver(fit).observe(el.parentElement); return s;
+}
+function arrow(g, x1, y1, x2, y2, col, w = 1.4, dash = null){
+  g.strokeStyle = col; g.fillStyle = col; g.lineWidth = w; if (dash) g.setLineDash(dash);
+  g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]);
+  const a = Math.atan2(y2 - y1, x2 - x1), L = 7;
+  g.beginPath(); g.moveTo(x2, y2); g.lineTo(x2 - L * Math.cos(a - 0.4), y2 - L * Math.sin(a - 0.4));
+  g.lineTo(x2 - L * Math.cos(a + 0.4), y2 - L * Math.sin(a + 0.4)); g.closePath(); g.fill();
+}
+function txt(g, s, x, y, col, size = 13, weight = 500, align = 'center', family = 'Source Sans 3, Segoe UI, sans-serif', italic = false){
+  g.fillStyle = col; g.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(s, x, y);
+}
+const MONO = 'JetBrains Mono, ui-monospace, monospace';
+const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
+
+/* ---------- Fig. 1: discrete policies vs. ODE policy ---------- */
+{
+  const S = vstage(document.getElementById('fig1'), [1100, 430], [560, 860]);
+  const N = 24, H = 8, T = 1.7;                       // steps, chunk length, seconds per chunk
+  const ref = u => 0.55 * Math.sin(2 * Math.PI * (0.9 * u + 0.08)) + 0.18 * Math.sin(2 * Math.PI * 2.1 * u);
+  let offs = [0.5, -0.35, 0.42];
+  const reroll = () => { offs = [0, 1, 2].map(i => (i % 2 ? -1 : 1) * (0.28 + rand() * 0.25)); };
+  const odePath = (() => { const p = [ref(0) + 0.6]; for (let i = 1; i <= N; i++){ const u = i / N; p.push(ref(u) + (p[i-1] - ref((i-1)/N)) * 0.62); } return p; })();
+  let clock = 0;
+  const heads = ['Regression', 'Generative', 'RL actor'];
+
+  function encoder(g, c, x, y){                      // input icon, encoder, embedding tokens
+    for (let i = 0; i < 3; i++){ g.fillStyle = hexA(c.muted, 0.18 + i * 0.12); g.strokeStyle = hexA(c.muted, .7); g.lineWidth = 1;
+      g.beginPath(); g.roundRect(x + i * 5, y - 22 + i * 5, 34, 26, 4); g.fill(); g.stroke(); }
+    txt(g, 'o, l  or  s', x + 22, y + 30, c.muted, 12, 500, 'center', MONO);
+    arrow(g, x + 50, y, x + 78, y, c.muted);
+    g.fillStyle = hexA(c.muted, .12); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3;
+    g.beginPath(); g.moveTo(x + 82, y - 26); g.lineTo(x + 160, y - 16); g.lineTo(x + 160, y + 16); g.lineTo(x + 82, y + 26); g.closePath(); g.fill(); g.stroke();
+    txt(g, 'Encoder', x + 121, y, c.ink, 14, 600);
+    arrow(g, x + 162, y, x + 184, y, c.muted);
+  }
+  function tokens(g, x, y, col, lit){
+    for (let i = 0; i < 4; i++){ g.fillStyle = hexA(col, 0.35 + 0.65 * lit * (0.6 + 0.4 * Math.sin(clock * 6 + i)));
+      g.beginPath(); g.roundRect(x, y - 24 + i * 12.5, 14, 10, 2); g.fill(); }
+  }
+  function timeline(g, c, x0, y0, w, h, kind, prog){
+    // prog: chunk-time in [0, 3]; discrete chunks appear whole, ODE actions appear one at a time
+    const X = i => x0 + 20 + (w - 40) * i / N, Y = v => y0 + h * 0.48 - v * h * 0.38;
+    g.strokeStyle = hexA(c.ink, .7); g.lineWidth = 1.3; arrow(g, x0, y0 + h - 4, x0 + w, y0 + h - 4, hexA(c.ink, .7));
+    txt(g, 't', x0 + w + 2, y0 + h - 16, c.muted, 13, 500, 'left', MONO, true);
+    for (let k = 0; k < 3; k++){
+      const xa = X(k * H), xb = X((k + 1) * H);
+      g.fillStyle = hexA(c.muted, k % 2 ? .07 : .03); g.fillRect(xa, y0 + 6, xb - xa, h - 14);
+      txt(g, ['chunk i−1', 'chunk i', 'chunk i+1'][k], (xa + xb) / 2, y0 + h + 12, c.muted, 12.5, 500, 'center', MONO);
+    }
+    g.setLineDash([3, 4]); g.strokeStyle = hexA(c.muted, .55); g.lineWidth = 1.3; g.beginPath();
+    for (let i = 0; i <= 60; i++){ const u = i / 60; const px = x0 + 20 + (w - 40) * u, py = Y(ref(u)); i ? g.lineTo(px, py) : g.moveTo(px, py); }
+    g.stroke(); g.setLineDash([]);
+    if (kind === 'disc'){
+      const shown = Math.min(3, Math.floor(prog) + 1);
+      for (let k = 0; k < shown; k++){
+        const pts = []; for (let i = k * H; i <= (k + 1) * H - (k < 2 ? 1 : 0); i++) pts.push([X(i), Y(ref(i / N) + offs[k] * 0.55)]);
+        const a = k === Math.floor(prog) ? ease((prog - k) * 4) : 1;
+        pts.forEach(([px, py]) => { g.strokeStyle = hexA(c.teal, .35 * a); g.lineWidth = 1; g.beginPath(); g.moveTo(px, Y(-1.05)); g.lineTo(px, py); g.stroke();
+          g.fillStyle = hexA(c.teal, a); g.beginPath(); g.arc(px, py, 4, 0, 7); g.fill(); });
+        if (k > 0){ const pv = [X(k * H - 1), Y(ref((k * H - 1) / N) + offs[k - 1] * 0.55)];
+          g.strokeStyle = hexA(c.orange, a); g.lineWidth = 2; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(...pv); g.lineTo(pts[0][0], pts[0][1]); g.stroke(); g.setLineDash([]); }
+      }
+    } else {
+      const n = Math.min(N, prog / 3 * N);
+      // faint field lines toward the path
+      for (let j = 0; j < 7; j++){ const u0 = j / 7; let v = odePath[Math.round(u0 * N)] + (j % 2 ? .5 : -.45);
+        g.strokeStyle = hexA(c.blue, .16); g.lineWidth = 1.2; g.beginPath(); g.moveTo(X(u0 * N), Y(v));
+        for (let s = 1; s <= 8; s++){ const i = Math.min(N, u0 * N + s * 0.7); const tgt = odePath[Math.floor(i)]; v += (tgt - v) * 0.33; g.lineTo(X(i), Y(v)); } g.stroke(); }
+      g.strokeStyle = c.blue; g.lineWidth = 3; g.lineJoin = 'round'; g.beginPath();
+      for (let i = 0; i <= n; i++){ const px = X(i), py = Y(odePath[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); }
+      const fi = Math.floor(n), fr = n - fi;
+      if (fi < N){ const px = X(fi + fr), py = Y(odePath[fi] + (odePath[fi + 1] - odePath[fi]) * fr); g.lineTo(px, py); g.stroke();
+        g.fillStyle = c.blue; g.beginPath(); g.arc(px, py, 5.5, 0, 7); g.fill(); g.strokeStyle = hexA(c.blue, .35); g.lineWidth = 6; g.beginPath(); g.arc(px, py, 9, 0, 7); g.stroke(); }
+      else g.stroke();
+      for (let i = 0; i <= fi; i++){ g.fillStyle = c.blue; g.beginPath(); g.arc(X(i), Y(odePath[i]), 3, 0, 7); g.fill(); }
+    }
+  }
+  function panel(g, c, ox, oy, kind, prog){
+    const col = kind === 'disc' ? c.teal : c.blue;
+    txt(g, kind === 'disc' ? 'Discrete policies' : 'ODE policy (ours)', ox + 270, oy + 22, col, 19, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
+    const y = oy + 100; encoder(g, c, ox + 14, y);
+    const chunkStart = prog % 1 < 0.22 && prog < 3;     // the encoder runs once at the start of each chunk
+    tokens(g, ox + 190, y, col, chunkStart ? 1 : 0.15);
+    txt(g, 'z', ox + 197, y + 36, c.ink, 13, 500, 'center', MONO, true);
+    arrow(g, ox + 210, y, ox + 236, y, c.muted);
+    if (kind === 'disc'){
+      txt(g, 'Action head π', ox + 300, y - 46, c.ink, 13.5, 500);
+      const hi = Math.floor(clock / 1.6) % 3, fade = ease((clock % 1.6) * 3);
+      g.fillStyle = hexA(c.teal, .14); g.strokeStyle = hexA(c.teal, .9); g.lineWidth = 1.4; g.beginPath(); g.roundRect(ox + 240, y - 20, 120, 40, 18); g.fill(); g.stroke();
+      txt(g, heads[hi], ox + 300, y, hexA(c.ink, fade), 14, 600);
+      arrow(g, ox + 362, y, ox + 384, y, c.muted);
+      const k = Math.min(2, Math.floor(prog)), pop = ease((prog - Math.floor(prog)) * 4);
+      for (let i = 0; i < H; i++){ const v = ref((k * H + i) / N) + offs[k] * 0.55; const hh = (18 + v * 16) * (prog < 3 ? pop : 1);
+        const px = ox + 392 + i * 9; g.strokeStyle = hexA(c.teal, .8); g.lineWidth = 1.4; g.beginPath(); g.moveTo(px, y + 22); g.lineTo(px, y + 22 - hh); g.stroke();
+        g.fillStyle = c.teal; g.beginPath(); g.arc(px, y + 22 - hh, 3, 0, 7); g.fill(); }
+      arrow(g, ox + 470, y, ox + 494, y, c.muted); txt(g, 'A', ox + 508, y, c.ink, 15, 600, 'center', MONO);
+      txt(g, 'whole chunk at once', ox + 430, y + 42, c.muted, 11.5, 500, 'center', MONO);
+    } else {
+      txt(g, 'Vector field f', ox + 335, y - 46, c.ink, 13.5, 500); txt(g, 'θ', ox + 377, y - 42, c.ink, 10, 500);
+      // field plate with moving streamlines and the integrated point
+      const P = [[ox + 252, y + 30], [ox + 286, y - 30], [ox + 430, y - 30], [ox + 396, y + 30]];
+      g.fillStyle = hexA(c.blue, .09); g.strokeStyle = hexA(c.blue, .85); g.lineWidth = 1.3; g.beginPath(); P.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.fill(); g.stroke();
+      const map = (u, v) => [ox + 262 + u * 150 + (v + 1) * 13, y + 18 - (v + 1) * 18];
+      for (let j = 0; j < 5; j++){ g.strokeStyle = hexA(c.blue, .3); g.lineWidth = 1; g.beginPath();
+        for (let i = 0; i <= 20; i++){ const u = i / 20, v = 0.65 * Math.sin(3 * u + j) * (1 - u) + 0.25 * Math.sin(5 * u); const [px, py] = map(u, v); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+      const u = ((clock * 0.35) % 1); const v = 0.25 * Math.sin(5 * u);
+      g.strokeStyle = c.blue; g.lineWidth = 2.4; g.beginPath(); for (let i = 0; i <= 30 * u; i++){ const uu = i / 30; const [px, py] = map(uu, 0.25 * Math.sin(5 * uu)); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
+      const [qx, qy] = map(u, v); g.fillStyle = c.blue; g.beginPath(); g.arc(qx, qy, 4, 0, 7); g.fill();
+      arrow(g, ox + 196, y + 46, ox + 262, y + 22, c.muted); txt(g, 's', ox + 190, y + 50, c.ink, 13, 500, 'center', MONO, true);
+      arrow(g, ox + 436, y, ox + 462, y, c.muted); txt(g, '∫ dt', ox + 492, y, c.blue, 18, 500, 'center', MONO);
+      txt(g, 'ȧ = f(a, s, z)', ox + 345, y + 48, c.ink, 13, 500, 'center', MONO);
+      txt(g, 'one action at a time', ox + 492, y + 30, c.muted, 11.5, 500, 'center', MONO);
+    }
+    timeline(g, c, ox + 20, oy + 190, 500, 190, kind, prog);
+  }
+  function draw(dt){
+    const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [560, 860] : [1100, 430];
+    g.clearRect(0, 0, vw, vh);
+    if (!reduce) clock += dt; else clock = 3 * T;
+    const cyc = 3 * T + 1.4, t = clock % cyc; const prog = Math.min(3, t / T);
+    if (!reduce && t < dt * 1.5) reroll();
+    if (S.narrow){ panel(g, c, 10, 4, 'disc', prog); panel(g, c, 10, 434, 'ode', prog); }
+    else { panel(g, c, 0, 4, 'disc', prog); g.strokeStyle = hexA(c.line, 1); g.lineWidth = 1; g.beginPath(); g.moveTo(550, 20); g.lineTo(550, 410); g.stroke(); panel(g, c, 560, 4, 'ode', prog); }
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+/* ---------- Fig. 2: the diversity head ---------- */
+{
+  const S = vstage(document.getElementById('fig2'), [1080, 380], [480, 1160]);
+  let clock = 0, eps = 1, epsShown = 1, lastSample = -10;
+  // a field panel (300 x 330): start at the bottom, goal at the top, obstacle in the middle
+  const PW = 300, PH = 330;
+  const lam = y => 1.5 * Math.exp(-((y - 0.33) / 0.15) ** 2) - 1.5 * Math.exp(-((y - 0.78) / 0.12) ** 2);
+  const fx = (x, y, e) => -2.4 * x + lam(y) * e;     // x across, y from start (0) to goal (1)
+  function route(e){ const p = [[0, 0]]; let x = 0; for (let i = 1; i <= 120; i++){ const y = i / 120; x += fx(x, y - 1 / 120, e) / 120; p.push([x, y]); } return p; }
+  const demoL = route(1), demoR = route(-1);
+  function fieldPanel(g, c, ox, oy, e, title, note, parts){
+    const M = (x, y) => [ox + PW / 2 + x * PW * 0.9, oy + PH - 30 - y * (PH - 70)];
+    txt(g, title, ox + PW / 2, oy + 10, c.ink, 17, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
+    // streamlines as moving dashes
+    for (let j = 0; j < 9; j++){ const x0 = (j / 8 - 0.5) * 0.62; let x = x0; g.strokeStyle = hexA(e === 0 ? c.muted : c.blue, .28); g.lineWidth = 1.3;
+      g.setLineDash([10, 8]); g.lineDashOffset = -clock * 22; g.beginPath(); g.moveTo(...M(x, 0));
+      for (let i = 1; i <= 40; i++){ const y = i / 40; x += fx(x, y, e) / 40; g.lineTo(...M(x, y)); } g.stroke(); }
+    g.setLineDash([]); g.lineDashOffset = 0;
+    // demonstrations
+    for (const d of [demoL, demoR]){ g.strokeStyle = hexA(c.muted, .45); g.lineWidth = 1.4; g.beginPath(); d.forEach((p, i) => i ? g.lineTo(...M(...p)) : g.moveTo(...M(...p))); g.stroke(); }
+    // obstacle
+    const [bx, by] = M(0, 0.55); g.fillStyle = hexA(c.muted, .14); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3;
+    g.beginPath(); g.roundRect(bx - 34, by - 18, 68, 36, 6); g.fill(); g.stroke();
+    g.save(); g.beginPath(); g.roundRect(bx - 34, by - 18, 68, 36, 6); g.clip(); g.strokeStyle = hexA(c.muted, .45); g.lineWidth = 1;
+    for (let k = -80; k < 80; k += 8){ g.beginPath(); g.moveTo(bx + k, by + 20); g.lineTo(bx + k + 40, by - 20); g.stroke(); } g.restore();
+    parts(M);
+    const [sx, sy] = M(0, 0), [gx, gy] = M(0, 1);
+    g.fillStyle = c.ink; g.beginPath(); g.arc(sx, sy, 6, 0, 7); g.fill(); txt(g, 'start', sx + 30, sy + 2, c.ink, 12.5, 500, 'center', MONO);
+    star(g, gx, gy, 9, c.ink); txt(g, 'goal', gx + 28, gy, c.ink, 12.5, 500, 'center', MONO);
+    txt(g, note, ox + PW / 2, oy + PH + 18, c.muted, 13.5, 500);
+  }
+  function star(g, x, y, r, col){ g.fillStyle = col; g.beginPath(); for (let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; g.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); } g.closePath(); g.fill(); }
+  function drawPath(g, M, p, col, w, frac, dash){
+    const n = Math.floor(frac * (p.length - 1)); g.strokeStyle = col; g.lineWidth = w; g.lineJoin = 'round'; if (dash) g.setLineDash(dash);
+    g.beginPath(); for (let i = 0; i <= n; i++){ const [px, py] = M(...p[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.setLineDash([]); return n;
+  }
+  function head(g, c, ox, oy){
+    txt(g, '(b) Diversity head', ox + 230, oy + 10, c.ink, 17, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
+    const since = clock - lastSample;                  // seconds since the last sample
+    // features of the field, gradient stopped
+    for (let i = 0; i < 7; i++){ g.fillStyle = hexA(c.muted, 0.25 + 0.5 * (0.5 + 0.5 * Math.sin(clock * 3 + i * 1.3))); g.beginPath(); g.roundRect(ox + 20, oy + 120 + i * 18, 20, 13, 3); g.fill(); }
+    txt(g, 'features', ox + 30, oy + 268, c.muted, 12.5, 500, 'center', MONO); txt(g, 'of f', ox + 26, oy + 284, c.muted, 12.5, 500, 'center', MONO);
+    arrow(g, ox + 48, oy + 183, ox + 92, oy + 183, c.muted, 1.4, [4, 3]); txt(g, 'sg', ox + 70, oy + 170, c.muted, 12, 500, 'center', MONO, true);
+    // the network h_psi with a pulse
+    const L = [[4, ox + 108], [3, ox + 148], [4, ox + 188]]; const nodes = L.map(([n, x]) => Array.from({length: n}, (_, i) => [x, oy + 183 + (i - (n - 1) / 2) * 26]));
+    for (let a = 0; a < 2; a++) for (const p of nodes[a]) for (const q of nodes[a + 1]){ g.strokeStyle = hexA(c.blue, .25); g.lineWidth = 1; g.beginPath(); g.moveTo(...p); g.lineTo(...q); g.stroke(); }
+    const pulse = ease(since / 0.6);
+    nodes.flat().forEach(([x, y]) => { g.fillStyle = c.bg; g.strokeStyle = c.blue; g.lineWidth = 1.8; g.beginPath(); g.arc(x, y, 6.5, 0, 7); g.fill(); g.stroke(); });
+    if (pulse < 1){ const px = ox + 108 + pulse * 80; g.fillStyle = hexA(c.orange, 1 - pulse * 0.3); g.beginPath(); g.arc(px, oy + 183, 5, 0, 7); g.fill(); }
+    txt(g, 'h', ox + 144, oy + 248, c.blue, 17, 600, 'center', MONO); txt(g, 'ψ', ox + 155, oy + 254, c.blue, 11, 500, 'center', MONO);
+    // mixture over the direction eps, two lobes
+    const cx = ox + 300, cy = oy + 96, R = 34;
+    arrow(g, ox + 200, oy + 160, cx - 52, cy + 8, c.muted);
+    for (const [side, col] of [[-1, c.blue], [1, c.teal]]){ g.fillStyle = hexA(col, .28); g.beginPath();
+      for (let i = 0; i <= 40; i++){ const a = Math.PI / 2 + side * (-Math.PI / 2) + (i / 40 - .5) * Math.PI * 0.9; const rr = R + 18 * Math.exp(-((i / 40 - .5) / 0.22) ** 2); g.lineTo(cx + rr * Math.cos(a) * (side < 0 ? 1 : 1), cy + rr * Math.sin(a)); }
+      g.lineTo(cx, cy); g.closePath(); g.fill(); }
+    g.strokeStyle = hexA(c.muted, .6); g.setLineDash([2, 3]); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.stroke(); g.setLineDash([]);
+    const ang = epsShown > 0 ? Math.PI * (1 - 0.06) : 0.06 * Math.PI; const sw = ease(since / 0.5);
+    const a0 = epsShown > 0 ? 0.06 * Math.PI : Math.PI * (1 - 0.06), aa = a0 + (ang - a0) * sw;
+    arrow(g, cx, cy, cx + (R + 4) * Math.cos(aa), cy - (R + 4) * Math.sin(aa) * 0.15, c.blue, 2.4);
+    g.fillStyle = c.ink; g.beginPath(); g.arc(cx, cy, 3.5, 0, 7); g.fill();
+    txt(g, 'ε', cx + (epsShown > 0 ? -22 : 22), cy - 16, c.blue, 17, 600, 'center', MONO, true);
+    txt(g, 'ε ~ Σ w N(μ, σ²)', cx, cy + 64, c.ink, 13, 500, 'center', MONO);
+    // rate per step lambda_k and its sum Lambda_k
+    const bx = ox + 252, by = oy + 300; arrow(g, ox + 200, oy + 206, bx - 6, by - 50, c.muted);
+    g.strokeStyle = hexA(c.ink, .6); g.lineWidth = 1; g.beginPath(); g.moveTo(bx, by - 70); g.lineTo(bx, by); g.lineTo(bx + 104, by); g.stroke();
+    const lamk = [1, .82, .66, .52, .42, .34, .28, .24]; let cum = 0; const grow = ease(since / 1.2);
+    g.strokeStyle = c.ink; g.lineWidth = 1.6; g.beginPath();
+    lamk.forEach((v, i) => { const show = Math.min(1, Math.max(0, grow * 8 - i)); g.fillStyle = hexA(c.blue, .45); g.fillRect(bx + 6 + i * 12, by - v * 20 * show, 8, v * 20 * show);
+      cum += v; const px = bx + 10 + i * 12, py = by - cum / 4.28 * 60; if (show > 0){ i ? g.lineTo(px, py) : g.moveTo(px, py); } });
+    g.stroke(); cum = 0; lamk.forEach((v, i) => { cum += v; if (grow * 8 - i > 0){ g.fillStyle = c.ink; g.beginPath(); g.arc(bx + 10 + i * 12, by - cum / 4.28 * 60, 2.6, 0, 7); g.fill(); } });
+    txt(g, 'Λ', bx + 118, by - 58, c.ink, 13, 600, 'left', MONO); txt(g, 'λ', bx + 118, by - 14, c.blue, 13, 600, 'left', MONO);
+    txt(g, 'step k in a chunk', bx + 52, by + 16, c.muted, 12, 500, 'center', MONO);
+    // the velocity offset
+    arrow(g, cx + 56, cy + 10, ox + 404, oy + 168, c.muted); arrow(g, bx + 110, by - 40, ox + 404, oy + 196, c.muted);
+    txt(g, 'ȧ = f + λ⊙ε', ox + 420, oy + 182, c.ink, 15, 600, 'center', MONO);
+    g.strokeStyle = c.blue; g.lineWidth = 1; g.beginPath(); g.moveTo(ox + 372, oy + 200); g.lineTo(ox + 468, oy + 200); g.stroke();
+    txt(g, 'fixed ε per chunk', ox + 420, oy + 214, c.muted, 12, 500, 'center', MONO);
+  }
+  function draw(dt){
+    const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [480, 1160] : [1080, 380]; g.clearRect(0, 0, vw, vh);
+    if (!reduce) clock += dt; else clock = 10;
+    if (!reduce && clock - lastSample > 3.4){ lastSample = clock; eps = -eps; epsShown = eps; }
+    if (reduce){ lastSample = 0; }
+    const since = clock - lastSample, frac = reduce ? 1 : ease((since - 0.6) / 1.8);
+    const pos = S.narrow ? [[90, 6], [10, 380], [90, 790]] : [[0, 6], [310, 6], [780, 6]];
+    // (a) plain field, path into the obstacle
+    fieldPanel(g, c, pos[0][0], pos[0][1], 0, '(a) Plain ODE', 'the mean field hits the obstacle', M => {
+      const p = route(0); const fr = reduce ? 1 : ease((clock % 3.4) / 1.6); const stop = 0.47;
+      const n = drawPath(g, M, p.filter(q => q[1] <= stop), c.ink, 3, fr);
+      if (fr > 0.95){ const [hx, hy] = M(0, stop); g.strokeStyle = c.orange; g.lineWidth = 3.2; g.beginPath(); g.moveTo(hx - 8, hy - 8); g.lineTo(hx + 8, hy + 8); g.moveTo(hx + 8, hy - 8); g.lineTo(hx - 8, hy + 8); g.stroke(); }
+    });
+    head(g, c, pos[1][0], pos[1][1]);
+    // (c) tilted field
+    fieldPanel(g, c, pos[2][0], pos[2][1], eps * (reduce ? 1 : ease(since / 0.6)), '(c) With the head', 'the offset tilts the whole field', M => {
+      drawPath(g, M, route(-eps), hexA(c.teal, .8), 2, 1, [6, 4]);
+      drawPath(g, M, route(eps), c.blue, 4, frac);
+      const [lx, ly] = M(eps > 0 ? 0.36 : -0.36, 0.86); txt(g, 'sampled ε', lx, ly, c.blue, 12.5, 600, 'center', MONO);
+    });
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+
+/* ---------- arbitrary control rate ---------- */
+{
+  const S = stage(document.getElementById('d-rate'));
+  const ref = x => 0.2*Math.sin(2*Math.PI*1.1*x) + 0.05*Math.cos(2*Math.PI*3*x);
+  const dref = x => 0.2*2*Math.PI*1.1*Math.cos(2*Math.PI*1.1*x) - 0.05*2*Math.PI*3*Math.sin(2*Math.PI*3*x);
+  const toPx = (x,y) => [S.w*(0.06+0.88*x), S.h*0.5 - y*S.h*1.1];
+  const rates = [20,40,80]; let k = 0, shown = 0;
+  const input = document.getElementById('r-rate'), out = document.getElementById('r-val');
+  input.addEventListener('input', () => { k = +input.value; out.textContent = rates[k] + ' Hz'; shown = 0; });
+  function draw(dt){
+    const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
+    g.strokeStyle=hexA(c.teal,.55); g.lineWidth=1.6; g.beginPath();
+    for (let i=0;i<=200;i++){ const x=i/200; const [px,py]=toPx(x,ref(x)); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke();
+    const n = 16 * rates[k]/20; let y = ref(0);
+    if (!reduce) shown = Math.min(n, shown + dt*n/1.6); else shown = n;
+    for (let i=0;i<=shown;i++){ const x=i/n; if (i>0){ const dx=1/n, x0=(i-1)/n; y += dx*(dref(x0+dx/2) - 4*(y-ref(x0))); }
+      const [px,py]=toPx(x,y); g.fillStyle=c.blue; g.beginPath(); g.arc(px,py, k===0?4:(k===1?3.2:2.5),0,7); g.fill(); }
+    g.fillStyle=hexA(c.muted,.9); g.font='500 11px JetBrains Mono, monospace';
+    g.fillText(`${Math.round(n)} actions · same model, step 1/${rates[k]/20}`, 12, 18);
+    if (!reduce && shown>=n){ shown = n; }
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+/* ---------- lightbox and copy ---------- */
+const lb = document.getElementById('lb'), lbi = document.getElementById('lb-img');
+document.querySelectorAll('.plate img').forEach(im => im.addEventListener('click', () => { lbi.src = im.src; lbi.alt = im.alt; lb.hidden = false; }));
+lb.addEventListener('click', () => { lb.hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.hidden = true; });
+const cb = document.getElementById('copy-bib');
+cb.addEventListener('click', () => { const t = document.getElementById('bib').textContent;
+  const done = () => { cb.textContent = 'Copied'; setTimeout(() => cb.textContent = 'Copy', 1600); };
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(done).catch(() => {
+    const r = document.createRange(); r.selectNodeContents(document.getElementById('bib')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cb.textContent = 'Selected'; }); });
+})();
+</script>
