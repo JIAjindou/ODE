@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<script>try { const t = localStorage.getItem('ode-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<script>let t = null; try { t = localStorage.getItem('ode-theme'); } catch (e) {} document.documentElement.dataset.theme = t || 'dark';</script>
 <style>
 /* Layout: one reading column (1120px) that opens on a live vector field; figures sit on white "paper" plates. */
 :root{
@@ -229,25 +229,21 @@ svg [data-s].dim{opacity:.12}
 .clip .why{font-size:14px;padding:22px 12px 10px}
 
 /* method steps */
-.step{display:grid;gap:12px;margin-top:56px}
-.step.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
-.step-txt{display:grid;gap:12px;max-width:78ch}
+.mstep{display:grid;gap:24px;margin-top:64px;padding-top:48px;border-top:1px solid var(--line)}
+.mrow{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:center}
+.step-txt{display:grid;gap:12px}
 .step-txt p{color:var(--muted);font-size:17px}
 .step-txt p b{color:var(--ink)}
-.step + .anim,.step + .benefits{margin-top:18px}
-.eqn{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 18px;overflow-x:auto;font-size:17px}
-.eqn .katex-display{margin:.7em 0}
-.benefits{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px;align-items:stretch}
-.bstack{display:grid;gap:16px;align-content:stretch}
-.benefits .demo canvas{aspect-ratio:16/8}
-.ben{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:6px;align-content:start}
-.ben p{color:var(--muted);font-size:15.5px}
-.ben.demo{padding:0}
-.demos.col{grid-template-columns:minmax(0,1fr);margin-top:0;gap:14px}
-.demos.col .demo canvas{aspect-ratio:16/8}
+.eqn{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 20px;overflow-x:auto;font-size:16.5px;min-height:112px;display:flex;align-items:center;justify-content:center}
+.eqn .katex-display{margin:.6em 0}
+.cards{display:grid;gap:18px}
+.cards.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cards.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cards .demo canvas{aspect-ratio:16/10}
+.cards .demo .body{flex:1;align-content:start}
 
 @media (max-width:900px){
-  .charts.c2,.charts.c3,.player,.step.two,.benefits{grid-template-columns:minmax(0,1fr)}
+  .charts.c2,.charts.c3,.player,.mrow,.cards.c2,.cards.c3{grid-template-columns:minmax(0,1fr)}
   .cells,.cells.c3{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:560px){ .cells,.cells.c3,.cells.c2{grid-template-columns:minmax(0,1fr)} }
@@ -461,66 +457,77 @@ svg [data-s].dim{opacity:.12}
     <h2 class="sec">Method</h2>
     <p class="lede">ODE policy replaces only the action head. The encoder, the data, and the training schedule stay the same.</p>
 
-    <div class="step">
-      <div class="step-txt">
-        <h3><span>1</span>Learn a velocity, not an action</h3>
+    <article class="mstep">
+      <div class="mrow">
+        <div class="step-txt">
+          <h3><span>1</span>Learn a velocity, not an action</h3>
+          <p>The images and the instruction are encoded into an embedding $\mathbf z_t$, as in any policy. The network $\mathbf f_\theta$ outputs how the action should change, given the action $\mathbf a(t)$ the robot is commanded to reach and its proprioception $\mathbf s_t$. Time $t$ is the physical time of the robot.</p>
+          <p>Because the field sees the current action, each step depends on where the motion has arrived. A discrete policy outputs a whole chunk at once and cannot react to its own intermediate actions.</p>
+        </div>
         <div class="eqn">$$\dot{\mathbf a}(t)=\mathbf f_\theta\big(\mathbf a(t),\,\mathbf s_t,\,\mathbf z_t\big)$$</div>
-        <p>The images and the instruction are encoded into an embedding $\mathbf z_t$, as in any policy. The network $\mathbf f_\theta$ then outputs how the action should change, given the action $\mathbf a(t)$ the robot is currently commanded to reach and its proprioception $\mathbf s_t$. Time $t$ is the physical time of the robot, counted in control steps.</p>
-        <p>Because the field sees the current action, each step depends on where the motion has arrived. A discrete policy outputs a whole chunk at once and cannot react to its own intermediate actions.</p>
       </div>
-    </div>
-    <figure class="anim">
-      <canvas id="fig1" aria-label="Animated figure, discrete policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
-    </figure>
+      <figure class="anim">
+        <canvas id="fig1" aria-label="Animated figure, discrete policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
+      </figure>
+    </article>
 
-    <div class="step">
-      <div class="step-txt">
-        <h3><span>2</span>Integrate chunk by chunk</h3>
-        <div class="eqn">$$\hat{\mathbf a}_{t+k+1}=\hat{\mathbf a}_{t+k}+\int_{t+k}^{t+k+1}\mathbf f_\theta\big(\mathbf a(t'),\,\mathbf s_t,\,\mathbf z_t\big)\,\mathrm dt',\quad k=0,\dots,H-1$$</div>
-        <p>Every $H=8$ steps, the policy reads the observation once and holds $\mathbf z_t$ and $\mathbf s_t$ fixed. It then integrates the field with RK4, one action after another. The next chunk starts from the last integrated action, not from scratch. This gives three benefits.</p>
+    <article class="mstep">
+      <div class="mrow">
+        <div class="step-txt">
+          <h3><span>2</span>Integrate chunk by chunk</h3>
+          <p>Every $H=8$ steps, the policy reads the observation once and holds $\mathbf z_t$ and $\mathbf s_t$ fixed. It then integrates the field with RK4, one action after another, and the next chunk starts from the last integrated action. This gives three benefits.</p>
+        </div>
+        <div class="eqn">$$\hat{\mathbf a}_{t+k+1}=\hat{\mathbf a}_{t+k}+\int_{t+k}^{t+k+1}\mathbf f_\theta\big(\mathbf a(t'),\mathbf s_t,\mathbf z_t\big)\,\mathrm dt'$$</div>
       </div>
-    </div>
-    <div class="benefits">
-      <div class="bstack"><div class="ben"><h4>Smooth</h4><p>Chunks join without jumps. The executed motion is one integral curve whose condition is refreshed every 8 steps.</p></div>
-      <div class="ben"><h4>Streaming</h4><p>Each action is sent to the controller as soon as it is integrated. A whole chunk takes 5.7 ms with <i>Euler</i> on LIBERO.</p></div></div>
-      <div class="ben demo">
-        <canvas id="d-rate" aria-label="One trained model integrated at 20, 40 and 80 Hz"></canvas>
-        <div class="body"><h4>Any control rate</h4><p>The field lives in continuous time, so one model runs at a finer rate by integrating with a smaller step.</p></div>
+      <div class="cards c3">
+        <article class="demo"><canvas id="d-smooth" aria-label="Consecutive chunks join into one continuous path"></canvas>
+          <div class="body"><h4>Smooth</h4><p>Chunks join without jumps. The motion is one integral curve whose condition is refreshed every 8 steps.</p></div></article>
+        <article class="demo"><canvas id="d-stream" aria-label="Timeline, the discrete policy sends a chunk after generating it, ODE policy sends each action as soon as it is integrated"></canvas>
+          <div class="body"><h4>Streaming</h4><p>Each action is sent as soon as it is integrated. A chunk takes 5.7 ms with <i>Euler</i>, against 61 ms for FM-DiT.</p></div></article>
+        <article class="demo"><canvas id="d-rate" aria-label="One trained model integrated at 20, 40 and 80 Hz"></canvas>
+          <div class="body"><h4>Any control rate</h4><p>The field lives in continuous time, so one model runs at a finer rate by integrating with a smaller step.</p></div></article>
       </div>
-    </div>
+    </article>
 
-    <div class="step two">
-      <div class="step-txt">
-        <h3><span>3</span>Train by matching the path</h3>
+    <article class="mstep">
+      <div class="mrow">
+        <div class="step-txt">
+          <h3><span>3</span>Train by matching the path</h3>
+          <p>Start from a demonstrated action, integrate $H$ steps, and match the whole path. The gradient flows back through the solver, and no velocity labels are needed.</p>
+          <p><b>Contractive perturbation.</b> Some segments start from a shifted point $\mathbf a_t+\boldsymbol\delta$, and the target shrinks the shift by $\rho^k$ at step $k$. The field learns to pull drift back, at no cost at inference.</p>
+        </div>
         <div class="eqn">$$\mathcal L_{\text{path}}^{\boldsymbol\delta}=\frac1H\sum_{k=1}^{H}\big\|\hat{\mathbf a}_{t+k}(\mathbf a_t+\boldsymbol\delta)-(\mathbf a_{t+k}+\rho^{k}\boldsymbol\delta)\big\|_2^2$$</div>
-        <p>Start from a demonstrated action, integrate $H$ steps, and match the whole path to the demonstration. The gradient flows back through the solver steps. No velocity labels are needed, so noisy demonstrations are not differentiated.</p>
-        <p><b>Contractive perturbation.</b> Some segments start from a shifted point $\mathbf a_t+\boldsymbol\delta$, and the target shrinks the shift by $\rho^k$ at step $k$. The field thus learns to pull drift back to the demonstrations, at no cost at inference.</p>
       </div>
-      <div class="demos col">
+      <div class="cards c2">
         <article class="demo"><canvas id="d-train" aria-label="Training animation, the integrated path from a shifted start is pulled onto the shrinking target"></canvas>
-          <div class="body"><h4>Path loss</h4><p>Orange segments are the errors between the integrated steps and their targets. Training removes them.</p></div></article>
+          <div class="body"><h4>During training</h4><p>Orange segments are the errors between the integrated steps and their targets. Training removes them.</p></div></article>
         <article class="demo"><canvas id="d-contract" aria-label="Contractive perturbation, perturbed starts are pulled back to the demonstration"></canvas>
           <div class="body"><h4>After training</h4><p>Paths from perturbed starts return to the demonstration.</p></div></article>
       </div>
-    </div>
+    </article>
 
-    <div class="step">
-      <div class="step-txt">
-        <h3><span>4</span>Optional diversity head</h3>
-        <div class="eqn">$$\dot{\mathbf a}(t')=\mathbf f_\theta\big(\mathbf a(t'),\,\mathbf s_t,\,\mathbf z_t\big)+\boldsymbol\lambda_k\odot\boldsymbol\epsilon$$</div>
-        <p>A deterministic field averages distinct demonstrated behaviors, e.g., passing an obstacle on the left or on the right, and heads into the obstacle. Since a mode is decided by the direction in which integration sets off, a small head reads the features of the field once per chunk and samples a direction $\boldsymbol\epsilon$ from a <i>Gaussian</i> mixture, with a rate $\boldsymbol\lambda_k$ per step. The offset tilts the field toward one route. The head is trained on detached inputs, so it leaves the gradient of $\mathbf f_\theta$ unchanged.</p>
+    <article class="mstep">
+      <div class="mrow">
+        <div class="step-txt">
+          <h3><span>4</span>Optional diversity head</h3>
+          <p>A deterministic field averages distinct behaviors, e.g., passing an obstacle on the left or on the right, and heads into the obstacle. A small head reads the features of the field once per chunk and samples a direction $\boldsymbol\epsilon$ with a rate $\boldsymbol\lambda_k$ per step, which tilts the field toward one route. It is trained on detached inputs, so the gradient of $\mathbf f_\theta$ stays unchanged.</p>
+        </div>
+        <div class="eqn">$$\dot{\mathbf a}(t')=\mathbf f_\theta\big(\mathbf a(t'),\mathbf s_t,\mathbf z_t\big)+\boldsymbol\lambda_k\odot\boldsymbol\epsilon$$</div>
       </div>
-    </div>
-    <figure class="anim">
-      <canvas id="fig2" aria-label="Animated figure of the diversity head, a sampled offset tilts the field toward one route"></canvas>
-    </figure>
+      <figure class="anim">
+        <canvas id="fig2" aria-label="Animated figure of the diversity head, a sampled offset tilts the field toward one route"></canvas>
+      </figure>
+    </article>
 
-    <div class="step">
-      <div class="step-txt">
-        <h3><span>5</span>The same field as an RL actor</h3>
-        <p>In RL, the field acts at every control step ($H=1$) and the integrated action is the mean of the <i>Gaussian</i> actor. PPO or SAC trains the field through the solver steps with its own objective. Only the actor is replaced, and the critic and the algorithm stay unchanged.</p>
+    <article class="mstep">
+      <div class="mrow">
+        <div class="step-txt">
+          <h3><span>5</span>The same field as an RL actor</h3>
+          <p>In RL, the field acts at every control step ($H=1$), and the integrated action is the mean of the <i>Gaussian</i> actor. PPO or SAC trains the field through the solver steps with its own objective. Only the actor is replaced, and the critic and the algorithm stay unchanged.</p>
+        </div>
+        <div class="eqn">$$\pi_\theta(\mathbf a_t\mid\cdot)=\mathcal N\big(\hat{\mathbf a}_t,\boldsymbol\sigma^2\big),\quad \hat{\mathbf a}_t=\int_0^1\mathbf f_\theta\big(\mathbf a(t'),\mathbf s_t,\mathbf z_t\big)\,\mathrm dt'$$</div>
       </div>
-    </div>
+    </article>
   </div>
 </section>
 
@@ -930,12 +937,58 @@ function rich(g, parts, x, y, col, size, weight = 600, family = MONO, italic = t
 }
 
 
+/* ---------- smooth: consecutive chunks form one curve ---------- */
+{
+  const S = stage(document.getElementById('d-smooth'));
+  const ref = x => 0.22 * Math.sin(2 * Math.PI * 0.9 * x + 0.6) + 0.05 * Math.sin(2 * Math.PI * 2.4 * x);
+  const N = 24, H = 8; let clock = 0;
+  const toPx = (x, y) => [S.w * (0.07 + 0.86 * x), S.h * 0.48 - y * S.h * 1.1];
+  function draw(dt){
+    const c = colors(), g = S.ctx; g.clearRect(0, 0, S.w, S.h); if (!reduce) clock += dt; else clock = 9;
+    const n = Math.min(N, (clock % 4.4) / 3 * N);
+    for (let k = 1; k < 3; k++){ const [px] = toPx(k * H / N, 0); g.strokeStyle = hexA(c.muted, .45); g.setLineDash([3, 4]); g.lineWidth = 1;
+      g.beginPath(); g.moveTo(px, S.h * 0.1); g.lineTo(px, S.h * 0.86); g.stroke(); g.setLineDash([]); }
+    for (let k = 0; k < 3; k++){ const a = k * H, b = Math.min(n, (k + 1) * H); if (b <= a) break;
+      g.strokeStyle = k % 2 ? c.teal : c.blue; g.lineWidth = 3.2; g.lineCap = 'round'; g.beginPath();
+      for (let i = a; i <= b + 1e-6; i += 0.25){ const [px, py] = toPx(Math.min(i, b) / N, ref(Math.min(i, b) / N)); i === a ? g.moveTo(px, py) : g.lineTo(px, py); } g.stroke();
+      for (let i = a; i <= b; i++){ const [px, py] = toPx(i / N, ref(i / N)); g.fillStyle = k % 2 ? c.teal : c.blue; g.beginPath(); g.arc(px, py, 3.2, 0, 7); g.fill(); } }
+    g.font = '500 14px JetBrains Mono, monospace'; g.fillStyle = hexA(c.muted, .95); g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    ['chunk 1', 'chunk 2', 'chunk 3'].forEach((t, k) => { const [px] = toPx((k + 0.5) * H / N, 0); g.fillText(t, px, S.h - 12); });
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+/* ---------- streaming: when each action of a chunk can be sent ---------- */
+{
+  const S = stage(document.getElementById('d-stream'));
+  const T = 70, FM = 61.2, ODE = 5.7; let clock = 0;   // ms per chunk of 8 actions on LIBERO (FM-DiT, ODE with Euler)
+  function draw(dt){
+    const c = colors(), g = S.ctx; g.clearRect(0, 0, S.w, S.h); if (!reduce) clock += dt; else clock = 9;
+    const now = reduce ? T : Math.min(T, ((clock % 4.2) / 3) * T);
+    const x0 = 16, x1 = S.w - 16, X = ms => x0 + (x1 - x0) * ms / T;
+    const rows = [['FM-DiT', S.h * 0.34, c.teal, Array(8).fill(FM)], ['ODE (ours)', S.h * 0.68, c.blue, Array.from({ length: 8 }, (_, i) => ODE * (i + 1) / 8)]];
+    g.textBaseline = 'alphabetic';
+    rows.forEach(([name, y, col, ts], r) => {
+      g.font = `${r ? 700 : 500} 15px Source Sans 3, Segoe UI, sans-serif`; g.fillStyle = r ? c.ink : c.muted; g.textAlign = 'left'; g.fillText(name, x0, y - 26);
+      g.strokeStyle = hexA(c.muted, .35); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke();
+      const busy = Math.min(now, ts[7]); g.fillStyle = hexA(col, .22); g.fillRect(X(0), y - 9, X(busy) - X(0), 18);
+      ts.forEach((t, i) => { const on = now >= t; const px = X(t) + (r ? 0 : (i - 3.5) * 3);
+        g.fillStyle = on ? col : hexA(c.muted, .25); g.beginPath(); g.arc(px, y - (r ? 0 : 0), on ? 5 : 3.5, 0, 7); g.fill(); });
+      g.font = '500 14px JetBrains Mono, monospace'; g.fillStyle = col; g.textAlign = r ? 'left' : 'right';
+      g.fillText(`${ts[7]} ms`, r ? X(ts[7]) + 12 : X(ts[7]) - 22, y + 30);
+    });
+    g.strokeStyle = hexA(c.ink, .55); g.lineWidth = 1.2; g.beginPath(); g.moveTo(X(now), S.h * 0.14); g.lineTo(X(now), S.h * 0.86); g.stroke();
+    g.font = '500 13px JetBrains Mono, monospace'; g.fillStyle = hexA(c.muted, .95); g.textAlign = 'right'; g.fillText('time per chunk →', x1, S.h - 10);
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
 /* ---------- arbitrary control rate ---------- */
 {
   const S = stage(document.getElementById('d-rate'));
   const ref = x => 0.2*Math.sin(2*Math.PI*1.1*x) + 0.05*Math.cos(2*Math.PI*3*x);
   const dref = x => 0.2*2*Math.PI*1.1*Math.cos(2*Math.PI*1.1*x) - 0.05*2*Math.PI*3*Math.sin(2*Math.PI*3*x);
-  const toPx = (x,y) => [S.w*(0.06+0.88*x), S.h*0.5 - y*S.h*1.1];
+  const toPx = (x,y) => [S.w*(0.06+0.88*x), S.h*0.62 - y*S.h*0.95];
   const rates = [20,40,80]; let k = 0, shown = 0, hold = 0;
   function draw(dt){
     const c = colors(), g = S.ctx; g.clearRect(0,0,S.w,S.h);
