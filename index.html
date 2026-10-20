@@ -160,9 +160,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .charts.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .chart{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .chart.mini{border:0;padding:0;background:none;border-radius:0}
-.chart .ct{font:700 17px/1.25 var(--display);color:var(--ink)}
-.chart .ct span{font:500 12px/1 var(--mono);color:var(--muted);margin-left:6px}
-.chart figcaption{font-size:14.5px;line-height:1.5;color:var(--muted);margin-top:auto;padding-top:4px}
+.chart .ct{font:700 19px/1.25 var(--display);color:var(--ink)}
+.chart .ct span{font:500 13.5px/1 var(--mono);color:var(--muted);margin-left:6px}
+.chart figcaption{font-size:16px;line-height:1.5;color:var(--muted);margin-top:auto;padding-top:4px}
 .chart figcaption b{color:var(--ink)}
 .chart .plot{position:relative;width:100%;min-height:40px}
 .chart .plot svg{display:block;overflow:visible}
@@ -171,23 +171,23 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .cells{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px}
 .cells.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .cells.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:15px;color:var(--muted)}
 .legend .li{display:inline-flex;align-items:center;gap:6px;cursor:default}
 .legend .li.ours{color:var(--ink);font-weight:600}
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
 .ctls{display:flex;flex-wrap:wrap;gap:8px}
 .seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:3px;flex-wrap:wrap}
-.seg button{border:0;background:transparent;color:var(--muted);font:600 13px/1 var(--body);padding:7px 11px;border-radius:999px;cursor:pointer}
+.seg button{border:0;background:transparent;color:var(--muted);font:600 14.5px/1 var(--body);padding:8px 12px;border-radius:999px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 svg .grid{stroke:var(--line);stroke-width:1}
 svg .axis{stroke:var(--muted);stroke-width:1}
-svg .tick{fill:var(--muted);font:400 12.5px var(--body)}
+svg .tick{fill:var(--muted);font:400 14.5px var(--body)}
 svg .tick.strong,svg .val.strong,svg .plab.strong{fill:var(--ink);font-weight:700}
-svg .alab{fill:var(--muted);font:500 13px var(--body)}
-svg .val{fill:var(--ink);font:500 12.5px var(--mono)}
-svg .plab{fill:var(--ink);font:500 12.5px var(--body)}
-svg .note{fill:var(--muted);font:500 12px var(--mono)}
-svg .gain{fill:var(--ink);font:700 13px var(--mono)}
+svg .alab{fill:var(--muted);font:500 15px var(--body)}
+svg .val{fill:var(--ink);font:500 14px var(--mono)}
+svg .plab{fill:var(--ink);font:500 14.5px var(--body)}
+svg .note{fill:var(--muted);font:500 14px var(--mono)}
+svg .gain{fill:var(--ink);font:700 15px var(--mono)}
 svg .bracket{fill:none;stroke:var(--ink);stroke-width:1.2;stroke-dasharray:3 2}
 svg .ref{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:4 3;opacity:.7}
 svg .guide{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
@@ -195,7 +195,7 @@ svg .err{stroke:var(--ink);stroke-width:1.2;opacity:.55}
 svg .shade{fill:var(--muted);opacity:.08}
 svg [data-s]{transition:opacity .2s}
 svg [data-s].dim{opacity:.12}
-.tip{position:fixed;z-index:30;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(10,20,30,.16);padding:10px 12px;font-size:13.5px;min-width:180px}
+.tip{position:fixed;z-index:30;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(10,20,30,.16);padding:10px 12px;font-size:15px;min-width:180px}
 .tip b{display:block;margin-bottom:6px;font-weight:700}
 .tip div{display:flex;align-items:center;gap:8px;line-height:1.6}
 .tip div i{width:10px;height:10px;border-radius:50%;flex:none}
@@ -638,9 +638,9 @@ function heroPanel(id, mode){
       }
     }
     // chunk boundaries
-    g.fillStyle = hexA(c.muted,.8); g.font = '500 11px JetBrains Mono, monospace';
+    g.fillStyle = hexA(c.muted,.8); g.font = '500 14px JetBrains Mono, monospace';
     for (let ch=1; ch*H<N; ch++){ const [px] = toPx(X(ch*H),0); g.strokeStyle = hexA(c.line,1); g.lineWidth=1; g.beginPath(); g.moveTo(px,S.h*0.16); g.lineTo(px,S.h*0.84); g.stroke(); }
-    g.fillText('physical time →', 14, S.h*0.86);
+    g.fillText('physical time →', 14, S.h*0.9);
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
@@ -676,7 +676,7 @@ heroPanel('hero-disc', 'disc'); heroPanel('hero-ode', 'ode');
       const [rx,ry]=toPx(tr.x,ref(tr.x)); g.strokeStyle=hexA(c.orange,.8); g.setLineDash([2,3]); g.beginPath(); g.moveTo(rx,ry); g.lineTo(sx,sy); g.stroke(); g.setLineDash([]);
     }
     if (!reduce && t - t0 > 2.4){ t0 = t; auto(); }
-    g.fillStyle=hexA(c.muted,.9); g.font='500 11px JetBrains Mono, monospace'; g.fillText('δ ~ start offset', 12, 18);
+    g.fillStyle=hexA(c.muted,.9); g.font='500 14px JetBrains Mono, monospace'; g.fillText('δ ~ start offset', 12, 22);
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0,0);
 }
@@ -702,8 +702,9 @@ function arrow(g, x1, y1, x2, y2, col, w = 1.4, dash = null){
   g.beginPath(); g.moveTo(x2, y2); g.lineTo(x2 - L * Math.cos(a - 0.4), y2 - L * Math.sin(a - 0.4));
   g.lineTo(x2 - L * Math.cos(a + 0.4), y2 - L * Math.sin(a + 0.4)); g.closePath(); g.fill();
 }
+const FS = 1.25;   // text in the animated figures, close to the body size
 function txt(g, s, x, y, col, size = 13, weight = 500, align = 'center', family = 'Source Sans 3, Segoe UI, sans-serif', italic = false){
-  g.fillStyle = col; g.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(s, x, y);
+  size *= FS; g.fillStyle = col; g.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(s, x, y);
 }
 const MONO = 'JetBrains Mono, ui-monospace, monospace';
 const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
@@ -711,10 +712,14 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
 /* ---------- Fig. 1: discrete policies vs. ODE policy ---------- */
 // text with a subscript, centered on x (e.g. f with theta)
 function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, italic = true){
-  g.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`; const wb = g.measureText(base).width;
-  g.font = `${italic ? 'italic ' : ''}${weight} ${size * 0.68}px ${family}`; const ws = g.measureText(sub).width;
-  const x0 = x - (wb + ws) / 2;
-  txt(g, base, x0, y, col, size, weight, 'left', family, italic); txt(g, sub, x0 + wb + 1, y + size * 0.3, col, size * 0.68, weight, 'left', family, italic);
+  rich(g, [[base], [sub, 1]], x, y, col, size, weight, family, italic);
+}
+// a run of text pieces, [text] or [text, 1] for a subscript, centered on x
+function rich(g, parts, x, y, col, size, weight = 600, family = MONO, italic = true){
+  const f = (sub) => `${italic ? 'italic ' : ''}${weight} ${size * FS * (sub ? 0.68 : 1)}px ${family}`;
+  const ws = parts.map(([t, sub]) => { g.font = f(sub); return g.measureText(t).width + (sub ? 1 : 0); });
+  let x0 = x - ws.reduce((a, b) => a + b, 0) / 2;
+  parts.forEach(([t, sub], i) => { txt(g, t, x0 + (sub ? 1 : 0), y + (sub ? size * FS * 0.3 : 0), col, size * (sub ? 0.68 : 1), weight, 'left', family, italic); x0 += ws[i]; });
 }
 {
   const S = vstage(document.getElementById('fig1'), [1100, 470], [560, 940]);
@@ -730,7 +735,7 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
   function inputs(g, c, x, y, label){
     for (let i = 0; i < 3; i++){ g.fillStyle = hexA(c.muted, 0.16 + i * 0.12); g.strokeStyle = hexA(c.muted, .75); g.lineWidth = 1;
       g.beginPath(); g.roundRect(x - 20 + i * 5, y - 18 + i * 5, 30, 24, 4); g.fill(); g.stroke(); }
-    txt(g, label, x, y + 34, c.muted, 12.5, 500, 'center', MONO);
+    txt(g, label, x + 8, y + 34, c.muted, 12.5, 500, 'center', MONO);
   }
   function encoder(g, c, x, y){
     g.fillStyle = hexA(c.muted, .1); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.3;
@@ -753,8 +758,8 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
         const px = X(i), py = Y(v); g.strokeStyle = hexA(c.blue, .16); g.lineWidth = 1.2; g.beginPath(); g.moveTo(px, py); g.lineTo(px + vx * (w - 32) * s, py - vy * h * 0.5 * s); g.stroke(); } }
     g.setLineDash([4, 4]); g.strokeStyle = hexA(c.muted, .7); g.lineWidth = 1.4; g.beginPath();
     for (let i = 0; i <= 80; i++){ const u = i / 80; i ? g.lineTo(X(u * N), Y(ref(u))) : g.moveTo(X(0), Y(ref(0))); } g.stroke(); g.setLineDash([]);
-    g.setLineDash([4, 4]); g.strokeStyle = hexA(c.muted, .7); g.beginPath(); g.moveTo(x0 + w - 150, y0 + 12); g.lineTo(x0 + w - 128, y0 + 12); g.stroke(); g.setLineDash([]);
-    txt(g, 'demonstration', x0 + w - 122, y0 + 12, c.muted, 11.5, 500, 'left', MONO);
+    g.setLineDash([4, 4]); g.strokeStyle = hexA(c.muted, .7); g.beginPath(); g.moveTo(x0 + w - 178, y0 + 14); g.lineTo(x0 + w - 156, y0 + 14); g.stroke(); g.setLineDash([]);
+    txt(g, 'demonstration', x0 + w - 150, y0 + 14, c.muted, 11.5, 500, 'left', MONO);
     if (kind === 'disc'){
       const shown = Math.min(3, Math.floor(prog) + 1);
       for (let k = 0; k < shown; k++){
@@ -783,7 +788,7 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
     const col = kind === 'disc' ? c.teal : c.blue, y = oy + 112;
     txt(g, kind === 'disc' ? 'Discrete policies' : 'ODE policy (ours)', ox + 270, oy + 20, col, 19, 700, 'center', 'Bricolage Grotesque, Segoe UI, sans-serif');
     const lit = prog < 3 && prog % 1 < 0.25 ? 1 : 0;      // the encoder runs once at the start of each chunk
-    inputs(g, c, ox + 34, y, kind === 'disc' ? 'o, l, s' : 'o, l');
+    inputs(g, c, ox + 38, y, kind === 'disc' ? 'o, l, s' : 'o, l');
     arrow(g, ox + 62, y, ox + 86, y, c.muted); encoder(g, c, ox + 90, y); arrow(g, ox + 172, y, ox + 192, y, c.muted);
     tokens(g, ox + 196, y, col, lit); txt(g, 'z', ox + 203, y + 34, c.ink, 13, 500, 'center', MONO, true);
     arrow(g, ox + 216, y, ox + 240, y, c.muted);
@@ -809,14 +814,14 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
       const u = (clock * 0.3) % 1; g.strokeStyle = c.blue; g.lineWidth = 2.2; g.beginPath();
       for (let i = 0; i <= 30 * u; i++){ const uu = i / 30; const [px, py] = map(uu, 0.25 * Math.sin(5 * uu)); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
       const [qx, qy] = map(u, 0.25 * Math.sin(5 * u)); g.fillStyle = c.blue; g.beginPath(); g.arc(qx, qy, 4, 0, 7); g.fill();
-      txtSub(g, 'ȧ = f', 'θ', ox + 300, y + 46, c.ink, 13); txt(g, '(a, s, z)', ox + 326, y + 46, c.ink, 13, 600, 'left', MONO, true);
-      arrow(g, ox + 396, y, ox + 416, y, c.muted); txt(g, '∫ dt', ox + 440, y, c.blue, 17, 600, 'center', MONO);
+      rich(g, [['ȧ = f'], ['θ', 1], ['(a, s, z)']], ox + 336, y + 50, c.ink, 13);
+      arrow(g, ox + 396, y, ox + 414, y, c.muted); txt(g, '∫dt', ox + 440, y, c.blue, 16, 600, 'center', MONO);
       arrow(g, ox + 464, y, ox + 486, y, c.muted);
       const pulse = 0.5 + 0.5 * Math.sin(clock * 10); g.fillStyle = hexA(c.blue, .2 + .2 * pulse); g.beginPath(); g.arc(ox + 502, y, 10, 0, 7); g.fill();
       g.fillStyle = c.blue; g.beginPath(); g.arc(ox + 502, y, 5, 0, 7); g.fill();
       txt(g, 'one action', ox + 494, y + 34, c.muted, 11.5, 500, 'center', MONO); txt(g, 'at a time', ox + 494, y + 50, c.muted, 11.5, 500, 'center', MONO);
       // proprioception enters the field directly
-      arrow(g, ox + 236, y + 52, ox + 254, y + 26, c.muted); txt(g, 's', ox + 230, y + 60, c.ink, 13, 500, 'center', MONO, true);
+      arrow(g, ox + 228, y + 58, ox + 252, y + 28, c.muted); txt(g, 's', ox + 222, y + 66, c.ink, 13, 500, 'center', MONO, true);
     }
     timeline(g, c, ox + 20, oy + 220, 490, 190, kind, prog);
   }
@@ -886,7 +891,6 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
     arrow(g, mx, my, mx + (R + 6) * Math.cos(aa), my + (R + 6) * Math.sin(aa) * 0.7, c.ink, 2.2);
     g.fillStyle = c.ink; g.beginPath(); g.arc(mx, my, 3.5, 0, 7); g.fill();
     txt(g, 'direction ε', mx, my + 50, c.ink, 13, 600, 'center', MONO, true);
-    txt(g, 'one mode per route', mx, my + 67, c.muted, 11.5, 500, 'center', MONO);
     // rate per step
     const rx = bx + 268, ry = oy + 312; arrow(g, bx + 198, cy + 16, rx - 8, ry - 34, c.muted);
     g.strokeStyle = hexA(c.ink, .6); g.lineWidth = 1; g.beginPath(); g.moveTo(rx, ry - 50); g.lineTo(rx, ry); g.lineTo(rx + 108, ry); g.stroke();
@@ -896,9 +900,8 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
     txt(g, 'k = 1 … 8', rx + 54, ry + 35, c.muted, 11.5, 500, 'center', MONO);
     // the offset added to the velocity
     const fx = bx + 448, fy = cy;
-    arrow(g, mx + 52, my + 8, fx - 34, fy - 18, c.muted); arrow(g, rx + 116, ry - 30, fx - 34, fy + 18, c.muted);
-    txtSub(g, 'ȧ = f', 'θ', fx, fy - 13, c.ink, 15); txtSub(g, '+ λ', 'k', fx - 12, fy + 13, c.ink, 15);
-    txt(g, '⊙ ε', fx + 14, fy + 13, c.ink, 15, 600, 'left', MONO, true);
+    arrow(g, mx + 52, my + 8, fx - 52, fy - 20, c.muted); arrow(g, rx + 116, ry - 30, fx - 60, fy + 20, c.muted);
+    rich(g, [['ȧ = f'], ['θ', 1]], fx, fy - 15, c.ink, 14); rich(g, [['+ λ'], ['k', 1], [' ⊙ ε']], fx, fy + 15, c.ink, 14);
   }
   function draw(dt){
     const c = colors(), g = S.ctx; const [vw, vh] = S.narrow ? [520, 1250] : [1080, 410]; g.clearRect(0, 0, vw, vh);
@@ -906,7 +909,7 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
     if (!reduce && clock - lastSample > 3.6){ lastSample = clock; eps = -eps; }
     const since = reduce ? 10 : clock - lastSample, frac = reduce ? 1 : ease((since - 0.5) / 1.8);
     const pos = S.narrow ? [[120, 6], [10, 420], [120, 840]] : [[0, 6], [290, 6], [800, 6]];
-    fieldPanel(g, c, pos[0][0], pos[0][1], 0, '(a) Plain ODE', 'the mean field hits the obstacle', M => {
+    fieldPanel(g, c, pos[0][0], pos[0][1], 0, '(a) Plain ODE', 'it heads into the obstacle', M => {
       const fr = reduce ? 1 : ease((clock % 3.6) / 1.5), stop = 0.42;
       const p = route(0).filter(q => q[1] <= stop); path(g, M, p, c.ink, 3, fr);
       if (fr > 0.97){ const [hx, hy] = M(0, stop); g.strokeStyle = c.orange; g.lineWidth = 3; g.beginPath(); g.moveTo(hx - 7, hy - 7); g.lineTo(hx + 7, hy + 7); g.moveTo(hx + 7, hy - 7); g.lineTo(hx - 7, hy + 7); g.stroke(); }
@@ -939,9 +942,9 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
     for (let i=0;i<=shown;i++){ const x=i/n; if (i>0){ const dx=1/n, x0=(i-1)/n; y += dx*(dref(x0+dx/2) - 4*(y-ref(x0))); }
       const [px,py]=toPx(x,y); g.fillStyle=c.blue; g.beginPath(); g.arc(px,py, k===0?4:(k===1?3.2:2.5),0,7); g.fill(); }
     // the rate cycles 20, 40, 80 Hz, one model throughout
-    g.fillStyle=c.blue; g.font='700 22px Bricolage Grotesque, Segoe UI, sans-serif'; g.textAlign='left'; g.textBaseline='alphabetic';
+    g.fillStyle=c.blue; g.font='700 26px Bricolage Grotesque, Segoe UI, sans-serif'; g.textAlign='left'; g.textBaseline='alphabetic';
     g.fillText(`${rates[k]} Hz`, 16, 34);
-    g.fillStyle=hexA(c.muted,.9); g.font='500 12px JetBrains Mono, monospace'; g.fillText(`${Math.round(n)} actions, same model`, 16, 54);
+    g.fillStyle=hexA(c.muted,.9); g.font='500 14px JetBrains Mono, monospace'; g.fillText(`${Math.round(n)} actions, same model`, 16, 58);
     if (!reduce && shown>=n){ hold += dt; if (hold > 1.4){ hold = 0; shown = 0; k = (k+1) % 3; } }
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
@@ -976,13 +979,13 @@ function txtSub(g, base, sub, x, y, col, size, weight = 600, family = MONO, ital
     const [sx,sy]=toPx(0,0), [gx,gy]=toPx(0.98,0);
     g.fillStyle=c.ink; g.beginPath(); g.arc(sx,sy,6,0,7); g.fill();
     g.strokeStyle=c.ink; g.lineWidth=2; g.beginPath(); g.arc(gx,gy,8,0,7); g.stroke();
-    g.font='500 12px JetBrains Mono, monospace'; g.fillStyle=c.muted; g.textAlign='left'; g.textBaseline='alphabetic';
+    g.font='500 14px JetBrains Mono, monospace'; g.fillStyle=c.muted; g.textAlign='left'; g.textBaseline='alphabetic';
     g.fillText('start', sx-4, sy+24); g.textAlign='right'; g.fillText('goal', gx+8, gy+26);
     // how often each route was taken
     const bw = 16, bx0 = S.w - 4*(bw+8) - 10, by0 = S.h - 14;
     const top = Math.max(1, ...count); count.forEach((v,i) => { const h = 44*v/top; g.fillStyle = cols[i]; g.fillRect(bx0 + i*(bw+8), by0 - h, bw, h); });
-    g.textAlign='left'; g.fillStyle=c.muted; g.fillText('routes taken', bx0 - 2, by0 - 54);
-    g.textAlign='left'; g.font='500 12px JetBrains Mono, monospace'; g.fillText(`${done.length} rollout${done.length === 1 ? "" : "s"}`, 14, 22);
+    g.textAlign='right'; g.fillStyle=c.muted; g.fillText('routes taken', S.w - 10, by0 - 54);
+    g.textAlign='left'; g.font='500 14px JetBrains Mono, monospace'; g.fillText(`${done.length} rollout${done.length === 1 ? "" : "s"}`, 14, 22);
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
@@ -1039,7 +1042,7 @@ function legend(host, items){
 }
 function axes(svg, W, H, o){
   // o: {x:{min,max,log,ticks,fmt,label}, y:{...}, m:{l,r,t,b}}
-  const m = Object.assign({ l: 48, r: 14, t: 12, b: 44 }, o.m || {});
+  const m = Object.assign({ l: 56, r: 16, t: 14, b: 52 }, o.m || {});
   const tx = o.x.log ? v => Math.log10(v) : v => v, ty = o.y.log ? v => Math.log10(v) : v => v;
   const X = v => m.l + (tx(v) - tx(o.x.min)) / (tx(o.x.max) - tx(o.x.min)) * (W - m.l - m.r);
   const Y = v => H - m.b - (ty(v) - ty(o.y.min)) / (ty(o.y.max) - ty(o.y.min)) * (H - m.t - m.b);
@@ -1047,10 +1050,10 @@ function axes(svg, W, H, o){
   (o.y.ticks || []).forEach(v => { sv('line', { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: 'grid' }, g);
     sv('text', { x: m.l - 8, y: Y(v), class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle' }, g).textContent = (o.y.fmt || String)(v); });
   (o.x.ticks || []).forEach(v => { if (!o.x.nogrid) sv('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, class: 'grid' }, g);
-    sv('text', { x: X(v), y: H - m.b + 18, class: 'tick', 'text-anchor': 'middle' }, g).textContent = (o.x.fmt || String)(v); });
+    sv('text', { x: X(v), y: H - m.b + 21, class: 'tick', 'text-anchor': 'middle' }, g).textContent = (o.x.fmt || String)(v); });
   sv('line', { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: 'axis' }, g);
   if (o.x.label) sv('text', { x: (m.l + W - m.r) / 2, y: H - 6, class: 'alab', 'text-anchor': 'middle' }, g).textContent = o.x.label;
-  if (o.y.label) sv('text', { x: 12, y: (m.t + H - m.b) / 2, class: 'alab', 'text-anchor': 'middle', transform: `rotate(-90 12 ${(m.t + H - m.b) / 2})` }, g).textContent = o.y.label;
+  if (o.y.label) sv('text', { x: 14, y: (m.t + H - m.b) / 2, class: 'alab', 'text-anchor': 'middle', transform: `rotate(-90 14 ${(m.t + H - m.b) / 2})` }, g).textContent = o.y.label;
   const id = 'c' + (++clipId); const cp = sv('clipPath', { id }, svg); sv('rect', { x: 0, y: 0, width: 0, height: H }, cp);
   const plot = sv('g', { 'clip-path': `url(#${id})` }, svg);
   return { X, Y, m, plot, W, H };
@@ -1060,7 +1063,7 @@ function lineChart(host, o){
   // o: {series:[{key,name,color,dash,pts:[[x,y,sd]],ours}], x, y, h, unit, refs:[{y,label}], notes:[{x,y1,y2,text}], xcat}
   legend(host, o.series.map(s => ({ key: s.key, name: s.name, color: s.color, dash: s.dash, ours: s.ours })));
   mount(host, (svg, W) => {
-    const H = o.h || Math.round(Math.min(330, Math.max(240, W * 0.6)));
+    const H = o.h || Math.round(Math.min(360, Math.max(270, W * 0.64)));
     const A = axes(svg, W, H, o); const { X, Y, plot } = A;
     (o.refs || []).forEach(r => { sv('line', { x1: A.m.l, x2: W - A.m.r, y1: Y(r.y), y2: Y(r.y), class: 'ref' }, svg);
       sv('text', { x: A.m.l + 6, y: Y(r.y) - 6, class: 'note' }, svg).textContent = r.label; });
@@ -1099,8 +1102,8 @@ function lineChart(host, o){
 function barChart(host, o){
   // o: {rows:[{key,name,color,v,sd,ours}], x:{min,max,log,ticks,fmt,label}, ref:{v,label}, unit}
   mount(host, (svg, W) => {
-    const rh = 30, top = o.ref ? 24 : 8, H = o.rows.length * rh + 44 + top;
-    const A = axes(svg, W, H, { x: o.x, y: { min: 0, max: 1, ticks: [] }, m: { l: o.left || 104, r: 46, t: top, b: 44 } });
+    const rh = 34, top = o.ref ? 26 : 8, H = o.rows.length * rh + 52 + top;
+    const A = axes(svg, W, H, { x: o.x, y: { min: 0, max: 1, ticks: [] }, m: { l: o.left || 118, r: 54, t: top, b: 52 } });
     const { X, plot } = A; const x0 = X(o.x.log ? o.x.min : 0);
     o.rows.forEach((r, i) => { const y = A.m.t + i * rh + 5, bh = rh - 10;
       sv('text', { x: A.m.l - 10, y: y + bh / 2, class: 'tick' + (r.ours ? ' strong' : ''), 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg).textContent = r.name;
@@ -1119,7 +1122,7 @@ function barChart(host, o){
 function scatterChart(host, o){
   // o: {pts:[{key,name,color,x,y,xe,ye,ours,dx,dy,anchor}], x, y, band:{from,label}}
   mount(host, (svg, W) => {
-    const H = o.h || Math.round(Math.min(340, Math.max(260, W * 0.62)));
+    const H = o.h || Math.round(Math.min(370, Math.max(280, W * 0.66)));
     const A = axes(svg, W, H, o); const { X, Y, plot } = A;
     if (o.band){ const x = X(o.band.from); sv('rect', { x, y: A.m.t, width: W - A.m.r - x, height: H - A.m.t - A.m.b, class: 'shade' }, svg);
       sv('text', { x: (x + W - A.m.r) / 2, y: A.m.t + 16, class: 'note', 'text-anchor': 'middle' }, svg).textContent = o.band.label; }
@@ -1176,7 +1179,7 @@ if (D){
       const xmin = rows[0][0], xmax = rows[rows.length - 1][0];
       const span = xmax - xmin, st = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50].find(v => span / v <= 4);
       const xt = []; for (let v = Math.ceil(xmin / st) * st; v <= xmax + 1e-9; v += st) xt.push(+v.toFixed(3));
-      lineChart(cell, { h: 200, m: { l: 44, r: 10, t: 8, b: 44 }, series: [
+      lineChart(cell, { h: 220, m: { l: 50, r: 12, t: 8, b: 52 }, series: [
           { key: 'ode', name: 'ODE actor', color: COL.ODE, ours: true, pts: rows.map(r => [r[0], r[1], r[2]]) },
           { key: 'dis', name: 'Discrete actor', color: COL.Discrete, pts: rows.map(r => [r[0], r[3], r[4]]) }],
         x: { min: xmin, max: xmax, ticks: xt, nogrid: false, fmt: v => String(v), label: 'Control steps (M)', tipname: 'Steps (M) ', tipfmt: v => v },
@@ -1197,19 +1200,19 @@ if (D){
     draw(); }
   // 02 real robot
   { const R = D.real; const rows = key => R.order.slice().reverse().map(m => ({ key: m, name: nm(m), color: COL[m], v: R[key][m][0], sd: R[key][m][1], ours: m === 'ODE' }));
-    barChart(C('ch-r-time'), { rows: rows('time'), left: 92, x: { min: 1, max: 400, log: true, ticks: [1, 10, 100], label: 'Inference per chunk (ms)' } });
+    barChart(C('ch-r-time'), { rows: rows('time'), left: 108, x: { min: 1, max: 400, log: true, ticks: [1, 10, 100], label: 'Inference per chunk (ms)' } });
     { const host = C('ch-r-acc'); let w = 0;
-      const draw = () => barChart(host, { rows: rows(w ? 'acc_in' : 'acc_bd'), left: 92, x: { min: 0, max: 7.5, ticks: [0, 2, 4, 6], label: 'Command acceleration (rad/s²)' }, ref: { v: R.acc_demo[w], label: 'human' } });
+      const draw = () => barChart(host, { rows: rows(w ? 'acc_in' : 'acc_bd'), left: 108, x: { min: 0, max: 7.5, ticks: [0, 2, 4, 6], label: 'Command acceleration (rad/s²)' }, ref: { v: R.acc_demo[w], label: 'human' } });
       const S = document.querySelector('#ch-real .seg-acc'); ['Acceleration at chunk boundaries', 'Acceleration inside chunks'].forEach((l, i) => { const b = document.createElement('button'); b.textContent = l; b.setAttribute('aria-pressed', i === 0);
         b.onclick = () => { w = i; S.querySelectorAll('button').forEach((x, j) => x.setAttribute('aria-pressed', j === i)); draw(); }; S.appendChild(b); });
       draw(); }
-    barChart(C('ch-r-jerk'), { rows: rows('jerk'), left: 92, x: { min: 0, max: 26, ticks: [0, 10, 20], label: 'RMS jerk of the joints (rad/s³)' }, ref: { v: R.jerk_demo, label: 'human' } }); }
+    barChart(C('ch-r-jerk'), { rows: rows('jerk'), left: 108, x: { min: 0, max: 26, ticks: [0, 10, 20], label: 'RMS jerk of the joints (rad/s³)' }, ref: { v: R.jerk_demo, label: 'human' } }); }
   // 02 at scale
   { const V = D.vla_exec;
     barChart(C('ch-s-head'), { rows: [{ key: 'ODE', name: 'ODE (ours)', color: COL.ODE, v: V.ODE.head, ours: true }, { key: 'FM', name: 'FM', color: COL.FM, v: V.FM.head }],
-      left: 92, x: { min: 0, max: 36, ticks: [0, 10, 20, 30], label: 'π0.5 action head per chunk (ms)' } });
+      left: 108, x: { min: 0, max: 36, ticks: [0, 10, 20, 30], label: 'π0.5 action head per chunk (ms)' } });
     barChart(C('ch-s-bd'), { rows: [{ key: 'ODE', name: 'ODE (ours)', color: COL.ODE, v: V.ODE.cmd_bd, ours: true }, { key: 'FM', name: 'FM', color: COL.FM, v: V.FM.cmd_bd }],
-      left: 92, x: { min: 0, max: 0.25, ticks: [0, 0.1, 0.2], label: 'π0.5 command change at boundaries' } }); }
+      left: 108, x: { min: 0, max: 0.25, ticks: [0, 0.1, 0.2], label: 'π0.5 command change at boundaries' } }); }
   // 03 LIBERO-plus
   lineChart(C('ch-plus'), { series: VM.map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet', pts: D.plus[m] })),
     x: { min: 0.8, max: 125, log: true, ticks: [1, 10, 100], label: 'Training epoch (log scale)', tipname: 'Epoch ' }, y: { min: 0, max: 50, ticks: [0, 10, 20, 30, 40, 50], label: 'Success rate (%)' }, unit: '%' });
@@ -1279,7 +1282,7 @@ document.querySelectorAll('.player').forEach(P => {
     const [sx, sy] = toPx(0, ref(0) + pert), [, ry] = toPx(0, ref(0));
     g.strokeStyle = hexA(c.ink, .6); g.setLineDash([2, 3]); g.beginPath(); g.moveTo(sx, ry); g.lineTo(sx, sy); g.stroke(); g.setLineDash([]);
     g.fillStyle = c.ink; g.beginPath(); g.arc(sx, sy, 5, 0, 7); g.fill();
-    g.font = '500 12px JetBrains Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = c.ink; g.fillText('δ', sx + 8, (sy + ry) / 2);
+    g.font = '500 15px JetBrains Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = c.ink; g.fillText('δ', sx + 8, (sy + ry) / 2);
     g.fillStyle = hexA(c.muted, .95); g.fillText(`training ${Math.round(it * 100)}%`, 14, S.h - 34);
     g.fillStyle = c.orange; g.fillText('path error', 14, S.h - 16);
   }
