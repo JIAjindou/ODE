@@ -730,7 +730,14 @@ function rich(g, parts, x, y, col, size, weight = 600, family = MONO, italic = t
   const f = (sub) => `${italic ? 'italic ' : ''}${weight} ${size * FS * (sub ? 0.68 : 1)}px ${family}`;
   const ws = parts.map(([t, sub]) => { g.font = f(sub); return g.measureText(t).width + (sub ? 1 : 0); });
   let x0 = x - ws.reduce((a, b) => a + b, 0) / 2;
-  parts.forEach(([t, sub], i) => { txt(g, t, x0 + (sub ? 1 : 0), y + (sub ? size * FS * 0.3 : 0), col, size * (sub ? 0.68 : 1), weight, 'left', family, italic); x0 += ws[i]; });
+  parts.forEach(([t, sub], i) => {
+    const xi = x0 + (sub ? 1 : 0), yi = y + (sub ? size * FS * 0.3 : 0);
+    if (t.startsWith('ȧ')){                          // the combining dot drifts in canvas text, so draw a plain a and its dot
+      g.font = f(sub); const wa = g.measureText('a').width, fs = size * FS;
+      txt(g, 'a' + t.slice(1), xi, yi, col, size, weight, 'left', family, italic);
+      g.fillStyle = col; g.beginPath(); g.arc(xi + wa * 0.5 + (italic ? fs * 0.1 : 0), yi - fs * 0.52, fs * 0.075, 0, 7); g.fill();
+    } else txt(g, t, xi, yi, col, size * (sub ? 0.68 : 1), weight, 'left', family, italic);
+    x0 += ws[i]; });
 }
 {
   const S = vstage(document.getElementById('fig1'), [1100, 470], [560, 940]);
