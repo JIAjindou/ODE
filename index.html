@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <style>
 /* Layout: one reading column (1120px) that opens on a live vector field; figures sit on white "paper" plates. */
 :root{
@@ -152,6 +153,93 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   .numbers,.rlvids{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+
+/* charts */
+.charts{display:grid;gap:18px}
+.charts.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.charts.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.chart{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.chart.mini{border:0;padding:0;background:none;border-radius:0}
+.chart .ct{font:700 17px/1.25 var(--display);color:var(--ink)}
+.chart .ct span{font:500 12px/1 var(--mono);color:var(--muted);margin-left:6px}
+.chart figcaption{font-size:14.5px;line-height:1.5;color:var(--muted);margin-top:auto;padding-top:4px}
+.chart figcaption b{color:var(--ink)}
+.chart .plot{position:relative;width:100%;min-height:40px}
+.chart .plot svg{display:block;overflow:visible}
+.chart .stage{border-radius:10px}
+.chart .stage canvas{aspect-ratio:1/1}
+.cells{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px}
+.cells.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cells.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;color:var(--muted)}
+.legend .li{display:inline-flex;align-items:center;gap:6px;cursor:default}
+.legend .li.ours{color:var(--ink);font-weight:600}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
+.ctls{display:flex;flex-wrap:wrap;gap:8px}
+.seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:3px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--muted);font:600 13px/1 var(--body);padding:7px 11px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg .axis{stroke:var(--muted);stroke-width:1}
+svg .tick{fill:var(--muted);font:400 12.5px var(--body)}
+svg .tick.strong,svg .val.strong,svg .plab.strong{fill:var(--ink);font-weight:700}
+svg .alab{fill:var(--muted);font:500 13px var(--body)}
+svg .val{fill:var(--ink);font:500 12.5px var(--mono)}
+svg .plab{fill:var(--ink);font:500 12.5px var(--body)}
+svg .note{fill:var(--muted);font:500 12px var(--mono)}
+svg .gain{fill:var(--ink);font:700 13px var(--mono)}
+svg .bracket{fill:none;stroke:var(--ink);stroke-width:1.2;stroke-dasharray:3 2}
+svg .ref{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:4 3;opacity:.7}
+svg .guide{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+svg .err{stroke:var(--ink);stroke-width:1.2;opacity:.55}
+svg .shade{fill:var(--muted);opacity:.08}
+svg [data-s]{transition:opacity .2s}
+svg [data-s].dim{opacity:.12}
+.tip{position:fixed;z-index:30;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(10,20,30,.16);padding:10px 12px;font-size:13.5px;min-width:180px}
+.tip b{display:block;margin-bottom:6px;font-weight:700}
+.tip div{display:flex;align-items:center;gap:8px;line-height:1.6}
+.tip div i{width:10px;height:10px;border-radius:50%;flex:none}
+.tip div span{margin-left:auto;padding-left:14px;font-family:var(--mono);font-size:12.5px}
+
+/* real-robot players */
+.player{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start}
+.player .txt{display:grid;gap:8px;min-width:0}
+.player .txt p{color:var(--muted);font-size:16px}
+.player .sr{color:var(--ink)!important;font-size:15px!important}
+.player .sr b{color:var(--blue)}
+.player .sr .muted{color:var(--muted)}
+.thumbs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+.thumb{position:relative;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:#000;cursor:pointer}
+.thumb video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;opacity:.75;transition:opacity .2s}
+.thumb:hover video,.thumb[aria-pressed="true"] video{opacity:1}
+.thumb[aria-pressed="true"]{border-color:var(--blue)}
+.thumb span{position:absolute;left:6px;top:6px;font:600 11.5px/1 var(--body);background:rgba(255,255,255,.92);color:#1C2633;padding:4px 7px;border-radius:999px}
+.thumb[aria-pressed="true"] span{background:#397DB7;color:#fff}
+.clip .why{font-size:14px;padding:22px 12px 10px}
+
+/* method steps */
+.step{display:grid;gap:12px;margin-top:56px}
+.step.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.step-txt{display:grid;gap:12px;max-width:78ch}
+.step-txt p{color:var(--muted);font-size:17px}
+.step-txt p b{color:var(--ink)}
+.step + .anim,.step + .benefits{margin-top:18px}
+.eqn{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 18px;overflow-x:auto;font-size:17px}
+.eqn .katex-display{margin:.7em 0}
+.benefits{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px;align-items:stretch}
+.bstack{display:grid;gap:16px;align-content:stretch}
+.benefits .demo canvas{aspect-ratio:16/8}
+.ben{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:6px;align-content:start}
+.ben p{color:var(--muted);font-size:15.5px}
+.ben.demo{padding:0}
+.demos.col{grid-template-columns:minmax(0,1fr);margin-top:0;gap:14px}
+.demos.col .demo canvas{aspect-ratio:16/8}
+
+@media (max-width:900px){
+  .charts.c2,.charts.c3,.player,.step.two,.benefits{grid-template-columns:minmax(0,1fr)}
+  .cells,.cells.c3{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){ .cells,.cells.c3,.cells.c2{grid-template-columns:minmax(0,1fr)} }
 </style>
 
 
@@ -211,70 +299,157 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <div class="num"><div class="v">0.6×</div><div class="k">the jerk of human demonstrations</div></div>
       <div class="num"><div class="v">3.9×</div><div class="k">mode balance after one epoch</div></div>
     </div>
-    <p class="note">All ratios against flow matching, except the jerk.</p>
+    <p class="note">All ratios against flow matching, except the jerk. Hover over any chart for its numbers.</p>
 
     <article class="block">
       <h3><span>01</span>Learns fast</h3>
-      <p class="lede">79.2% on LIBERO after one epoch, against at most 43.2% for six baselines. The gain holds in a VLA, in a world action model, and in RL.</p>
+      <p class="lede">The same field learns from demonstrations and from rewards. Below, ODE policy is the actor of PPO on four robots.</p>
       <div class="rlvids">
         <figure class="clip sq"><video data-src="assets/video/rl_anymal.mp4" muted loop playsinline preload="none" aria-label="ANYmal-C quadruped walking over stairs with an ODE policy actor"></video><span class="lab">ANYmal-C</span></figure>
         <figure class="clip sq"><video data-src="assets/video/rl_g1.mp4" muted loop playsinline preload="none" aria-label="G1 humanoid with an ODE policy actor"></video><span class="lab">G1 humanoid</span></figure>
         <figure class="clip sq"><video data-src="assets/video/rl_franka.mp4" muted loop playsinline preload="none" aria-label="Franka arm opening a drawer with an ODE policy actor"></video><span class="lab">Franka drawer</span></figure>
         <figure class="clip sq"><video data-src="assets/video/rl_quad.mp4" muted loop playsinline preload="none" aria-label="Quadcopter reaching a target with an ODE policy actor"></video><span class="lab">Quadcopter</span></figure>
       </div>
-      <p class="vcap">ODE policy as the actor of PPO</p>
-      <figure class="plate" style="max-width:872px"><img src="assets/figs/efficiency.jpg" alt="Learning efficiency in visuomotor imitation learning" loading="lazy"></figure>
-      <div class="two">
-        <figure class="plate" style="max-width:676px"><img src="assets/figs/scale.jpg" alt="Learning efficiency in a VLA and a world action model" loading="lazy"></figure>
+
+      <div class="charts c2">
+        <figure class="chart" id="ch-libero">
+          <p class="ct">Imitation learning on LIBERO</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 1.</b> Success rate over training, four suites trained jointly, mean and std over three random seeds. ODE policy reaches 79.2% after one epoch and 85% after two, where A2A-DiT needs four and the other baselines thirty or more.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-eff">
+          <p class="ct">Less data, smaller models</p>
+          <div class="ctls"><div class="seg seg-a" role="group" aria-label="Setting"></div><div class="seg seg-b" role="group" aria-label="Epoch"></div></div>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 2.</b> ODE policy against FM-DiT with fewer demonstrations per task or fewer parameters. ODE policy with 20 demonstrations per task matches FM-DiT with 50.</figcaption>
+        </figure>
       </div>
-      <figure class="plate" style="max-width:872px"><img src="assets/figs/rl.jpg" alt="Learning efficiency in reinforcement learning" loading="lazy"></figure>
+      <div class="charts c2">
+        <figure class="chart" id="ch-vla">
+          <p class="ct">Action head of a VLA (π<sub>0.5</sub>)</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 3.</b> A randomly initialized ODE head with 3% of the parameters of the flow matching expert. It leads the pretrained expert early and stays close afterwards. One seed, band over the four suites.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-wam">
+          <p class="ct">Action head of a world action model (ImageWAM)</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 4.</b> ODE head against the original flow matching head and an A2A head, 82.6% against 24.6% after one epoch. One seed, band over the four suites.</figcaption>
+        </figure>
+      </div>
+      <figure class="chart wide" id="ch-rl">
+        <p class="ct">Actor in reinforcement learning</p>
+        <div class="legend"></div>
+        <div class="cells"></div>
+        <figcaption><b>Figure 5.</b> The ODE actor against the discrete actor of each task, with the critic and the algorithm unchanged. Success of PPO on Isaac Lab and return of FlashSAC on HumanoidBench, mean and std over three random seeds.</figcaption>
+      </figure>
     </article>
 
     <article class="block">
       <h3><span>02</span>Executes precisely and smoothly</h3>
-      <p class="lede">On a real Galaxea R1 Lite, ODE policy succeeds where flow matching and diffusion baselines fail, with commands smoother than the human demonstrations.</p>
-      <div class="task">
-        <figure class="clip"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy completes the bimanual microwave task"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span></figure>
+      <p class="lede">On a real Galaxea R1 Lite, ODE policy succeeds where flow matching and diffusion fail. Click a baseline to watch it.</p>
+      <div class="player">
+        <figure class="clip main"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none" aria-label="Real-robot rollout of the microwave task"></video><span class="lab ours">ODE policy</span><span class="spd">3×</span><span class="why" hidden></span></figure>
         <div class="txt">
           <h4>Bimanual microwave</h4>
-          <p>Grasp a bowl, place it in, push it in, close the door.</p>
-          <p class="sr"><b>75%</b> ODE &nbsp;·&nbsp; 20% FM-DiT &nbsp;·&nbsp; 0% DDPM / DDIM</p>
-          <div class="base">
-            <figure class="clip"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none" aria-label="FM-DiT leaves the microwave door open"></video><span class="lab">FM-DiT</span><span class="why">door left open</span></figure>
-            <figure class="clip"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none" aria-label="DDPM-UNet fails to grasp the bowl"></video><span class="lab">DDPM</span><span class="why">misses the bowl</span></figure>
-            <figure class="clip"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none" aria-label="DDIM-UNet fails to grasp the bowl"></video><span class="lab">DDIM</span><span class="why">misses the bowl</span></figure>
+          <p>Grasp a bowl, place it in the microwave, push it in, close the door with the other arm.</p>
+          <p class="sr"><b>75%</b> ODE &nbsp;·&nbsp; 20% FM-DiT &nbsp;·&nbsp; 0% DDPM &nbsp;·&nbsp; 0% DDIM</p>
+          <div class="thumbs">
+            <button class="thumb" aria-pressed="true" data-full="assets/video/microwave_ode.mp4" data-name="ODE policy"><video data-src="assets/video/microwave_ode.mp4" muted loop playsinline preload="none"></video><span>ODE</span></button>
+            <button class="thumb" aria-pressed="false" data-full="assets/video/microwave_fm.mp4" data-name="FM-DiT" data-why="leaves the door open"><video data-src="assets/video/microwave_fm.mp4" muted loop playsinline preload="none"></video><span>FM-DiT</span></button>
+            <button class="thumb" aria-pressed="false" data-full="assets/video/microwave_ddpm.mp4" data-name="DDPM-UNet" data-why="fails to grasp the bowl"><video data-src="assets/video/microwave_ddpm.mp4" muted loop playsinline preload="none"></video><span>DDPM</span></button>
+            <button class="thumb" aria-pressed="false" data-full="assets/video/microwave_ddim.mp4" data-name="DDIM-UNet" data-why="fails to grasp the bowl"><video data-src="assets/video/microwave_ddim.mp4" muted loop playsinline preload="none"></video><span>DDIM</span></button>
           </div>
         </div>
       </div>
-      <div class="task">
-        <figure class="clip"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="ODE policy inserts a flower into a narrow vase"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span></figure>
+      <div class="player">
+        <figure class="clip main"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none" aria-label="Real-robot rollout of the flower task"></video><span class="lab ours">ODE policy</span><span class="spd">2×</span><span class="why" hidden></span></figure>
         <div class="txt">
           <h4>Flower into a narrow vase</h4>
-          <p>Insert a thin stem into a small opening. Poppy / dahlia.</p>
-          <p class="sr"><b>30% / 60%</b> ODE &nbsp;·&nbsp; 20% / 40% FM-DiT &nbsp;·&nbsp; 0% / 0% DDPM &nbsp;·&nbsp; 0% / 5% DDIM</p>
-          <div class="base">
-            <figure class="clip"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none" aria-label="FM-DiT fails to insert the stem"></video><span class="lab">FM-DiT</span><span class="why">stem not inserted</span></figure>
-            <figure class="clip"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none" aria-label="DDPM-UNet fails to insert the stem"></video><span class="lab">DDPM</span><span class="why">stem not inserted</span></figure>
-            <figure class="clip"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none" aria-label="DDIM-UNet fails to insert the stem"></video><span class="lab">DDIM</span><span class="why">stem not inserted</span></figure>
+          <p>Insert a thin stem into a small opening, which leaves almost no room for error.</p>
+          <p class="sr"><b>30% / 60%</b> ODE &nbsp;·&nbsp; 20% / 40% FM-DiT &nbsp;·&nbsp; 0% / 0% DDPM &nbsp;·&nbsp; 0% / 5% DDIM <span class="muted">(poppy / dahlia)</span></p>
+          <div class="thumbs">
+            <button class="thumb" aria-pressed="true" data-full="assets/video/flower_ode.mp4" data-name="ODE policy"><video data-src="assets/video/flower_ode.mp4" muted loop playsinline preload="none"></video><span>ODE</span></button>
+            <button class="thumb" aria-pressed="false" data-full="assets/video/flower_fm.mp4" data-name="FM-DiT" data-why="the stem misses the opening"><video data-src="assets/video/flower_fm.mp4" muted loop playsinline preload="none"></video><span>FM-DiT</span></button>
+            <button class="thumb" aria-pressed="false" data-full="assets/video/flower_ddpm.mp4" data-name="DDPM-UNet" data-why="the stem misses the opening"><video data-src="assets/video/flower_ddpm.mp4" muted loop playsinline preload="none"></video><span>DDPM</span></button>
+            <button class="thumb" aria-pressed="false" data-full="assets/video/flower_ddim.mp4" data-name="DDIM-UNet" data-why="the stem misses the opening"><video data-src="assets/video/flower_ddim.mp4" muted loop playsinline preload="none"></video><span>DDIM</span></button>
           </div>
         </div>
       </div>
-      <figure class="plate" style="max-width:888px"><img src="assets/figs/real_exec.jpg" alt="Inference cost and smoothness on the real robot" loading="lazy"></figure>
-      <figure class="plate" style="max-width:871px"><img src="assets/figs/inference.jpg" alt="Inference cost and action smoothness on LIBERO" loading="lazy"></figure>
+
+      <figure class="chart wide" id="ch-real">
+        <p class="ct">Microwave task on the real robot</p>
+        <div class="ctls"><div class="seg seg-acc" role="group" aria-label="Acceleration measured"></div></div>
+        <div class="cells c3">
+          <div class="chart mini" id="ch-r-time"><div class="plot"></div></div>
+          <div class="chart mini" id="ch-r-acc"><div class="plot"></div></div>
+          <div class="chart mini" id="ch-r-jerk"><div class="plot"></div></div>
+        </div>
+        <figcaption><b>Figure 6.</b> Inference on one RTX 5090 and the smoothness of the motion, mean and std over episodes. The dashed line marks the human demonstrations. ODE policy is 3.7× faster than the fastest baseline, its commands accelerate as gently as the demonstrations at chunk boundaries and less inside chunks, and its measured jerk is below that of the demonstrations.</figcaption>
+      </figure>
+      <div class="charts c2">
+        <figure class="chart" id="ch-time">
+          <p class="ct">Speed and success on LIBERO</p>
+          <div class="plot"></div>
+          <figcaption><b>Figure 7.</b> Time per chunk of 8 actions against success at epoch 100. ODE policy takes 5.7 ms with <i>Euler</i>, 10.8× faster than FM-DiT, and keeps its success with every solver.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-jerk">
+          <p class="ct">Smoothness on LIBERO</p>
+          <div class="ctls"><div class="seg seg-b" role="group" aria-label="Epoch"></div></div>
+          <div class="plot"></div>
+          <figcaption><b>Figure 8.</b> Jerk of the executed end-effector motion over successful episodes, lower is smoother. ODE policy is the smoothest at every checkpoint.</figcaption>
+        </figure>
+      </div>
+      <figure class="chart wide" id="ch-scale">
+        <p class="ct">At scale, in π<sub>0.5</sub></p>
+        <div class="cells c2">
+          <div class="chart mini" id="ch-s-head"><div class="plot"></div></div>
+          <div class="chart mini" id="ch-s-bd"><div class="plot"></div></div>
+        </div>
+        <figcaption><b>Figure 9.</b> The ODE head generates a chunk in 2.2 ms instead of 31.8 ms, so the whole model runs in 42.4 ms instead of 66.6 ms, and the command changes half as much across chunk boundaries.</figcaption>
+      </figure>
     </article>
 
     <article class="block">
       <h3><span>03</span>Generalizes</h3>
-      <p class="lede">Robust to unseen perturbations on LIBERO-plus, early in training. A world action model with ODE policy reaches 89.9% zero-shot.</p>
-      <figure class="plate" style="max-width:871px"><img src="assets/figs/plus.jpg" alt="Generalization to unseen perturbations" loading="lazy"></figure>
+      <p class="lede">Zero-shot on LIBERO-plus, with unseen camera views, initial states, layouts, backgrounds, lighting, and sensor noise.</p>
+      <div class="charts c3">
+        <figure class="chart" id="ch-plus">
+          <p class="ct">Visuomotor policies</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 10.</b> Robust early, 30.1% after one epoch against at most 22.6%. Three random seeds.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-plus-vla">
+          <p class="ct">VLA (π<sub>0.5</sub>)</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 11.</b> Without pretraining and with 3% of the parameters, comparable to the pretrained expert.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-plus-wam">
+          <p class="ct">WAM (ImageWAM)</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 12.</b> 89.9% at epoch 10, ahead of both heads throughout.</figcaption>
+        </figure>
+      </div>
     </article>
 
     <article class="block">
       <h3><span>04</span>Keeps multi-modality</h3>
-      <p class="lede">A sampled direction tilts the field toward one route, so ODE policy takes all four routes from the first epoch.</p>
-      <div class="modes">
-        <figure class="stage"><canvas id="d-modes" aria-label="Animated rollouts on the four-route navigation task, each rollout takes one route"></canvas></figure>
-        <figure class="plate"><img src="assets/figs/nav2d_bc.jpg" alt="Task success and mode balance on the navigation task" loading="lazy"></figure>
+      <p class="lede">An agent passes one of four gaps to reach the goal. A sampled direction tilts the field toward one route, so ODE policy takes all four.</p>
+      <div class="charts c3">
+        <figure class="chart">
+          <p class="ct">Rollouts of ODE policy</p>
+          <div class="stage"><canvas id="d-modes" aria-label="Animated rollouts on the four-route navigation task, each rollout takes one route"></canvas></div>
+          <figcaption><b>Figure 13.</b> Each rollout samples a direction once and follows one route. Illustration.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-nav-sr">
+          <p class="ct">Task success</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 14.</b> Success over training, mean and std over three random seeds.</figcaption>
+        </figure>
+        <figure class="chart" id="ch-nav-g">
+          <p class="ct">Mode balance</p>
+          <div class="legend"></div><div class="plot"></div>
+          <figcaption><b>Figure 15.</b> γ is 1 if the four routes are taken equally often and 0 if some route is never taken. After one epoch, 0.54 against 0.14 for FM-DiT.</figcaption>
+        </figure>
       </div>
     </article>
   </div>
@@ -283,39 +458,67 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 <section id="method">
   <div class="wrap">
     <h2 class="sec">Method</h2>
-    <div class="idea">
-      <div class="eq" role="math" aria-label="a dot equals f theta of a, s, z">
-        <span class="c1">ȧ(t)</span> = <span class="c2">f<sub>θ</sub></span>( a(t), s<sub>t</sub>, z<sub>t</sub> )
-        <br>
-        a<sub>t+k+1</sub> = a<sub>t+k</sub> + ∫ f<sub>θ</sub> dt
-      </div>
-      <div class="idea-txt">
-        <p>Learn the velocity of the action, then integrate it in short chunks (H = 8, RK4). The next chunk starts where the last one ended. Training matches the integrated path to the demonstration, without velocity labels.</p>
+    <p class="lede">ODE policy replaces only the action head. The encoder, the data, and the training schedule stay the same.</p>
+
+    <div class="step">
+      <div class="step-txt">
+        <h3><span>1</span>Learn a velocity, not an action</h3>
+        <div class="eqn">$$\dot{\mathbf a}(t)=\mathbf f_\theta\big(\mathbf a(t),\,\mathbf s_t,\,\mathbf z_t\big)$$</div>
+        <p>The images and the instruction are encoded into an embedding $\mathbf z_t$, as in any policy. The network $\mathbf f_\theta$ then outputs how the action should change, given the action $\mathbf a(t)$ the robot is currently commanded to reach and its proprioception $\mathbf s_t$. Time $t$ is the physical time of the robot, counted in control steps.</p>
+        <p>Because the field sees the current action, each step depends on where the motion has arrived. A discrete policy outputs a whole chunk at once and cannot react to its own intermediate actions.</p>
       </div>
     </div>
     <figure class="anim">
       <canvas id="fig1" aria-label="Animated figure, discrete policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
     </figure>
-    <h3 class="sub">Diversity head</h3>
-    <p class="lede">The mode is decided by the direction in which integration sets off, so it is enough to randomize that direction.</p>
+
+    <div class="step">
+      <div class="step-txt">
+        <h3><span>2</span>Integrate chunk by chunk</h3>
+        <div class="eqn">$$\hat{\mathbf a}_{t+k+1}=\hat{\mathbf a}_{t+k}+\int_{t+k}^{t+k+1}\mathbf f_\theta\big(\mathbf a(t'),\,\mathbf s_t,\,\mathbf z_t\big)\,\mathrm dt',\quad k=0,\dots,H-1$$</div>
+        <p>Every $H=8$ steps, the policy reads the observation once and holds $\mathbf z_t$ and $\mathbf s_t$ fixed. It then integrates the field with RK4, one action after another. The next chunk starts from the last integrated action, not from scratch. This gives three benefits.</p>
+      </div>
+    </div>
+    <div class="benefits">
+      <div class="bstack"><div class="ben"><h4>Smooth</h4><p>Chunks join without jumps. The executed motion is one integral curve whose condition is refreshed every 8 steps.</p></div>
+      <div class="ben"><h4>Streaming</h4><p>Each action is sent to the controller as soon as it is integrated. A whole chunk takes 5.7 ms with <i>Euler</i> on LIBERO.</p></div></div>
+      <div class="ben demo">
+        <canvas id="d-rate" aria-label="One trained model integrated at 20, 40 and 80 Hz"></canvas>
+        <div class="body"><h4>Any control rate</h4><p>The field lives in continuous time, so one model runs at a finer rate by integrating with a smaller step.</p></div>
+      </div>
+    </div>
+
+    <div class="step two">
+      <div class="step-txt">
+        <h3><span>3</span>Train by matching the path</h3>
+        <div class="eqn">$$\mathcal L_{\text{path}}^{\boldsymbol\delta}=\frac1H\sum_{k=1}^{H}\big\|\hat{\mathbf a}_{t+k}(\mathbf a_t+\boldsymbol\delta)-(\mathbf a_{t+k}+\rho^{k}\boldsymbol\delta)\big\|_2^2$$</div>
+        <p>Start from a demonstrated action, integrate $H$ steps, and match the whole path to the demonstration. The gradient flows back through the solver steps. No velocity labels are needed, so noisy demonstrations are not differentiated.</p>
+        <p><b>Contractive perturbation.</b> Some segments start from a shifted point $\mathbf a_t+\boldsymbol\delta$, and the target shrinks the shift by $\rho^k$ at step $k$. The field thus learns to pull drift back to the demonstrations, at no cost at inference.</p>
+      </div>
+      <div class="demos col">
+        <article class="demo"><canvas id="d-train" aria-label="Training animation, the integrated path from a shifted start is pulled onto the shrinking target"></canvas>
+          <div class="body"><h4>Path loss</h4><p>Orange segments are the errors between the integrated steps and their targets. Training removes them.</p></div></article>
+        <article class="demo"><canvas id="d-contract" aria-label="Contractive perturbation, perturbed starts are pulled back to the demonstration"></canvas>
+          <div class="body"><h4>After training</h4><p>Paths from perturbed starts return to the demonstration.</p></div></article>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-txt">
+        <h3><span>4</span>Optional diversity head</h3>
+        <div class="eqn">$$\dot{\mathbf a}(t')=\mathbf f_\theta\big(\mathbf a(t'),\,\mathbf s_t,\,\mathbf z_t\big)+\boldsymbol\lambda_k\odot\boldsymbol\epsilon$$</div>
+        <p>A deterministic field averages distinct demonstrated behaviors, e.g., passing an obstacle on the left or on the right, and heads into the obstacle. Since a mode is decided by the direction in which integration sets off, a small head reads the features of the field once per chunk and samples a direction $\boldsymbol\epsilon$ from a <i>Gaussian</i> mixture, with a rate $\boldsymbol\lambda_k$ per step. The offset tilts the field toward one route. The head is trained on detached inputs, so it leaves the gradient of $\mathbf f_\theta$ unchanged.</p>
+      </div>
+    </div>
     <figure class="anim">
       <canvas id="fig2" aria-label="Animated figure of the diversity head, a sampled offset tilts the field toward one route"></canvas>
     </figure>
-    <div class="demos">
-      <article class="demo">
-        <canvas id="d-contract" aria-label="Contractive perturbation, perturbed starts are pulled back to the demonstration"></canvas>
-        <div class="body">
-          <h4>Contractive perturbation</h4>
-          <p>Some training chunks start off the demonstration, so the field learns to pull drift back.</p>
-        </div>
-      </article>
-      <article class="demo">
-        <canvas id="d-rate" aria-label="One trained model integrated at 20, 40 and 80 Hz"></canvas>
-        <div class="body">
-          <h4>Any control rate</h4>
-          <p>The field lives in continuous time. One model runs at a finer rate by integrating with a smaller step.</p>
-        </div>
-      </article>
+
+    <div class="step">
+      <div class="step-txt">
+        <h3><span>5</span>The same field as an RL actor</h3>
+        <p>In RL, the field acts at every control step ($H=1$) and the integrated action is the mean of the <i>Gaussian</i> actor. PPO or SAC trains the field through the solver steps with its own objective. Only the actor is replaced, and the critic and the algorithm stay unchanged.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -344,6 +547,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
 <div class="lb" id="lb" hidden><img id="lb-img" alt=""></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="assets/data.js"></script>
+<script>try { renderMathInElement(document.getElementById('method'), { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }] }); } catch (e) {}</script>
 <script>
 (() => {
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -781,6 +988,288 @@ const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
     const top = Math.max(1, ...count); count.forEach((v,i) => { const h = 44*v/top; g.fillStyle = cols[i]; g.fillRect(bx0 + i*(bw+8), by0 - h, bw, h); });
     g.textAlign='left'; g.fillStyle=c.muted; g.fillText('routes taken', bx0 - 2, by0 - 54);
     g.textAlign='left'; g.font='500 12px JetBrains Mono, monospace'; g.fillText(`${done.length} rollout${done.length === 1 ? "" : "s"}`, 14, 22);
+  }
+  const L = loop(draw); L.start(S.el); if (reduce) draw(0);
+}
+
+/* ---------- charts: drawn from the paper data (assets/data.js), redrawn at the size of their box ---------- */
+const D = window.ODE_DATA || null;
+const SVGNS = 'http://www.w3.org/2000/svg';
+function sv(tag, attrs, parent){ const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+// blue-green ramp of the paper figures, ours darkest
+const RAMP = ['#C4E3A6', '#8ECFB0', '#57B1AB', '#397DB7'];
+function ramp(v){ const s = v * (RAMP.length - 1), i = Math.min(RAMP.length - 2, Math.floor(s)), f = s - i;
+  const a = parseInt(RAMP[i].slice(1), 16), b = parseInt(RAMP[i + 1].slice(1), 16);
+  const ch = sh => Math.round(((a >> sh) & 255) * (1 - f) + ((b >> sh) & 255) * f);
+  return `rgb(${ch(16)},${ch(8)},${ch(0)})`; }
+const VM = ['ODE-UNet', 'A2A-DiT', 'FM-DiT', 'FM-UNet', 'DDPM-DiT', 'DDPM-UNet', 'ACT'];
+const COL = {}; VM.forEach((m, i) => COL[m] = i ? ramp(0.72 - (i - 1) * 0.64 / (VM.length - 2)) : ramp(1));   // baselines kept apart from ours
+Object.assign(COL, { 'ODE': COL['ODE-UNet'], 'A2A': COL['A2A-DiT'], 'FM': COL['FM-DiT'], 'FM-R': COL['FM-DiT'], 'MARS': COL['DDPM-UNet'],
+  'DDIM-UNet': COL['FM-UNet'], 'Discrete': ramp(0.42) });
+const NAME = { 'ODE-UNet': 'ODE (ours)', 'ODE': 'ODE (ours)', 'FM-R': 'FM, random init.', 'Discrete': 'Discrete actor' };
+const nm = m => NAME[m] || m;
+const fmt1 = v => String(Math.abs(v) >= 100 ? Math.round(v) : +v.toPrecision(3));
+
+// one tooltip for every chart
+const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; document.body.appendChild(tip);
+function showTip(html, x, y){ tip.innerHTML = html; tip.hidden = false; const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y + 14; if (left + r.width > innerWidth - 8) left = x - r.width - 14; if (top + r.height > innerHeight - 8) top = y - r.height - 14;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px'; }
+const hideTip = () => { tip.hidden = true; };
+
+// reveal from left to right the first time the chart is seen
+const seen = new WeakSet();
+const revealIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !seen.has(e.target)){ seen.add(e.target); e.target._reveal && e.target._reveal(); } }), { threshold: 0.35 });
+function mount(host, render){
+  // render(svg, W) draws the chart at width W and returns its height; redraws on resize and when the data changes
+  host._render = render; if (host._draw){ host._W = 0; host._draw(); return; }
+  const box = host.querySelector('.plot') || host; host._W = 0;
+  const draw = host._draw = () => { const w = Math.round(box.getBoundingClientRect().width); if (!w || w === host._W) return; host._W = w;
+    box.querySelectorAll('svg').forEach(s => s.remove());
+    const svg = sv('svg', { width: w, role: 'img' }, box); const h = host._render(svg, w); svg.setAttribute('height', h); svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    const clip = svg.querySelector('clipPath rect'); if (clip){ clip.setAttribute('width', seen.has(host) || reduce ? w : 0); } };
+  host._reveal = () => { const clip = box.querySelector('clipPath rect'); if (!clip) return; const w = +box.querySelector('svg').getAttribute('width'); const t0 = performance.now();
+    const step = t => { const p = Math.min(1, (t - t0) / 1100); clip.setAttribute('width', w * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); };
+  new ResizeObserver(draw).observe(box); draw(); revealIO.observe(host);
+}
+let clipId = 0;
+function legend(host, items){
+  const L = host.querySelector('.legend'); if (!L) return; L.innerHTML = '';
+  items.forEach(it => { const s = document.createElement('span'); s.className = 'li' + (it.ours ? ' ours' : '');
+    s.innerHTML = `<i style="background:${it.color}${it.dash ? ';background:repeating-linear-gradient(90deg,' + it.color + ' 0 5px,transparent 5px 8px)' : ''}"></i>${it.name}`;
+    s.addEventListener('mouseenter', () => host.classList.add('focus') || host.querySelectorAll(`[data-s]`).forEach(e => e.classList.toggle('dim', e.dataset.s !== it.key)));
+    s.addEventListener('mouseleave', () => { host.classList.remove('focus'); host.querySelectorAll('[data-s]').forEach(e => e.classList.remove('dim')); });
+    L.appendChild(s); });
+}
+function axes(svg, W, H, o){
+  // o: {x:{min,max,log,ticks,fmt,label}, y:{...}, m:{l,r,t,b}}
+  const m = Object.assign({ l: 48, r: 14, t: 12, b: 44 }, o.m || {});
+  const tx = o.x.log ? v => Math.log10(v) : v => v, ty = o.y.log ? v => Math.log10(v) : v => v;
+  const X = v => m.l + (tx(v) - tx(o.x.min)) / (tx(o.x.max) - tx(o.x.min)) * (W - m.l - m.r);
+  const Y = v => H - m.b - (ty(v) - ty(o.y.min)) / (ty(o.y.max) - ty(o.y.min)) * (H - m.t - m.b);
+  const g = sv('g', { class: 'axes' }, svg);
+  (o.y.ticks || []).forEach(v => { sv('line', { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: 'grid' }, g);
+    sv('text', { x: m.l - 8, y: Y(v), class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle' }, g).textContent = (o.y.fmt || String)(v); });
+  (o.x.ticks || []).forEach(v => { if (!o.x.nogrid) sv('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, class: 'grid' }, g);
+    sv('text', { x: X(v), y: H - m.b + 18, class: 'tick', 'text-anchor': 'middle' }, g).textContent = (o.x.fmt || String)(v); });
+  sv('line', { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: 'axis' }, g);
+  if (o.x.label) sv('text', { x: (m.l + W - m.r) / 2, y: H - 6, class: 'alab', 'text-anchor': 'middle' }, g).textContent = o.x.label;
+  if (o.y.label) sv('text', { x: 12, y: (m.t + H - m.b) / 2, class: 'alab', 'text-anchor': 'middle', transform: `rotate(-90 12 ${(m.t + H - m.b) / 2})` }, g).textContent = o.y.label;
+  const id = 'c' + (++clipId); const cp = sv('clipPath', { id }, svg); sv('rect', { x: 0, y: 0, width: 0, height: H }, cp);
+  const plot = sv('g', { 'clip-path': `url(#${id})` }, svg);
+  return { X, Y, m, plot, W, H };
+}
+// a line chart with bands and a crosshair tooltip
+function lineChart(host, o){
+  // o: {series:[{key,name,color,dash,pts:[[x,y,sd]],ours}], x, y, h, unit, refs:[{y,label}], notes:[{x,y1,y2,text}], xcat}
+  legend(host, o.series.map(s => ({ key: s.key, name: s.name, color: s.color, dash: s.dash, ours: s.ours })));
+  mount(host, (svg, W) => {
+    const H = o.h || Math.round(Math.min(330, Math.max(240, W * 0.6)));
+    const A = axes(svg, W, H, o); const { X, Y, plot } = A;
+    (o.refs || []).forEach(r => { sv('line', { x1: A.m.l, x2: W - A.m.r, y1: Y(r.y), y2: Y(r.y), class: 'ref' }, svg);
+      sv('text', { x: A.m.l + 6, y: Y(r.y) - 6, class: 'note' }, svg).textContent = r.label; });
+    const ys = v => Math.max(o.y.min, Math.min(o.y.max, v));
+    for (const s of [...o.series].reverse()){
+      const g = sv('g', { 'data-s': s.key, class: 'series' + (s.ours ? ' ours' : '') }, plot);
+      if (s.pts[0].length > 2 && s.pts.some(p => p[2])){
+        const up = s.pts.map(p => `${X(p[0])},${Y(ys(p[1] + p[2]))}`), dn = s.pts.slice().reverse().map(p => `${X(p[0])},${Y(ys(p[1] - p[2]))}`);
+        sv('polygon', { points: up.concat(dn).join(' '), fill: s.color, opacity: s.ours ? 0.16 : 0.12 }, g); }
+      sv('polyline', { points: s.pts.map(p => `${X(p[0])},${Y(p[1])}`).join(' '), fill: 'none', stroke: s.color, 'stroke-width': s.ours ? 3 : 2,
+        'stroke-dasharray': s.dash ? '6 4' : 'none', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+      s.pts.forEach(p => sv('circle', { cx: X(p[0]), cy: Y(p[1]), r: s.ours ? 3.6 : 3, fill: s.color }, g));
+    }
+    (o.notes || []).forEach(n => { const x = X(n.x) + 12; sv('path', { d: `M${x - 5},${Y(n.y1)} H${x} V${Y(n.y2)} H${x - 5}`, class: 'bracket' }, plot);
+      sv('text', { x: x + 6, y: (Y(n.y1) + Y(n.y2)) / 2, class: 'gain', 'dominant-baseline': 'middle' }, plot).textContent = n.text; });
+    // crosshair
+    const xs = [...new Set(o.series.flatMap(s => s.pts.map(p => p[0])))].sort((a, b) => a - b);
+    const guide = sv('line', { y1: A.m.t, y2: H - A.m.b, class: 'guide', visibility: 'hidden' }, svg);
+    const dots = sv('g', {}, svg);
+    const hit = sv('rect', { x: A.m.l, y: A.m.t, width: W - A.m.l - A.m.r, height: H - A.m.t - A.m.b, fill: 'transparent' }, svg);
+    const move = e => { const r = svg.getBoundingClientRect(); const px = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      let best = xs[0]; xs.forEach(v => { if (Math.abs(X(v) - px) < Math.abs(X(best) - px)) best = v; });
+      guide.setAttribute('x1', X(best)); guide.setAttribute('x2', X(best)); guide.setAttribute('visibility', 'visible'); dots.innerHTML = '';
+      const rows = o.series.map(s => ({ s, p: s.pts.find(p => p[0] === best) })).filter(r => r.p).sort((a, b) => b.p[1] - a.p[1]);
+      rows.forEach(({ s, p }) => sv('circle', { cx: X(p[0]), cy: Y(p[1]), r: 5, fill: s.color, stroke: 'var(--surface)', 'stroke-width': 2 }, dots));
+      const xl = o.xcat ? o.xcat[best] : (o.x.tipfmt || o.x.fmt || String)(best);
+      showTip(`<b>${o.x.tipname || ''}${xl}</b>` + rows.map(({ s, p }) => `<div><i style="background:${s.color}"></i>${s.name}<span>${fmt1(p[1])}${o.unit || ''}${p[2] ? ' ± ' + fmt1(p[2]) : ''}</span></div>`).join(''),
+        e.touches ? e.touches[0].clientX : e.clientX, e.touches ? e.touches[0].clientY : e.clientY); };
+    const leave = () => { guide.setAttribute('visibility', 'hidden'); dots.innerHTML = ''; hideTip(); };
+    hit.addEventListener('mousemove', move); hit.addEventListener('mouseleave', leave);
+    hit.addEventListener('touchstart', move, { passive: true }); hit.addEventListener('touchend', leave);
+    return H;
+  });
+}
+// horizontal bars, one row per method
+function barChart(host, o){
+  // o: {rows:[{key,name,color,v,sd,ours}], x:{min,max,log,ticks,fmt,label}, ref:{v,label}, unit}
+  mount(host, (svg, W) => {
+    const rh = 30, top = o.ref ? 24 : 8, H = o.rows.length * rh + 44 + top;
+    const A = axes(svg, W, H, { x: o.x, y: { min: 0, max: 1, ticks: [] }, m: { l: o.left || 104, r: 46, t: top, b: 44 } });
+    const { X, plot } = A; const x0 = X(o.x.log ? o.x.min : 0);
+    o.rows.forEach((r, i) => { const y = A.m.t + i * rh + 5, bh = rh - 10;
+      sv('text', { x: A.m.l - 10, y: y + bh / 2, class: 'tick' + (r.ours ? ' strong' : ''), 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg).textContent = r.name;
+      const g = sv('g', { 'data-s': r.key }, plot);
+      sv('rect', { x: x0, y, width: Math.max(1, X(r.v) - x0), height: bh, rx: 3, fill: r.color }, g);
+      if (r.sd) sv('line', { x1: X(Math.max(o.x.min, r.v - r.sd)), x2: X(r.v + r.sd), y1: y + bh / 2, y2: y + bh / 2, class: 'err' }, g);
+      sv('text', { x: X(r.v + (r.sd || 0)) + 6, y: y + bh / 2, class: 'val' + (r.ours ? ' strong' : ''), 'dominant-baseline': 'middle' }, g).textContent = fmt1(r.v);
+      const hit = sv('rect', { x: A.m.l, y: y - 4, width: W - A.m.l - A.m.r, height: rh, fill: 'transparent' }, svg);
+      hit.addEventListener('mousemove', e => showTip(`<b>${r.name}</b><div>${o.x.label}<span>${fmt1(r.v)}${r.sd ? ' ± ' + fmt1(r.sd) : ''}</span></div>`, e.clientX, e.clientY));
+      hit.addEventListener('mouseleave', hideTip); });
+    if (o.ref){ sv('line', { x1: X(o.ref.v), x2: X(o.ref.v), y1: 18, y2: H - A.m.b, class: 'ref' }, svg);
+      sv('text', { x: X(o.ref.v), y: 12, class: 'note', 'text-anchor': 'middle' }, svg).textContent = o.ref.label; }
+    return H;
+  });
+}
+function scatterChart(host, o){
+  // o: {pts:[{key,name,color,x,y,xe,ye,ours,dx,dy,anchor}], x, y, band:{from,label}}
+  mount(host, (svg, W) => {
+    const H = o.h || Math.round(Math.min(340, Math.max(260, W * 0.62)));
+    const A = axes(svg, W, H, o); const { X, Y, plot } = A;
+    if (o.band){ const x = X(o.band.from); sv('rect', { x, y: A.m.t, width: W - A.m.r - x, height: H - A.m.t - A.m.b, class: 'shade' }, svg);
+      sv('text', { x: (x + W - A.m.r) / 2, y: A.m.t + 16, class: 'note', 'text-anchor': 'middle' }, svg).textContent = o.band.label; }
+    o.pts.forEach(p => { const g = sv('g', { 'data-s': p.key }, plot);
+      if (p.xe) sv('line', { x1: X(p.x - p.xe), x2: X(p.x + p.xe), y1: Y(p.y), y2: Y(p.y), class: 'err' }, g);
+      if (p.ye) sv('line', { x1: X(p.x), x2: X(p.x), y1: Y(p.y - p.ye), y2: Y(p.y + p.ye), class: 'err' }, g);
+      sv('circle', { cx: X(p.x), cy: Y(p.y), r: p.ours ? 6.5 : 5.5, fill: p.color }, g);
+      sv('text', { x: X(p.x) + (p.dx ?? 9), y: Y(p.y) + (p.dy ?? 0), class: 'plab' + (p.ours ? ' strong' : ''), 'text-anchor': p.anchor || 'start', 'dominant-baseline': 'middle' }, g).textContent = p.name;
+      const hit = sv('circle', { cx: X(p.x), cy: Y(p.y), r: 14, fill: 'transparent' }, svg);
+      hit.addEventListener('mousemove', e => showTip(`<b>${p.name}</b><div>Time per chunk<span>${fmt1(p.x)} ms</span></div><div>Success<span>${fmt1(p.y)}%</span></div>`, e.clientX, e.clientY));
+      hit.addEventListener('mouseleave', hideTip); });
+    return H;
+  });
+}
+const pct = { min: 0, max: 100, ticks: [0, 25, 50, 75, 100], label: 'Success rate (%)' };
+const C = id => document.getElementById(id);
+if (D){
+  // 01 LIBERO learning curves
+  lineChart(C('ch-libero'), { series: VM.map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet', pts: D.libero[m] })),
+    x: { min: 1, max: 100, log: true, ticks: [1, 2, 5, 10, 20, 50, 100], label: 'Training epoch (log scale)', tipname: 'Epoch ' }, y: pct, unit: '%',
+    refs: [{ y: 85, label: '85%' }] });
+  // 01 data and model size, ODE vs FM-DiT
+  { const host = C('ch-eff'); let mode = 0, ep = 0; const EPS = ['1', '10', '100'];
+    const draw = () => { const src = mode ? D.size : D.demos;
+      const cats = src['ODE-UNet'].map(r => r.x);
+      lineChart(host, { xcat: cats, series: ['ODE-UNet', 'FM-DiT'].map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet',
+          pts: src[m].map((r, i) => [i, r[EPS[ep]][0], r[EPS[ep]][1]]) })),
+        x: { min: -0.3, max: cats.length - 0.7, ticks: cats.map((_, i) => i), fmt: i => cats[i], label: mode ? 'Parameters' : 'Demonstrations per task', tipname: mode ? 'Parameters ' : 'Demos ' },
+        y: pct, unit: '%' }); };
+    const a = host.querySelector('.seg-a'), b = host.querySelector('.seg-b');
+    const mk = (S, labels, cb) => { labels.forEach((l, i) => { const x = document.createElement('button'); x.textContent = l; x.setAttribute('aria-pressed', i === 0);
+      x.onclick = () => { S.querySelectorAll('button').forEach((y, j) => y.setAttribute('aria-pressed', j === i)); cb(i); draw(); }; S.appendChild(x); }); };
+    mk(a, ['Fewer demonstrations', 'Smaller models'], i => mode = i); mk(b, ['Epoch 1', 'Epoch 10', 'Epoch 100'], i => ep = i);
+    draw(); }
+  // 01 VLA and WAM
+  const SC = (src, b, ms) => ms.map(m => ({ key: m, name: nm(m), color: COL[m], dash: m.endsWith('-R'), ours: m === 'ODE', pts: src[b + ':' + m] }));
+  const at = (src, b, m, e) => src[b + ':' + m].find(p => p[0] === e)[1];
+  lineChart(C('ch-vla'), { series: SC(D.vla, 'libero', ['ODE', 'FM', 'FM-R']).map(s => s.key === 'ODE' ? { ...s, name: 'ODE (ours), 13.7M' } : { ...s, name: s.name + ', 430M' }),
+    x: { min: 0.3, max: 3.1, ticks: [0.5, 1, 1.5, 2, 2.5, 3], label: 'Epoch', tipname: 'Epoch ' }, y: pct, unit: '%',
+    notes: [{ x: 0.5, y1: at(D.vla, 'libero', 'FM-R', 0.5), y2: at(D.vla, 'libero', 'ODE', 0.5), text: '+' + (at(D.vla, 'libero', 'ODE', 0.5) - at(D.vla, 'libero', 'FM-R', 0.5)).toFixed(1) }] });
+  lineChart(C('ch-wam'), { series: SC(D.wam, 'libero', ['ODE', 'A2A', 'FM']),
+    x: { min: 0, max: 10.4, ticks: [1, 2, 4, 6, 8, 10], label: 'Epoch', tipname: 'Epoch ' }, y: pct, unit: '%',
+    notes: [{ x: 1, y1: at(D.wam, 'libero', 'FM', 1), y2: at(D.wam, 'libero', 'ODE', 1), text: '+' + (at(D.wam, 'libero', 'ODE', 1) - at(D.wam, 'libero', 'FM', 1)).toFixed(1) }] });
+  // 01 RL small multiples
+  { const grid = C('ch-rl'); const L = grid.querySelector('.legend');
+    L.innerHTML = `<span class="li ours"><i style="background:${COL.ODE}"></i>ODE actor (ours)</span><span class="li"><i style="background:${COL.Discrete}"></i>Discrete actor</span>`;
+    const T = [['ppo', 'drawer', 'Franka open drawer'], ['ppo', 'g1', 'G1 walk'], ['ppo', 'drone', 'Quadcopter reach'], ['ppo', 'anymal', 'ANYmal-C rough walk'],
+      ['sac', 'walk', 'H1 walk'], ['sac', 'run', 'H1 run'], ['sac', 'reach', 'H1 reach']];
+    T.forEach(([alg, k, title]) => { const cell = document.createElement('div'); cell.className = 'chart mini';
+      cell.innerHTML = `<p class="ct">${title} <span>${alg === 'ppo' ? 'PPO' : 'FlashSAC'}</span></p><div class="plot"></div>`; grid.querySelector('.cells').appendChild(cell);
+      const rows = D[alg][k]; const mx = Math.max(...rows.map(r => Math.max(r[1] + r[2], r[3] + r[4])));
+      const ymax = alg === 'ppo' ? 100 : Math.ceil(mx / (mx > 1000 ? 1000 : mx > 100 ? 50 : 25)) * (mx > 1000 ? 1000 : mx > 100 ? 50 : 25);
+      const yt = alg === 'ppo' ? [0, 50, 100] : [0, ymax / 2, ymax];
+      const xmin = rows[0][0], xmax = rows[rows.length - 1][0];
+      const span = xmax - xmin, st = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50].find(v => span / v <= 4);
+      const xt = []; for (let v = Math.ceil(xmin / st) * st; v <= xmax + 1e-9; v += st) xt.push(+v.toFixed(3));
+      lineChart(cell, { h: 200, m: { l: 44, r: 10, t: 8, b: 44 }, series: [
+          { key: 'ode', name: 'ODE actor', color: COL.ODE, ours: true, pts: rows.map(r => [r[0], r[1], r[2]]) },
+          { key: 'dis', name: 'Discrete actor', color: COL.Discrete, pts: rows.map(r => [r[0], r[3], r[4]]) }],
+        x: { min: xmin, max: xmax, ticks: xt, nogrid: false, fmt: v => String(v), label: 'Control steps (M)', tipname: 'Steps (M) ', tipfmt: v => v },
+        y: { min: 0, max: ymax, ticks: yt, fmt: v => v >= 1000 ? v / 1000 + 'k' : v, label: alg === 'ppo' ? 'Success (%)' : 'Return' }, unit: alg === 'ppo' ? '%' : '' }); }); }
+  // 02 inference time vs success on LIBERO
+  { const T = D.time; const P = (k, name, o = {}) => ({ key: k, name, color: COL[k.split(' ')[0]], x: T[k][0], xe: T[k][1], y: T[k][2], ye: T[k][3], ...o });
+    scatterChart(C('ch-time'), { pts: [P('ODE-UNet Euler', 'ODE, Euler', { ours: true, dy: -14, dx: -6 }), P('ODE-UNet RK2', 'RK2', { ours: true, dy: 14, dx: -2 }), P('ODE-UNet', 'RK4', { ours: true }),
+        P('A2A-DiT', 'A2A-DiT', { dy: 14, dx: -10, anchor: 'end' }), P('FM-DiT', 'FM-DiT', { dy: -14, dx: -4, anchor: 'end' }), P('FM-UNet', 'FM-UNet', { dy: 14 }),
+        P('DDPM-DiT', 'DDPM-DiT', { anchor: 'end', dx: -10 }), P('DDPM-UNet', 'DDPM-UNet', { anchor: 'end', dx: -10 }), P('ACT', 'ACT', { dy: 0 })],
+      x: { min: 2, max: 2000, log: true, ticks: [2, 10, 100, 1000], label: 'Time per chunk of 8 actions (ms, log scale)' },
+      y: { min: 72, max: 97, ticks: [75, 80, 85, 90, 95], label: 'Success rate (%)' }, band: { from: 400, label: 'slower than 20 Hz' } }); }
+  // 02 jerk on LIBERO, epoch selectable
+  { const host = C('ch-jerk'); let ep = 1; const EP = [20, 50, 100];
+    const draw = () => { barChart(host, { rows: VM.map(m => { const r = D.jerk[m].find(p => p[0] === EP[ep]); return { key: m, name: nm(m), color: COL[m], v: r[1], ours: m === 'ODE-UNet' }; }),
+      x: { min: 0, max: 8, ticks: [0, 2, 4, 6, 8], label: 'Jerk of the executed motion (m/s³)' } }); };
+    const S = host.querySelector('.seg-b'); ['Epoch 20', 'Epoch 50', 'Epoch 100'].forEach((l, i) => { const b = document.createElement('button'); b.textContent = l; b.setAttribute('aria-pressed', i === ep);
+      b.onclick = () => { ep = i; S.querySelectorAll('button').forEach((x, j) => x.setAttribute('aria-pressed', j === i)); draw(); }; S.appendChild(b); });
+    draw(); }
+  // 02 real robot
+  { const R = D.real; const rows = key => R.order.slice().reverse().map(m => ({ key: m, name: nm(m), color: COL[m], v: R[key][m][0], sd: R[key][m][1], ours: m === 'ODE' }));
+    barChart(C('ch-r-time'), { rows: rows('time'), left: 92, x: { min: 1, max: 400, log: true, ticks: [1, 10, 100], label: 'Inference per chunk (ms)' } });
+    { const host = C('ch-r-acc'); let w = 0;
+      const draw = () => barChart(host, { rows: rows(w ? 'acc_in' : 'acc_bd'), left: 92, x: { min: 0, max: 7.5, ticks: [0, 2, 4, 6], label: 'Command acceleration (rad/s²)' }, ref: { v: R.acc_demo[w], label: 'human' } });
+      const S = document.querySelector('#ch-real .seg-acc'); ['Acceleration at chunk boundaries', 'Acceleration inside chunks'].forEach((l, i) => { const b = document.createElement('button'); b.textContent = l; b.setAttribute('aria-pressed', i === 0);
+        b.onclick = () => { w = i; S.querySelectorAll('button').forEach((x, j) => x.setAttribute('aria-pressed', j === i)); draw(); }; S.appendChild(b); });
+      draw(); }
+    barChart(C('ch-r-jerk'), { rows: rows('jerk'), left: 92, x: { min: 0, max: 26, ticks: [0, 10, 20], label: 'RMS jerk of the joints (rad/s³)' }, ref: { v: R.jerk_demo, label: 'human' } }); }
+  // 02 at scale
+  { const V = D.vla_exec;
+    barChart(C('ch-s-head'), { rows: [{ key: 'ODE', name: 'ODE (ours)', color: COL.ODE, v: V.ODE.head, ours: true }, { key: 'FM', name: 'FM', color: COL.FM, v: V.FM.head }],
+      left: 92, x: { min: 0, max: 36, ticks: [0, 10, 20, 30], label: 'π0.5 action head per chunk (ms)' } });
+    barChart(C('ch-s-bd'), { rows: [{ key: 'ODE', name: 'ODE (ours)', color: COL.ODE, v: V.ODE.cmd_bd, ours: true }, { key: 'FM', name: 'FM', color: COL.FM, v: V.FM.cmd_bd }],
+      left: 92, x: { min: 0, max: 0.25, ticks: [0, 0.1, 0.2], label: 'π0.5 command change at boundaries' } }); }
+  // 03 LIBERO-plus
+  lineChart(C('ch-plus'), { series: VM.map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE-UNet', pts: D.plus[m] })),
+    x: { min: 0.8, max: 125, log: true, ticks: [1, 10, 100], label: 'Training epoch (log scale)', tipname: 'Epoch ' }, y: { min: 0, max: 50, ticks: [0, 10, 20, 30, 40, 50], label: 'Success rate (%)' }, unit: '%' });
+  lineChart(C('ch-plus-vla'), { series: SC(D.vla, 'plus', ['ODE', 'FM', 'FM-R']).map(s => s.key === 'ODE' ? { ...s, name: 'ODE (ours), 13.7M' } : { ...s, name: s.name + ', 430M' }),
+    x: { min: 0.3, max: 3.1, ticks: [0.5, 1, 1.5, 2, 2.5, 3], label: 'Epoch', tipname: 'Epoch ' }, y: pct, unit: '%' });
+  lineChart(C('ch-plus-wam'), { series: SC(D.wam, 'plus', ['ODE', 'A2A', 'FM']),
+    x: { min: 0, max: 10.4, ticks: [1, 2, 4, 6, 8, 10], label: 'Epoch', tipname: 'Epoch ' }, y: pct, unit: '%' });
+  // 04 navigation
+  { const M = ['ODE', 'FM-DiT', 'A2A-DiT', 'MARS'];
+    const S = col => M.map(m => ({ key: m, name: nm(m), color: COL[m], ours: m === 'ODE', pts: D.nav[m].map(r => [r[0], r[col], r[col + 1]]) }));
+    lineChart(C('ch-nav-sr'), { series: S(1), x: { min: 0.8, max: 25, log: true, ticks: [1, 3, 5, 10, 20], label: 'Training epoch (log scale)', tipname: 'Epoch ' }, y: pct, unit: '%' });
+    lineChart(C('ch-nav-g'), { series: S(3), x: { min: 0.8, max: 25, log: true, ticks: [1, 3, 5, 10, 20], label: 'Training epoch (log scale)', tipname: 'Epoch ' },
+      y: { min: 0, max: 1, ticks: [0, 0.25, 0.5, 0.75, 1], label: 'Mode balance γ' } }); }
+}
+
+/* ---------- real-robot players: a click on a thumbnail plays it in the large player ---------- */
+document.querySelectorAll('.player').forEach(P => {
+  const main = P.querySelector('.main video'), lab = P.querySelector('.main .lab'), why = P.querySelector('.main .why'), spd = P.querySelector('.main .spd');
+  P.querySelectorAll('.thumb').forEach(t => t.addEventListener('click', () => {
+    P.querySelectorAll('.thumb').forEach(x => x.setAttribute('aria-pressed', x === t));
+    main.src = t.dataset.full; main.play().catch(() => {});
+    lab.textContent = t.dataset.name; lab.classList.toggle('ours', t.dataset.name.startsWith('ODE'));
+    why.textContent = t.dataset.why || ''; why.hidden = !t.dataset.why;
+    const r = main.getBoundingClientRect(); if (r.top < 60 || r.bottom > innerHeight) main.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+  }));
+});
+
+/* ---------- training: the integrated path is pulled onto the demonstration ---------- */
+{
+  const S = stage(document.getElementById('d-train'));
+  const ref = x => 0.22 * Math.sin(2 * Math.PI * 0.75 * x + 0.4);
+  const toPx = (x, y) => [S.w * (0.08 + 0.84 * x), S.h * 0.56 - y * S.h * 0.7];
+  let clock = 0;
+  function draw(dt){
+    const c = colors(), g = S.ctx; g.clearRect(0, 0, S.w, S.h); if (!reduce) clock += dt; else clock = 4;
+    const T = 5.2, ph = clock % T, it = Math.min(1, ph / 3.6);   // training progress in one cycle
+    const err = 1 - ease(it), pert = 0.16;
+    // demonstration
+    g.setLineDash([5, 5]); g.strokeStyle = hexA(c.muted, .8); g.lineWidth = 1.6; g.beginPath();
+    for (let i = 0; i <= 100; i++){ const x = i / 100; const [px, py] = toPx(x, ref(x)); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.setLineDash([]);
+    // H = 8 integrated steps from a perturbed start; early in training they drift, later they come back
+    const H = 8, pts = []; for (let k = 0; k <= H; k++){ const x = k / H; const back = Math.pow(0.62, k);
+      const y = ref(x) + pert * back + err * 0.22 * Math.sin(1.7 * x * Math.PI) * (k > 0 ? 1 : 0); pts.push([x, y]); }
+    for (let k = 1; k <= H; k++){ const [x, y] = pts[k]; const tgt = ref(x) + pert * Math.pow(0.62, k);
+      const [a, b] = toPx(x, y), [, d] = toPx(x, tgt); g.strokeStyle = hexA(c.orange, .85); g.lineWidth = 1.6; g.beginPath(); g.moveTo(a, b); g.lineTo(a, d); g.stroke();
+      g.fillStyle = hexA(c.orange, .9); g.beginPath(); g.arc(a, d, 2.6, 0, 7); g.fill(); }
+    g.strokeStyle = c.blue; g.lineWidth = 2.6; g.lineJoin = 'round'; g.beginPath(); pts.forEach(([x, y], i) => { const [px, py] = toPx(x, y); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke();
+    pts.forEach(([x, y]) => { const [px, py] = toPx(x, y); g.fillStyle = c.blue; g.beginPath(); g.arc(px, py, 3.4, 0, 7); g.fill(); });
+    // start point and its offset
+    const [sx, sy] = toPx(0, ref(0) + pert), [, ry] = toPx(0, ref(0));
+    g.strokeStyle = hexA(c.ink, .6); g.setLineDash([2, 3]); g.beginPath(); g.moveTo(sx, ry); g.lineTo(sx, sy); g.stroke(); g.setLineDash([]);
+    g.fillStyle = c.ink; g.beginPath(); g.arc(sx, sy, 5, 0, 7); g.fill();
+    g.font = '500 12px JetBrains Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = c.ink; g.fillText('δ', sx + 8, (sy + ry) / 2);
+    g.fillStyle = hexA(c.muted, .95); g.fillText(`training ${Math.round(it * 100)}%`, 14, S.h - 34);
+    g.fillStyle = c.orange; g.fillText('path error', 14, S.h - 16);
   }
   const L = loop(draw); L.start(S.el); if (reduce) draw(0);
 }
