@@ -290,9 +290,9 @@ svg [data-s].dim{opacity:.12}
 <section id="idea">
   <div class="wrap">
     <h2 class="sec">Actions should not jump either</h2>
-    <p class="lede">A discrete-time policy predicts each chunk of actions on its own, so the motion jumps where chunks meet. ODE policy learns how the action changes and integrates it over the robot's physical time, so each action follows from the previous one.</p>
+    <p class="lede">A direct-action policy predicts each chunk of actions on its own, so the motion jumps where chunks meet. ODE policy learns how the action changes and integrates it over the robot's physical time, so each action follows from the previous one.</p>
     <div class="pair">
-      <figure class="stage"><canvas id="hero-disc" aria-label="Animation of a discrete-time chunked policy, actions jump at chunk boundaries"></canvas><figcaption><b>Discrete-time policy</b> jumps at chunk boundaries</figcaption></figure>
+      <figure class="stage"><canvas id="hero-disc" aria-label="Animation of a direct-action chunked policy, actions jump at chunk boundaries"></canvas><figcaption><b>Direct-action policy</b> jumps at chunk boundaries</figcaption></figure>
       <figure class="stage"><canvas id="hero-ode" aria-label="Animation of ODE policy, chunks join without jumps"></canvas><figcaption><b class="ours">ODE policy</b> continuous by construction</figcaption></figure>
     </div>
   </div>
@@ -348,7 +348,7 @@ svg [data-s].dim{opacity:.12}
         <p class="ct">Actor in reinforcement learning</p>
         <div class="legend"></div>
         <div class="cells"></div>
-        <figcaption><b>Figure 5.</b> The ODE actor against the discrete-time actor of each task, with the critic and the algorithm unchanged. Success of PPO on Isaac Lab and return of FlashSAC on HumanoidBench, mean and std over three random seeds.</figcaption>
+        <figcaption><b>Figure 5.</b> The ODE actor against the direct-action actor of each task, with the critic and the algorithm unchanged. Success of PPO on Isaac Lab and return of FlashSAC on HumanoidBench, mean and std over three random seeds.</figcaption>
       </figure>
     </article>
 
@@ -465,12 +465,12 @@ svg [data-s].dim{opacity:.12}
         <div class="step-txt">
           <h3><span>1</span>Learn a velocity, not an action</h3>
           <p>The images and the instruction are encoded into an embedding $\mathbf z_t$, as in any policy. The network $\mathbf f_\theta$ outputs how the action should change, given the action $\mathbf a(t)$ the robot is commanded to reach and its proprioception $\mathbf s_t$. Time $t$ is the physical time of the robot.</p>
-          <p>Because the field sees the current action, each step depends on where the motion has arrived. A discrete-time policy outputs a whole chunk at once and cannot react to its own intermediate actions.</p>
+          <p>Because the field sees the current action, each step depends on where the motion has arrived. A direct-action policy outputs a whole chunk at once and cannot react to its own intermediate actions.</p>
         </div>
         <div class="eqn">$$\dot{\mathbf a}(t)=\mathbf f_\theta\big(\mathbf a(t),\,\mathbf s_t,\,\mathbf z_t\big)$$</div>
       </div>
       <figure class="anim">
-        <canvas id="fig1" aria-label="Animated figure, discrete-time policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
+        <canvas id="fig1" aria-label="Animated figure, direct-action policies emit whole chunks with jumps, ODE policy integrates a continuous path"></canvas>
       </figure>
     </article>
 
@@ -485,7 +485,7 @@ svg [data-s].dim{opacity:.12}
       <div class="cards c3">
         <article class="demo"><canvas id="d-smooth" aria-label="Consecutive chunks join into one continuous path"></canvas>
           <div class="body"><h4>Smooth</h4><p>Chunks join without jumps. The motion is one integral curve whose condition is refreshed every 8 steps.</p></div></article>
-        <article class="demo"><canvas id="d-stream" aria-label="Timeline, the discrete-time policy sends a chunk after generating it, ODE policy sends each action as soon as it is integrated"></canvas>
+        <article class="demo"><canvas id="d-stream" aria-label="Timeline, the direct-action policy sends a chunk after generating it, ODE policy sends each action as soon as it is integrated"></canvas>
           <div class="body"><h4>Streaming</h4><p>Each action is sent as soon as it is integrated. A chunk takes 5.7 ms with <i>Euler</i>, against 61 ms for FM-DiT.</p></div></article>
         <article class="demo"><canvas id="d-rate" aria-label="One trained model integrated at 20, 40 and 80 Hz"></canvas>
           <div class="body"><h4>Any control rate</h4><p>The field lives in continuous time, so one model runs at a finer rate by integrating with a smaller step.</p></div></article>
@@ -807,7 +807,7 @@ function rich(g, parts, x, y, col, size, weight = 600, family = MONO, italic = t
   }
   function panel(g, c, ox, oy, kind, prog){
     const col = kind === 'disc' ? c.teal : c.blue, y = oy + 112;
-    txt(g, kind === 'disc' ? 'Discrete-time policies' : 'ODE policy (ours)', ox + 270, oy + 20, col, 19, 700, 'center', 'Inter Tight, Segoe UI, sans-serif');
+    txt(g, kind === 'disc' ? 'Direct-action policies' : 'ODE policy (ours)', ox + 270, oy + 20, col, 19, 700, 'center', 'Inter Tight, Segoe UI, sans-serif');
     const lit = prog < 3 && prog % 1 < 0.25 ? 1 : 0;      // the encoder runs once at the start of each chunk
     inputs(g, c, ox + 38, y, kind === 'disc' ? 'o, l, s' : 'o, l');
     arrow(g, ox + 62, y, ox + 86, y, c.muted); encoder(g, c, ox + 90, y); arrow(g, ox + 172, y, ox + 192, y, c.muted);
@@ -1071,7 +1071,7 @@ const VM = ['ODE-UNet', 'A2A-DiT', 'FM-DiT', 'FM-UNet', 'DDPM-DiT', 'DDPM-UNet',
 const COL = {}; VM.forEach((m, i) => COL[m] = i ? ramp(0.72 - (i - 1) * 0.64 / (VM.length - 2)) : ramp(1));   // baselines kept apart from ours
 Object.assign(COL, { 'ODE': COL['ODE-UNet'], 'A2A': COL['A2A-DiT'], 'FM': COL['FM-DiT'], 'FM-R': COL['FM-DiT'], 'MARS': COL['DDPM-UNet'],
   'DDIM-UNet': COL['FM-UNet'], 'Discrete': ramp(0.42) });
-const NAME = { 'ODE-UNet': 'ODE (ours)', 'ODE': 'ODE (ours)', 'FM-R': 'FM, random init.', 'Discrete': 'Discrete-time actor' };
+const NAME = { 'ODE-UNet': 'ODE (ours)', 'ODE': 'ODE (ours)', 'FM-R': 'FM, random init.', 'Discrete': 'Direct-action actor' };
 const nm = m => NAME[m] || m;
 const fmt1 = v => String(Math.abs(v) >= 100 ? Math.round(v) : +v.toPrecision(3));
 
@@ -1248,7 +1248,7 @@ if (D){
     notes: [{ x: 1, y1: at(D.wam, 'libero', 'FM', 1), y2: at(D.wam, 'libero', 'ODE', 1), text: '+' + (at(D.wam, 'libero', 'ODE', 1) - at(D.wam, 'libero', 'FM', 1)).toFixed(1) }] });
   // 01 RL small multiples
   { const grid = C('ch-rl'); const L = grid.querySelector('.legend');
-    L.innerHTML = `<span class="li ours"><i style="background:${COL.ODE}"></i>ODE actor (ours)</span><span class="li"><i style="background:${COL.Discrete}"></i>Discrete-time actor</span>`;
+    L.innerHTML = `<span class="li ours"><i style="background:${COL.ODE}"></i>ODE actor (ours)</span><span class="li"><i style="background:${COL.Discrete}"></i>Direct-action actor</span>`;
     const T = [['ppo', 'drawer', 'Franka open drawer'], ['ppo', 'g1', 'G1 walk'], ['ppo', 'drone', 'Quadcopter reach'], ['ppo', 'anymal', 'ANYmal-C rough walk'],
       ['sac', 'walk', 'H1 walk'], ['sac', 'run', 'H1 run'], ['sac', 'reach', 'H1 reach']];
     T.forEach(([alg, k, title]) => { const cell = document.createElement('div'); cell.className = 'chart mini';
@@ -1261,7 +1261,7 @@ if (D){
       const xt = []; for (let v = Math.ceil(xmin / st) * st; v <= xmax + 1e-9; v += st) xt.push(+v.toFixed(3));
       lineChart(cell, { h: 220, m: { l: 50, r: 12, t: 8, b: 52 }, series: [
           { key: 'ode', name: 'ODE actor', color: COL.ODE, ours: true, pts: rows.map(r => [r[0], r[1], r[2]]) },
-          { key: 'dis', name: 'Discrete-time actor', color: COL.Discrete, pts: rows.map(r => [r[0], r[3], r[4]]) }],
+          { key: 'dis', name: 'Direct-action actor', color: COL.Discrete, pts: rows.map(r => [r[0], r[3], r[4]]) }],
         x: { min: xmin, max: xmax, ticks: xt, nogrid: false, fmt: v => String(v), label: 'Control steps (M)', tipname: 'Steps (M) ', tipfmt: v => v },
         y: { min: 0, max: ymax, ticks: yt, fmt: v => v >= 1000 ? v / 1000 + 'k' : v, label: alg === 'ppo' ? 'Success (%)' : 'Return' }, unit: alg === 'ppo' ? '%' : '' }); }); }
   // 02 inference time vs success on LIBERO
