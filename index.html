@@ -576,8 +576,10 @@ svg [data-s].dim{opacity:.12}
       <div class="mmvids">
         <figure class="clip"><video data-src="assets/video/drawer_left.mp4" muted loop playsinline preload="none" aria-label="ODE policy on the Galaxea R1 Lite, the left arm puts the apple into the drawer and the right arm closes it"></video><span class="lab ours">Left arm places</span><span class="spd">2×</span></figure>
         <figure class="clip"><video data-src="assets/video/drawer_right.mp4" muted loop playsinline preload="none" aria-label="ODE policy on the Galaxea R1 Lite, the right arm puts the apple into the drawer and the left arm closes it"></video><span class="lab ours">Right arm places</span><span class="spd">2×</span></figure>
+        <figure class="clip"><video data-src="assets/video/drawer_fm_left.mp4" muted loop playsinline preload="none" aria-label="FM-DiT on the Galaxea R1 Lite, the left arm goes for the apple but does not pick it up"></video><span class="lab">FM-DiT</span><span class="spd">2×</span><span class="why">left arm misses the apple</span></figure>
+        <figure class="clip"><video data-src="assets/video/drawer_fm_right.mp4" muted loop playsinline preload="none" aria-label="FM-DiT on the Galaxea R1 Lite, the right arm goes for the apple but does not pick it up"></video><span class="lab">FM-DiT</span><span class="spd">2×</span><span class="why">right arm misses the apple</span></figure>
       </div>
-      <p class="note">Learned from 25 demonstrations per mode. Over 20 trials, the left arm places the apple 8 times and the right arm 12 times, with <b>5/8</b> and <b>7/12</b> successes.</p>
+      <p class="note">Learned from 25 demonstrations per mode. Over 20 trials, ODE policy places the apple with the left arm 8 times and with the right arm 12 times, with <b>5/8</b> and <b>7/12</b> successes (60%). FM-DiT goes for the apple with both arms (14 and 6 times) but succeeds in none.</p>
       <div class="charts c3">
         <figure class="chart">
           <p class="ct">Rollouts of ODE policy</p>
