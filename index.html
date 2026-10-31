@@ -1602,9 +1602,12 @@ document.querySelectorAll('.player').forEach(P => {
 
 /* ---------- lightbox and copy ---------- */
 // videos load when they come near the viewport and pause when they leave it
+// download a video well before it scrolls in, but decode and play only the ones on screen (many playing at once made scrolling stutter)
+const vload = new IntersectionObserver(es => es.forEach(e => { const v = e.target;
+  if (e.isIntersecting && !v.src && v.dataset.src) { v.preload = 'auto'; v.src = v.dataset.src; vload.unobserve(v); } }), { rootMargin: '900px 0px' });
 const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target;
-  if (e.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else if (v.src) v.pause(); }), { rootMargin: '800px 0px' });  // start loading well before a video scrolls in
-document.querySelectorAll('video').forEach(v => vio.observe(v));
+  if (e.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else if (!v.paused) v.pause(); }), { threshold: 0.15 });
+document.querySelectorAll('video').forEach(v => { vload.observe(v); vio.observe(v); });
 const lb = document.getElementById('lb'), lbi = document.getElementById('lb-img');
 document.querySelectorAll('.plate img').forEach(im => im.addEventListener('click', () => { lbi.src = im.src; lbi.alt = im.alt; lb.hidden = false; }));
 lb.addEventListener('click', () => { lb.hidden = true; });
