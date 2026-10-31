@@ -130,12 +130,11 @@ nav.top.on .theme{border-color:var(--line-2);background:var(--surface);color:var
 
 /* cover: the real-robot demo fills the first screen, the video drifts slower than the page */
 .cover{position:relative;height:100vh;height:100svh;min-height:600px;max-height:1120px;overflow:hidden;background:#0b1118;color:#fff;isolation:isolate}
-.cover-v{position:absolute;left:0;right:0;top:-6%;width:100%;height:112%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:3px;background:#0b1118;animation:vin 1.6s var(--ease-out) backwards}
-.cover-v .tile{position:relative;overflow:hidden;min-height:0}
-.cover-v video{display:block;width:100%;height:100%;object-fit:cover}
-.cover-v .tile span{position:absolute;left:10px;top:9px;font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.78);text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.cover-v{position:absolute;left:0;right:0;top:-6%;width:100%;height:112%;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:8px;background:#0b1118;overflow:hidden;animation:vin 1.6s var(--ease-out) backwards}
+.cover-v .crow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}  /* sixteen tiles of one size, whole 16:9 frames (user, 2026-10-31) */
+.cover-v video{display:block;width:100%;aspect-ratio:16/9;height:auto;border-radius:6px}
 .cover .tagline{margin-top:14px;font:500 clamp(19px,2.1vw,30px)/1.2 var(--display);letter-spacing:-.02em;color:rgba(255,255,255,.9);text-shadow:0 2px 24px rgba(0,0,0,.4)}
-@media (max-width:640px){ .cover-v{grid-template-columns:repeat(2,minmax(0,1fr))} .cover-v .tile:nth-child(n+9){display:none} .cover-v .tile span{display:none} }
+@media (max-width:640px){ .cover-v .crow{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .cover-shade{position:absolute;inset:0;background:
   linear-gradient(180deg,rgba(8,14,20,.58) 0%,rgba(8,14,20,0) 24%),
   linear-gradient(180deg,rgba(8,14,20,0) 34%,rgba(8,14,20,.62) 72%,rgba(8,14,20,.9) 100%),
@@ -232,7 +231,7 @@ h4{font:600 19px/1.3 var(--display);letter-spacing:-.018em;margin:0}
 .rtasks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .rt{margin:0;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:var(--surface);display:flex;flex-direction:column}
 .rt .tv{background:#000}
-.rt video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.rt video{display:block;width:100%;height:auto}
 .rt figcaption{padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
 .rt h4{font:600 17px/1.25 var(--display);letter-spacing:-.01em;color:var(--ink)}
 .rt p{font-size:14.5px;line-height:1.45;color:var(--soft)}
@@ -430,22 +429,10 @@ svg [data-s].dim{opacity:.12}
 
 <header class="cover" id="top">
   <div class="cover-v" role="img" aria-label="Sixteen autonomous rollouts of ODE policy on a single-arm robot, a dual-arm robot, dexterous hands, and humanoids">
-    <div class="tile"><video src="assets/video/cover/box.mp4" poster="assets/video/cover/box.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Box packing</span></div>
-    <div class="tile"><video src="assets/video/cover/microwave.mp4" poster="assets/video/cover/microwave.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Bimanual microwave</span></div>
-    <div class="tile"><video src="assets/video/cover/cup.mp4" poster="assets/video/cover/cup.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Cup reorientation</span></div>
-    <div class="tile"><video src="assets/video/cover/drawer.mp4" poster="assets/video/cover/drawer.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Drawer, left arm</span></div>
-    <div class="tile"><video src="assets/video/cover/pills.mp4" poster="assets/video/cover/pills.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Pill pouring</span></div>
-    <div class="tile"><video src="assets/video/cover/toy.mp4" poster="assets/video/cover/toy.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Toy to sofa</span></div>
-    <div class="tile"><video src="assets/video/cover/flower.mp4" poster="assets/video/cover/flower.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Flower into a vase</span></div>
-    <div class="tile"><video src="assets/video/cover/key.mp4" poster="assets/video/cover/key.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Key hanging</span></div>
-    <div class="tile"><video src="assets/video/cover/flowers.mp4" poster="assets/video/cover/flowers.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Two flowers</span></div>
-    <div class="tile"><video src="assets/video/cover/sock.mp4" poster="assets/video/cover/sock.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Sock folding</span></div>
-    <div class="tile"><video src="assets/video/cover/loco.mp4" poster="assets/video/cover/loco.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Motion tracking, RL</span></div>
-    <div class="tile"><video src="assets/video/cover/cube.mp4" poster="assets/video/cover/cube.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Cube stacking</span></div>
-    <div class="tile"><video src="assets/video/cover/insert.mp4" poster="assets/video/cover/insert.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Block insertion</span></div>
-    <div class="tile"><video src="assets/video/cover/can.mp4" poster="assets/video/cover/can.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Can to plate</span></div>
-    <div class="tile"><video src="assets/video/cover/drawer2.mp4" poster="assets/video/cover/drawer2.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Drawer, right arm</span></div>
-    <div class="tile"><video src="assets/video/cover/hmw.mp4" poster="assets/video/cover/hmw.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video><span>Humanoid microwave</span></div>
+    <div class="crow"><div class="tile"><video src="assets/video/cover/box.mp4" poster="assets/video/cover/box.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/microwave.mp4" poster="assets/video/cover/microwave.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/cup.mp4" poster="assets/video/cover/cup.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/drawer.mp4" poster="assets/video/cover/drawer.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div></div>
+    <div class="crow"><div class="tile"><video src="assets/video/cover/pills.mp4" poster="assets/video/cover/pills.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/toy.mp4" poster="assets/video/cover/toy.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/flower.mp4" poster="assets/video/cover/flower.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/key.mp4" poster="assets/video/cover/key.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div></div>
+    <div class="crow"><div class="tile"><video src="assets/video/cover/flowers.mp4" poster="assets/video/cover/flowers.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/sock.mp4" poster="assets/video/cover/sock.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/loco.mp4" poster="assets/video/cover/loco.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/cube.mp4" poster="assets/video/cover/cube.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div></div>
+    <div class="crow"><div class="tile"><video src="assets/video/cover/insert.mp4" poster="assets/video/cover/insert.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/can.mp4" poster="assets/video/cover/can.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/drawer2.mp4" poster="assets/video/cover/drawer2.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div><div class="tile"><video src="assets/video/cover/hmw.mp4" poster="assets/video/cover/hmw.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div></div>
   </div>
   <div class="cover-shade"></div>
   <div class="wrap cover-in">
@@ -1603,7 +1590,7 @@ document.querySelectorAll('.player').forEach(P => {
 /* ---------- lightbox and copy ---------- */
 // videos load when they come near the viewport and pause when they leave it
 const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target;
-  if (e.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else if (v.src) v.pause(); }), { rootMargin: '200px' });
+  if (e.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else if (v.src) v.pause(); }), { rootMargin: '800px 0px' });  // start loading well before a video scrolls in
 document.querySelectorAll('video').forEach(v => vio.observe(v));
 const lb = document.getElementById('lb'), lbi = document.getElementById('lb-img');
 document.querySelectorAll('.plate img').forEach(im => im.addEventListener('click', () => { lbi.src = im.src; lbi.alt = im.alt; lb.hidden = false; }));
