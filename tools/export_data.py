@@ -57,8 +57,22 @@ out['wam'] = {k: sorted(v) for k, v in d.items()}
 # RL, SuperMimic on the 40 LAFAN1 clips with a G1 humanoid, over wall-clock hours (three random seeds)
 tr = read('rl_supermimic_training_return_3way.csv')
 out['rl_train'] = {m: [[num(r['hours']), num(r[m + '_mean']), num(r[m + '_std'])] for r in tr[::6]] for m in ('ode', 'mlp', 'ppo')}
+def _interp(x, xs, ys):
+    for (x0, y0), (x1, y1) in zip(zip(xs, ys), zip(xs[1:], ys[1:])):
+        if x0 <= x <= x1:
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    return ys[0] if x < xs[0] else ys[-1]
+
+
+def _gain(o, m):  # gain of the ODE actor over the direct-action actor in %, as in Fig. rl of the paper
+    xs, ys = [r[0] for r in m], [r[1] for r in m]
+    return [[r[0], round(100 * (r[1] - _interp(r[0], xs, ys)) / _interp(r[0], xs, ys), 2)] for r in o]
+
+
 out['rl_eval'] = {m: [[num(r['hours_mean']), num(r['full_return_mean']), num(r['full_return_std']), num(r['action_acc_mean']) * 1000,
                        num(r['action_acc_std']) * 1000] for r in read(f'rl_supermimic_eval_hours_{m}.csv')] for m in ('ode', 'mlp', 'ppo')}
+out['rl_gain_train'] = _gain([[num(r['hours']), float(r['ode_mean'])] for r in tr[::3]], [[num(r['hours']), float(r['mlp_mean'])] for r in tr[::3]])
+out['rl_gain_eval'] = _gain(out['rl_eval']['ode'], out['rl_eval']['mlp'])
 
 # inference time vs. success on LIBERO, smoothness over epochs
 out['time'] = {r['method']: [num(r['ms_call']), num(r['ms_call_std']), num(r['sr']), num(r['sr_sd'])] for r in read('e_time.csv')}
